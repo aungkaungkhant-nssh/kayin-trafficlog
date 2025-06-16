@@ -1,0 +1,37 @@
+import { getDatabase } from "./db";
+
+
+export async function seedUser() {
+    const name = process.env.EXPO_PUBLIC_SEED_USER;
+    const password = process.env.EXPO_PUBLIC_SEED_PASSWORD;
+    try {
+        const database = await getDatabase();
+        await database.execAsync(`
+            PRAGMA journal_mode = WAL;
+            CREATE TABLE IF NOT EXISTS 
+            officers (
+                        id INTEGER PRIMARY KEY NOT NULL,  
+                        name TEXT NOT NULL,
+                        password TEXT NOT NULL,
+                        created_at TEXT,
+                        updated_at TEXT
+                    );
+            INSERT INTO officers (name, password) VALUES ('${name}','${password}');
+            `);
+        console.log("Ok")
+    } catch (err) {
+        console.log(err)
+    }
+
+}
+
+
+export async function getSeedUser() {
+    try {
+        const database = await getDatabase();
+        const result = await database.getAllAsync("SELECT * FROM officers");
+        return result
+    } catch (error) {
+        console.log(error)
+    }
+}
