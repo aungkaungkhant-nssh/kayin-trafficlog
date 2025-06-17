@@ -1,9 +1,8 @@
-import AppButton from '@/ui/AppButton'
-import { Image } from 'expo-image'
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { TextInput } from 'react-native-paper'
-
+import AppButton from '@/ui/AppButton';
+import AppTextInput from '@/ui/AppTextInput';
+import { Image } from 'expo-image';
+import React from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 const Login = () => {
     return (
         <View style={styles.container}>
@@ -14,22 +13,20 @@ const Login = () => {
                 />
                 <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)</Text>
                 <View style={styles.inputWrapper}>
-                    <TextInput
+                    <AppTextInput
                         label="အမည်"
                         value={"hello"}
                         onChangeText={() => console.log("hi")}
                         theme={{
                         }}
-                        style={{ backgroundColor: '#CCCCFF' }}
                     />
                 </View>
                 <View style={styles.inputWrapper}>
-                    <TextInput
+                    <AppTextInput
                         label="စကားဝှက်"
-                        secureTextEntry
-                        value={"hello"}
-                        onChangeText={() => console.log("hi")}
-                        style={{ backgroundColor: '#CCCCFF' }}
+                        isPassword
+                        value={"a"}
+                        onChangeText={() => console.log("hello")}
                     />
                 </View>
                 <View>
