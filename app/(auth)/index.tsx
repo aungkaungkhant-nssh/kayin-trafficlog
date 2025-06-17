@@ -1,9 +1,28 @@
-import AppButton from '@/ui/AppButton';
-import AppTextInput from '@/ui/AppTextInput';
-import { Image } from 'expo-image';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
+import AppButton from "@/ui/AppButton";
+import AppTextInput from "@/ui/AppTextInput";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Image } from "expo-image";
+import React from "react";
+import { Controller, useForm } from "react-hook-form";
+import { StyleSheet, Text, View } from "react-native";
+
 const Login = () => {
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+    } = useForm<LoginSchemaType>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            name: '',
+            password: '',
+        }
+    });
+
+    const onSubmit = (data: LoginSchemaType) => {
+        console.log("Form Data:", data);
+    };
     return (
         <View style={styles.container}>
             <View style={styles.innerContainer}>
@@ -12,27 +31,48 @@ const Login = () => {
                     style={styles.image}
                 />
                 <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)</Text>
+
+                {/* Name input */}
                 <View style={styles.inputWrapper}>
-                    <AppTextInput
-                        label="အမည်"
-                        value={"hello"}
-                        onChangeText={() => console.log("hi")}
-                        theme={{
-                        }}
+                    <Controller
+                        control={control}
+                        name="name"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="အမည်"
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
                     />
+                    {errors.name && (
+                        <Text style={styles.errorText}>{errors.name.message}</Text>
+                    )}
                 </View>
+
+                {/* Password input */}
                 <View style={styles.inputWrapper}>
-                    <AppTextInput
-                        label="စကားဝှက်"
-                        isPassword
-                        value={"a"}
-                        onChangeText={() => console.log("hello")}
+                    <Controller
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="စကားဝှက်"
+                                isPassword
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
                     />
+                    {errors.password && (
+                        <Text style={styles.errorText}>{errors.password.message}</Text>
+                    )}
                 </View>
+
                 <View>
                     <AppButton
                         label='အကောင့်ဝင်ရန်'
-                        onPress={(() => console.log("hello"))}
+                        onPress={handleSubmit(onSubmit)}
                     />
                 </View>
             </View>
@@ -66,6 +106,11 @@ const styles = StyleSheet.create({
     inputWrapper: {
         marginBottom: 15,
     },
+    errorText: {
+        color: "red",
+        marginTop: 4,
+    },
 })
 
-export default Login
+export default Login;
+
