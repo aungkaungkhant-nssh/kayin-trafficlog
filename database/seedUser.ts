@@ -35,3 +35,13 @@ export async function getSeedUser() {
         console.log(error)
     }
 }
+
+export async function deleteUser(id: number) {
+    try {
+        const database = await getDatabase();
+        const result = await database.runAsync("DELETE FROM officers WHERE id = $id", { $id: id });
+        return result;
+    } catch (error) {
+        console.log(error);
+    }
+}
