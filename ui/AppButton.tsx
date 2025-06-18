@@ -6,7 +6,8 @@ interface AppButtonProps {
   onPress: () => void
   label: string
   icon?: string
-  disabled?: boolean
+  disabled?: boolean;
+  loading?: boolean;
 }
 
 const AppButton: React.FC<AppButtonProps> = ({
@@ -14,6 +15,7 @@ const AppButton: React.FC<AppButtonProps> = ({
   label,
   icon,
   disabled = false,
+  loading = false
 }) => {
   return (
     <Button
@@ -24,6 +26,7 @@ const AppButton: React.FC<AppButtonProps> = ({
       style={styles.button}
       labelStyle={styles.label}
       contentStyle={styles.content}
+      loading={loading}
     >
       {label}
     </Button>

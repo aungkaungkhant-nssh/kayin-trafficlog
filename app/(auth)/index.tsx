@@ -4,15 +4,18 @@ import AppButton from "@/ui/AppButton";
 import AppTextInput from "@/ui/AppTextInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
+import { useRouter } from 'expo-router';
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
-
 const Login = () => {
+    const router = useRouter();
     const {
         control,
         handleSubmit,
-        formState: { errors },
+        setError,
+        clearErrors,
+        formState: { errors, isSubmitting },
     } = useForm<LoginSchemaType>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
@@ -23,7 +26,17 @@ const Login = () => {
 
     const onSubmit = async (data: LoginSchemaType) => {
         const res = await loginUser(data);
-        console.log(res)
+        if (!res.success) {
+            // Set a form-level error using a custom "root" key
+            setError("root", {
+                type: "manual",
+                message: res.error,
+            });
+            return;
+        }
+        clearErrors("root");
+        router.replace('/(tabs)');
+
     };
     return (
         <KeyboardAvoidingView
@@ -37,7 +50,11 @@ const Login = () => {
                         style={styles.image}
                     />
                     <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)</Text>
-
+                    {errors.root && (
+                        <Text style={{ ...styles.errorText, marginVertical: 10 }}>
+                            {errors.root.message}
+                        </Text>
+                    )}
                     {/* Name input */}
                     <View style={styles.inputWrapper}>
                         <Controller
@@ -79,11 +96,11 @@ const Login = () => {
                         <AppButton
                             label='အကောင့်ဝင်ရန်'
                             onPress={handleSubmit(onSubmit)}
+                            loading={isSubmitting}
                         />
                     </View>
                 </View>
             </View>
-
         </KeyboardAvoidingView>
 
     )

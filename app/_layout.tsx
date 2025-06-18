@@ -1,4 +1,3 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
 import useLoadSession from '@/hooks/useLoadSession';
 import AppNavigator from '@/navigator/AppNavigator';
 import AuthNavigator from '@/navigator/AuthNavigator';
@@ -11,7 +10,6 @@ import {
 import 'react-native-reanimated';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
   const { officer, loading } = useLoadSession();
 
   const [fontsLoaded] = useFonts({
