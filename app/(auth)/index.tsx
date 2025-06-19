@@ -1,7 +1,7 @@
+import AppButton from "@/components/ui/AppButton";
+import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/auth";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
-import AppButton from "@/ui/AppButton";
-import AppTextInput from "@/ui/AppTextInput";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { useRouter } from 'expo-router';
