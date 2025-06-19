@@ -24,7 +24,7 @@ export default function TabLayout() {
     }
   };
   return (
-    <PaperProvider>
+    <PaperProvider theme={theme}>
       <AlertModal
         visible={logoutVisible}
         onCancel={() => setLogoutVisible(false)}
@@ -32,8 +32,17 @@ export default function TabLayout() {
       />
       <Tabs
         screenOptions={{
+
+          headerStyle: {
+            backgroundColor: '#000080'
+          },
+          headerTintColor: '#fff',
+          headerTitleStyle: {
+            fontSize: 15,
+          },
+          headerTitleAlign: 'center',
           tabBarActiveTintColor: theme.colors.primary,
-          headerShown: false,
+          headerShown: true,
           tabBarButton: HapticTab,
           tabBarBackground: TabBarBackground,
           tabBarStyle: Platform.select({
@@ -46,7 +55,8 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Home',
+            title: 'ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)',
+            tabBarLabel: 'ပင်မစာမျက်နှာ',
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           }}
         />

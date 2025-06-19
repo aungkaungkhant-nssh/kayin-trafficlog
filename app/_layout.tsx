@@ -1,7 +1,6 @@
 import useLoadSession from '@/hooks/useLoadSession';
-import AppNavigator from '@/navigator/AppNavigator';
-import AuthNavigator from '@/navigator/AuthNavigator';
 import { useFonts } from 'expo-font';
+import { Stack } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import {
   DefaultTheme,
@@ -28,19 +27,32 @@ export default function RootLayout() {
     colors: {
       ...DefaultTheme.colors,
       primary: '#000080',
-      error: ""
     },
   };
-
   return (
     <PaperProvider theme={customTheme}>
-      {
-        !officer ? (
-          <AuthNavigator />
-        ) : (
-          <AppNavigator />
-        )
-      }
-    </PaperProvider>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          headerShadowVisible: false,
+          headerStyle: {
+            backgroundColor: '#000080',
+          },
+        }}
+      >
+        {
+          !officer ? (
+            <Stack.Screen
+              name="(auth)"
+            />
+          ) : (
+            <Stack.Screen
+              name="(tabs)"
+            ></Stack.Screen>
+          )
+        }
+
+      </Stack>
+    </PaperProvider >
   );
 }

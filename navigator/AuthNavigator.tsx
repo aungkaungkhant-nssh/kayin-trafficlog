@@ -13,7 +13,7 @@ const AuthNavigator = () => {
                     },
                     headerTintColor: '#fff',
                     headerTitleStyle: {
-                        fontSize: 15,  // smaller font size
+                        fontSize: 15,
                     },
                     headerTitleAlign: 'center',
                 }}

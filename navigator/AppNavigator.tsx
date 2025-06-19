@@ -4,7 +4,10 @@ import React from 'react'
 const AppNavigator = () => {
     return (
         <Stack>
-            <Stack.Screen name="(tabs)"></Stack.Screen>
+            <Stack.Screen
+                name="(tabs)"
+                options={{ headerShown: false }}
+            ></Stack.Screen>
         </Stack>
     )
 }
