@@ -1,9 +1,5 @@
-import React from 'react'
+import { View } from 'react-native';
 
-const logout = () => {
-    return (
-        <div>logout</div>
-    )
+export default function LogoutScreen() {
+    return <View />;
 }
-
-export default logout

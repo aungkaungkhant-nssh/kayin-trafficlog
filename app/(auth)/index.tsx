@@ -1,4 +1,4 @@
-import { loginUser } from "@/database/loginUser";
+import { loginOfficer } from "@/database/auth";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import AppButton from "@/ui/AppButton";
 import AppTextInput from "@/ui/AppTextInput";
@@ -25,9 +25,14 @@ const Login = () => {
     });
 
     const onSubmit = async (data: LoginSchemaType) => {
-        const res = await loginUser(data);
+        const trimmedData = {
+            name: data.name.trim(),
+            password: data.password.trim(),
+        };
+
+        const res = await loginOfficer(trimmedData);
+
         if (!res.success) {
-            // Set a form-level error using a custom "root" key
             setError("root", {
                 type: "manual",
                 message: res.error,

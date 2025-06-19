@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { getDatabase } from "./db";
 
-export async function loginUser({ name, password }: { name: string, password: string }) {
+export async function loginOfficer({ name, password }: { name: string, password: string }) {
     try {
         const database = await getDatabase();
         const result = await database.getFirstAsync(
@@ -15,6 +15,17 @@ export async function loginUser({ name, password }: { name: string, password: st
         return { success: true, user: result };
     } catch (err: any) {
         console.log(err);
+        return { success: false, error: err.message };
+    }
+}
+
+
+export async function logoutOfficer() {
+    try {
+        await SecureStore.deleteItemAsync('officerSession');
+        return { success: true };
+    } catch (err: any) {
+        console.log('Logout error:', err);
         return { success: false, error: err.message };
     }
 }
