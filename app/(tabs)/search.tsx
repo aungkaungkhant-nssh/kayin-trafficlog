@@ -69,11 +69,28 @@ const Search = () => {
                                 name="name"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
-                                        label="၁/"
-                                        value='၁/'
-                                        setValue={() => console.log("hello")}
+                                        selectedValue='၁/'
+                                        onValueChange={() => console.log("hello")}
                                         options={typeOptions}
-                                        width={100}
+                                        placeholder='၁/'
+                                    />
+                                )}
+                            />
+                            {/* {errors.name && (
+                                <Text style={styles.errorText}>{errors.name.message}</Text>
+                                )} */}
+                        </View>
+
+                        <View>
+                            <Controller
+                                control={control}
+                                name="name"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppDropdown
+                                        selectedValue='၁/'
+                                        onValueChange={() => console.log("hello")}
+                                        options={typeOptions}
+                                        placeholder='၁/'
                                     />
                                 )}
                             />
@@ -87,11 +104,10 @@ const Search = () => {
                                 name="name"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
-                                        label="၁/"
-                                        value='၁/'
-                                        setValue={() => console.log("hello")}
+                                        selectedValue='၁/'
+                                        onValueChange={() => console.log("hello")}
                                         options={typeOptions}
-                                        width={100}
+                                        placeholder='၁/'
                                     />
                                 )}
                             />
@@ -99,23 +115,22 @@ const Search = () => {
                                 <Text style={styles.errorText}>{errors.name.message}</Text>
                                 )} */}
                         </View>
-                        <View>
+                        <View >
                             <Controller
                                 control={control}
                                 name="name"
                                 render={({ field: { onChange, value } }) => (
-                                    <AppDropdown
-                                        label="၁/"
-                                        value='၁/'
-                                        setValue={() => console.log("hello")}
-                                        options={typeOptions}
-                                        width={100}
+                                    <AppTextInput
+                                        value={value}
+                                        onChangeText={onChange}
+                                        style={{ height: 50 }}
+                                        placeholder='22222222'
                                     />
                                 )}
                             />
                             {/* {errors.name && (
-                                <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                        <Text style={styles.errorText}>{errors.name.message}</Text>
+                    )} */}
                         </View>
                     </View>
                 </View>
@@ -221,6 +236,7 @@ const styles = StyleSheet.create({
     dropDownContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 4
+        gap: 4,
+        flexWrap: 'wrap',
     }
 });

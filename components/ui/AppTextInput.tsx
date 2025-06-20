@@ -58,7 +58,7 @@ function AppTextInput({
 
 const styles = StyleSheet.create({
     input: {
-        backgroundColor: '#CCCCFF',
+        backgroundColor: '#f2f2f2',
     },
 });
 
