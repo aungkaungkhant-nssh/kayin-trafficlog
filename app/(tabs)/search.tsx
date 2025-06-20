@@ -1,31 +1,56 @@
+import nrcData from '@/assets/NRC_DATA.json'; // Assuming you have a JSON file with NRC data
 import AppButton from '@/components/ui/AppButton';
 import AppDropdown from '@/components/ui/AppDropDown';
 import AppTextInput from '@/components/ui/AppTextInput';
-import { loginSchema, LoginSchemaType } from '@/schema/login.schema';
+import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, StyleSheet, View } from 'react-native';
-
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 const Search = () => {
     const {
+        watch,
         control,
         handleSubmit,
         setError,
         clearErrors,
         formState: { errors, isSubmitting },
-    } = useForm<LoginSchemaType>({
-        resolver: zodResolver(loginSchema),
+    } = useForm<SearchSchemaType>({
+        resolver: zodResolver(searchSchema),
         defaultValues: {
             name: '',
-            password: '',
+            fatherName: '',
+            nrcState: '3',
+            nrcTownShip: '',
+            nrcType: '',
+            vehicleNumber: '',
         }
     });
+    const nrcStateValue = watch('nrcState') || '3';
 
-    const typeOptions = [
-        { label: '၁/', value: '1' },
-        { label: '၂/', value: '2' },
-    ];
+    const filteredTownShips = useMemo(() => {
+        if (!nrcStateValue) return []; // no state selected => empty list
+        return nrcData.nrcTownships
+            .filter((township) => township.stateCode === nrcStateValue)
+            .map((township) => ({
+                value: township.short.mm,
+                label: township.short.mm,
+            }));
+    }, [nrcStateValue])
+
+    const nrcNumbers = nrcData.nrcStates.map((state) => ({
+        value: state.number.en,
+        label: state.number.mm,
+    }));
+
+
+
+    const nrcTypes = nrcData.nrcTypes.map((nrcType) => ({
+        value: nrcType.name.mm,
+        label: nrcType.name.mm
+    }));
+
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.card}>
@@ -62,16 +87,17 @@ const Search = () => {
                     )} */}
                 </View>
                 <View style={styles.inputWrapper}>
+                    <Text style={{ color: "#333", marginBottom: 5 }}>မှတ်ပုံတင်အမှတ်</Text>
                     <View style={styles.dropDownContainer}>
                         <View>
                             <Controller
                                 control={control}
-                                name="name"
+                                name="nrcState"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
-                                        selectedValue='၁/'
-                                        onValueChange={() => console.log("hello")}
-                                        options={typeOptions}
+                                        selectedValue={value}
+                                        onValueChange={onChange}
+                                        options={nrcNumbers}
                                         placeholder='၁/'
                                     />
                                 )}
@@ -84,12 +110,12 @@ const Search = () => {
                         <View>
                             <Controller
                                 control={control}
-                                name="name"
+                                name="nrcTownShip"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
                                         selectedValue='၁/'
                                         onValueChange={() => console.log("hello")}
-                                        options={typeOptions}
+                                        options={filteredTownShips}
                                         placeholder='၁/'
                                     />
                                 )}
@@ -101,12 +127,12 @@ const Search = () => {
                         <View>
                             <Controller
                                 control={control}
-                                name="name"
+                                name="nrcType"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
                                         selectedValue='၁/'
                                         onValueChange={() => console.log("hello")}
-                                        options={typeOptions}
+                                        options={nrcTypes}
                                         placeholder='၁/'
                                     />
                                 )}
@@ -133,55 +159,6 @@ const Search = () => {
                     )} */}
                         </View>
                     </View>
-                </View>
-
-                <View style={styles.inputWrapper}>
-                    <Controller
-                        control={control}
-                        name="name"
-                        render={({ field: { onChange, value } }) => (
-                            <AppTextInput
-                                label="ယာဉ်နံပါတ်"
-                                value={value}
-                                onChangeText={onChange}
-                            />
-                        )}
-                    />
-                    {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
-                </View>
-                <View style={styles.inputWrapper}>
-                    <Controller
-                        control={control}
-                        name="name"
-                        render={({ field: { onChange, value } }) => (
-                            <AppTextInput
-                                label="ယာဉ်လိုင်စင်"
-                                value={value}
-                                onChangeText={onChange}
-                            />
-                        )}
-                    />
-                    {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
-                </View>
-                <View style={styles.inputWrapper}>
-                    <Controller
-                        control={control}
-                        name="name"
-                        render={({ field: { onChange, value } }) => (
-                            <AppTextInput
-                                label="ယာဉ်မောင်းလိုင်စင်"
-                                value={value}
-                                onChangeText={onChange}
-                            />
-                        )}
-                    />
-                    {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
                 </View>
 
 
