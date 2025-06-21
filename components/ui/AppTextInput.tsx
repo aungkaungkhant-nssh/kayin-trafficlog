@@ -5,6 +5,7 @@ import { TextInput, TextInputProps } from 'react-native-paper';
 interface AppTextInputProps extends TextInputProps {
     isPassword?: boolean;
     rightIconName?: string;
+    keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
     onRightIconPress?: () => void;
     leftIconName?: string;
     onLeftIconPress?: () => void;
@@ -18,6 +19,7 @@ function AppTextInput({
     leftIconName,
     onLeftIconPress,
     style,
+    keyboardType = 'default',
     ...rest
 }: AppTextInputProps) {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
@@ -47,10 +49,12 @@ function AppTextInput({
     return (
         <TextInput
             mode="flat"
+
             secureTextEntry={isPassword && !isPasswordVisible}
             style={[styles.input, style]}
             left={renderLeftIcon()}
             right={renderRightIcon()}
+            keyboardType={keyboardType}
             {...rest}
         />
     );

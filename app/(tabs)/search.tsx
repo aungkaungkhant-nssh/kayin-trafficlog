@@ -3,6 +3,7 @@ import AppButton from '@/components/ui/AppButton';
 import AppDropdown from '@/components/ui/AppDropDown';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
+import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -21,29 +22,38 @@ const Search = () => {
             name: '',
             fatherName: '',
             nrcState: '3',
-            nrcTownShip: '',
-            nrcType: '',
+            nrcTownShip: 'ဘအန',
+            nrcType: 'နိုင်',
+            nrcNumber: "222222",
             vehicleNumber: '',
+            vehicleLicense: '',
+
         }
     });
     const nrcStateValue = watch('nrcState') || '3';
 
     const filteredTownShips = useMemo(() => {
-        if (!nrcStateValue) return []; // no state selected => empty list
+        if (!nrcStateValue) return [];
+
+        const seen = new Set<string>();
+
         return nrcData.nrcTownships
             .filter((township) => township.stateCode === nrcStateValue)
             .map((township) => ({
-                value: township.short.mm,
+                value: `${township.short.mm}`,
                 label: township.short.mm,
-            }));
-    }, [nrcStateValue])
+            }))
+            .filter((item) => {
+                if (seen.has(item.value)) return false;
+                seen.add(item.value);
+                return true;
+            });
+    }, [nrcStateValue]);
 
     const nrcNumbers = nrcData.nrcStates.map((state) => ({
         value: state.number.en,
-        label: state.number.mm,
+        label: `${state.number.mm} /`,
     }));
-
-
 
     const nrcTypes = nrcData.nrcTypes.map((nrcType) => ({
         value: nrcType.name.mm,
@@ -51,9 +61,20 @@ const Search = () => {
     }));
 
 
+    const onSubmit = (data: SearchSchemaType) => {
+        console.log(data);
+        // Handle form submission logic here
+    }
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <View style={styles.card}>
+                <View style={styles.noticeWrapper}>
+                    <MaterialIcons name="info" size={16} color="#d9534f" style={styles.icon} />
+                    <Text style={styles.noticeText}>
+                        အမည် သို့မဟုတ် အဘ အမည်စသည့် အချက်အလက်တစ်ခုတည်းဖြင့်လည်း ရှာဖွေနိုင်ပါသည်။
+                    </Text>
+                </View>
+
                 <View style={styles.inputWrapper}>
                     <Controller
                         control={control}
@@ -73,7 +94,7 @@ const Search = () => {
                 <View style={styles.inputWrapper}>
                     <Controller
                         control={control}
-                        name="name"
+                        name="fatherName"
                         render={({ field: { onChange, value } }) => (
                             <AppTextInput
                                 label="အဘမည်"
@@ -113,10 +134,10 @@ const Search = () => {
                                 name="nrcTownShip"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
-                                        selectedValue='၁/'
-                                        onValueChange={() => console.log("hello")}
+                                        selectedValue={value}
+                                        onValueChange={onChange}
                                         options={filteredTownShips}
-                                        placeholder='၁/'
+                                        placeholder={filteredTownShips[0]?.label}
                                     />
                                 )}
                             />
@@ -130,10 +151,10 @@ const Search = () => {
                                 name="nrcType"
                                 render={({ field: { onChange, value } }) => (
                                     <AppDropdown
-                                        selectedValue='၁/'
-                                        onValueChange={() => console.log("hello")}
+                                        selectedValue={value}
+                                        onValueChange={onChange}
                                         options={nrcTypes}
-                                        placeholder='၁/'
+                                        placeholder={nrcTypes[0]?.label}
                                     />
                                 )}
                             />
@@ -144,13 +165,14 @@ const Search = () => {
                         <View >
                             <Controller
                                 control={control}
-                                name="name"
+                                name="nrcNumber"
                                 render={({ field: { onChange, value } }) => (
                                     <AppTextInput
                                         value={value}
                                         onChangeText={onChange}
                                         style={{ height: 50 }}
-                                        placeholder='22222222'
+                                        placeholder=''
+                                        keyboardType='numeric'
                                     />
                                 )}
                             />
@@ -161,11 +183,44 @@ const Search = () => {
                     </View>
                 </View>
 
+                <View style={styles.inputWrapper}>
+                    <Controller
+                        control={control}
+                        name="vehicleNumber"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="ယာဉ်နံပါတ်"
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
+                    {/* {errors.name && (
+                        <Text style={styles.errorText}>{errors.name.message}</Text>
+                    )} */}
+                </View>
+
+                <View style={styles.inputWrapper}>
+                    <Controller
+                        control={control}
+                        name="vehicleLicense"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="ယာဉ်လိုင်စင်"
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
+                    {/* {errors.name && (
+                              <Text style={styles.errorText}>{errors.name.message}</Text>
+                          )} */}
+                </View>
 
                 <View>
                     <AppButton
                         label='ရှာမည်'
-                        onPress={() => console.log("hello")}
+                        onPress={handleSubmit(onSubmit)}
                         loading={isSubmitting}
                     />
                 </View>
@@ -197,9 +252,10 @@ const styles = StyleSheet.create({
         elevation: 5, // Android shadow
     },
     title: {
-        fontSize: 18,
+        fontSize: 14,
         fontWeight: '600',
         marginBottom: 12,
+        color: "red"
     },
     input: {
         borderWidth: 1,
@@ -215,5 +271,22 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 4,
         flexWrap: 'wrap',
-    }
+    },
+    noticeWrapper: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        marginBottom: 18,
+    },
+    icon: {
+        marginRight: 6,
+        marginTop: 2,
+    },
+    noticeText: {
+        flex: 1,
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#d9534f',
+        lineHeight: 18,
+        textAlign: 'justify',
+    },
 });

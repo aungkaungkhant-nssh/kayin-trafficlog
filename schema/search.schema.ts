@@ -6,7 +6,9 @@ export const searchSchema = z.object({
     nrcState: z.string(),
     nrcTownShip: z.string(),
     nrcType: z.string(),
-    vehicleNumber: z.string()
+    nrcNumber: z.string(),
+    vehicleNumber: z.string(),
+    vehicleLicense: z.string().optional(),
 });
 
 export type SearchSchemaType = z.infer<typeof searchSchema>;

@@ -125,14 +125,6 @@
         "stateCode": "1"
       },
       {
-        "id": "_XkhjBIER0i7APgS",
-        "code": "PHAKANT",
-        "short": { "en": "PHAKANA", "mm": "ဖကန" },
-        "name": { "en": "PHA KANT", "mm": "ဖားကန့်" },
-        "stateId": "bTuNIfLfchNvk1N_",
-        "stateCode": "1"
-      },
-      {
         "id": "YwSNNC_QhN79Y_GM",
         "code": "MACHANBAW",
         "short": { "en": "MAKHABA", "mm": "မခဘ" },
@@ -3873,55 +3865,3 @@
       }
     ]
   }
-//   <View style={styles.inputWrapper}>
-//   <Controller
-//       control={control}
-//       name="name"
-//       render={({ field: { onChange, value } }) => (
-//           <AppTextInput
-//               label="ယာဉ်နံပါတ်"
-//               value={value}
-//               onChangeText={onChange}
-//           />
-//       )}
-//   />
-//   {/* {errors.name && (
-//       <Text style={styles.errorText}>{errors.name.message}</Text>
-//   )} */}
-// </View>
-
-//   <View style={styles.inputWrapper}>
-//   <Controller
-//       control={control}
-//       name="name"
-//       render={({ field: { onChange, value } }) => (
-//           <AppTextInput
-//               label="ယာဉ်လိုင်စင်"
-//               value={value}
-//               onChangeText={onChange}
-//           />
-//       )}
-//   />
-//   {/* {errors.name && (
-//       <Text style={styles.errorText}>{errors.name.message}</Text>
-//   )} */}
-// </View>
-
-
-
-// <View style={styles.inputWrapper}>
-//   <Controller
-//       control={control}
-//       name="name"
-//       render={({ field: { onChange, value } }) => (
-//           <AppTextInput
-//               label="ယာဉ်မောင်းလိုင်စင်"
-//               value={value}
-//               onChangeText={onChange}
-//           />
-//       )}
-//   />
-//   {/* {errors.name && (
-//       <Text style={styles.errorText}>{errors.name.message}</Text>
-//   )} */}
-// </View>
