@@ -67,13 +67,20 @@ const Search = () => {
         }))
     }, []);
 
+    const getNrcStateMM = (en: string) => {
+        const match = nrcData.nrcStates.find((state) => state.number.en === en);
+        return `${match?.number.mm} /`;
+    };
+
     const onSubmit = async (data: SearchSchemaType) => {
-        console.log(data);
+        const nrcState = getNrcStateMM(data.nrcState)
+        const nationalIdNumber = `${nrcState}${data.nrcTownShip}(${data.nrcType})${data.nrcNumber}`;
+        console.log(nationalIdNumber)
+        // const nationalIdNumber = 
         const res = await searchOffenderVehicles({
             name: "akk"
         })
 
-        console.log(res)
         // Handle form submission logic here
     }
     return (
