@@ -3,6 +3,7 @@ import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppDropdown from '@/components/ui/AppDropDown';
 import AppTextInput from '@/components/ui/AppTextInput';
+import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -66,9 +67,13 @@ const Search = () => {
         }))
     }, []);
 
-    const onSubmit = (data: SearchSchemaType) => {
+    const onSubmit = async (data: SearchSchemaType) => {
         console.log(data);
-        setModalVisible(true)
+        const res = await searchOffenderVehicles({
+            name: "akk"
+        })
+
+        console.log(res)
         // Handle form submission logic here
     }
     return (
@@ -287,3 +292,4 @@ const styles = StyleSheet.create({
         textAlign: 'justify',
     },
 });
+

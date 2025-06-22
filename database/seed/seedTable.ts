@@ -1,22 +1,22 @@
-import { getDatabase } from "./db";
+import { getDatabase } from "../db";
 
 export async function seedTable() {
-    try {
-        const database = await getDatabase();
+  try {
+    const database = await getDatabase();
 
-        // 1. disciplinary_articles
-        await database.execAsync(`
+    // 1. disciplinary_articles
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS disciplinary_articles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        number INTEGER UNIQUE NOT NULL,
+        number TEXT UNIQUE NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))
       );
     `);
 
-        // 2. committed_offenses
-        await database.execAsync(`
+    // 2. committed_offenses
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS committed_offenses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -26,8 +26,8 @@ export async function seedTable() {
       );
     `);
 
-        // 3. disciplinary_committed
-        await database.execAsync(`
+    // 3. disciplinary_committed
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS disciplinary_committed (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -41,8 +41,8 @@ export async function seedTable() {
       );
     `);
 
-        // 4. offenders
-        await database.execAsync(`
+    // 4. offenders
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS offenders (
         id INTEGER PRIMARY KEY NOT NULL,
@@ -56,10 +56,10 @@ export async function seedTable() {
       );
     `);
 
-        // 5. vehicleCategories
-        await database.execAsync(`
+    // 5. vehicleCategories
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS vehicleCategories (
+      CREATE TABLE IF NOT EXISTS vehicle_categories (
         id INTEGER PRIMARY KEY NOT NULL,
         name TEXT NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
@@ -67,8 +67,8 @@ export async function seedTable() {
       );
     `);
 
-        // 6. vehicles
-        await database.execAsync(`
+    // 6. vehicles
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -83,10 +83,10 @@ export async function seedTable() {
       );
     `);
 
-        // 7. offenderVehicles
-        await database.execAsync(`
+    // 7. offenderVehicles
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS offenderVehicles (
+      CREATE TABLE IF NOT EXISTS offender_vehicles (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         offender_id INTEGER NOT NULL,
         vehicle_id INTEGER NOT NULL,
@@ -97,10 +97,10 @@ export async function seedTable() {
       );
     `);
 
-        // 8. seizedItems
-        await database.execAsync(`
+    // 8. seizedItems
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS seizedItems (
+      CREATE TABLE IF NOT EXISTS seized_items (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
@@ -108,22 +108,11 @@ export async function seedTable() {
       );
     `);
 
-        // 9. officers (missing in your original code)
-        await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS officers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        rank TEXT NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
 
-        // 10. vehicleSeizureRecords
-        await database.execAsync(`
+    // 10. vehicleSeizureRecords
+    await database.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS vehicleSeizureRecords (
+      CREATE TABLE IF NOT EXISTS vehicle_seizure_Records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         offender_vehicles INTEGER NOT NULL,
         disciplinary_commited_id INTEGER NOT NULL,
@@ -143,8 +132,8 @@ export async function seedTable() {
       );
     `);
 
-        console.log("✅ All tables created successfully.");
-    } catch (err) {
-        console.error("❌ Error creating tables:", err);
-    }
+    console.log("✅ All tables created successfully.");
+  } catch (err) {
+    console.error("❌ Error creating tables:", err);
+  }
 }
