@@ -10,6 +10,7 @@ type AlertModalProps = {
     message?: string;
     confirmText?: string;
     cancelText?: string;
+    icon?: React.ReactNode;
 };
 
 export function AlertModal({
@@ -19,6 +20,7 @@ export function AlertModal({
     message = 'ထွက်ရန်သေချာပါသလား',
     confirmText = 'အတည်ပြုမည်',
     cancelText = 'မပြုလုပ်တော့ပါ',
+    icon,
 }: AlertModalProps) {
     const theme = useTheme();
 
@@ -37,14 +39,21 @@ export function AlertModal({
                     top: '-10%',
                 }}
             >
-                <AntDesign
-                    name="warning"
-                    size={40}
-                    color={theme.colors.error}
-                    style={{ marginBottom: 16 }}
-                />
+                <View style={{ marginBottom: 16 }}>
+                    {icon ? (
+                        icon
+                    ) : (
+                        <AntDesign
+                            name="warning"
+                            size={40}
+                            color={theme.colors.error}
 
-                <Text style={{ textAlign: 'center', fontSize: 16, marginBottom: 20 }}>
+                        />
+                    )}
+                </View>
+
+
+                <Text style={{ textAlign: 'center', fontSize: 16, marginBottom: 20, fontWeight: 'bold' }}>
                     {message}
                 </Text>
 

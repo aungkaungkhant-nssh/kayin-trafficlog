@@ -1,5 +1,5 @@
 import * as SecureStore from 'expo-secure-store';
-import { getDatabase } from "./db";
+import { getDatabase } from "../db";
 
 export async function loginOfficer({ name, password }: { name: string, password: string }) {
     try {

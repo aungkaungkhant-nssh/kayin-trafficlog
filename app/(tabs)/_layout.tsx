@@ -3,7 +3,7 @@ import LeftHeader from '@/components/header/leftHeader';
 import { AlertModal } from '@/components/ui/AlertModal';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import TabBarBackground from '@/components/ui/TabBarBackground';
-import { logoutOfficer } from '@/database/auth';
+import { logoutOfficer } from '@/database/officer/auth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs, useRouter } from 'expo-router';

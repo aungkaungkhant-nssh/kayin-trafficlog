@@ -10,6 +10,9 @@ import 'react-native-reanimated';
 
 export default function RootLayout() {
   const { officer, loading } = useLoadSession();
+
+
+
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -21,6 +24,7 @@ export default function RootLayout() {
       </View>
     );
   }
+
 
   const customTheme = {
     ...DefaultTheme,

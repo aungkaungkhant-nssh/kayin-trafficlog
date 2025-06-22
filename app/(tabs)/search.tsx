@@ -1,20 +1,21 @@
 import nrcData from '@/assets/NRC_DATA.json'; // Assuming you have a JSON file with NRC data
+import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppDropdown from '@/components/ui/AppDropDown';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+
 const Search = () => {
+    const [modalVisible, setModalVisible] = useState(false);
     const {
         watch,
         control,
         handleSubmit,
-        setError,
-        clearErrors,
         formState: { errors, isSubmitting },
     } = useForm<SearchSchemaType>({
         resolver: zodResolver(searchSchema),
@@ -50,23 +51,36 @@ const Search = () => {
             });
     }, [nrcStateValue]);
 
-    const nrcNumbers = nrcData.nrcStates.map((state) => ({
-        value: state.number.en,
-        label: `${state.number.mm} /`,
-    }));
 
-    const nrcTypes = nrcData.nrcTypes.map((nrcType) => ({
-        value: nrcType.name.mm,
-        label: nrcType.name.mm
-    }));
+    const nrcNumbers = useMemo(() => {
+        return nrcData.nrcStates.map((state) => ({
+            value: state.number.en,
+            label: `${state.number.mm} /`,
+        }));
+    }, [])
 
+    const nrcTypes = useMemo(() => {
+        return nrcData.nrcTypes.map((nrcType) => ({
+            value: nrcType.name.mm,
+            label: nrcType.name.mm
+        }))
+    }, []);
 
     const onSubmit = (data: SearchSchemaType) => {
         console.log(data);
+        setModalVisible(true)
         // Handle form submission logic here
     }
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            <AlertModal
+                visible={modalVisible}
+                onCancel={() => setModalVisible(false)}
+                onConfirm={() => setModalVisible(false)}
+                message="ပြစ်မှုကြူးလွန်ထားခြင်းမရှိပါ။"
+                confirmText='ပြစ်မှုထည့်မည်'
+                icon={<MaterialIcons name="check-circle" size={40} color="#28a745" />}
+            />
             <View style={styles.card}>
                 <View style={styles.noticeWrapper}>
                     <MaterialIcons name="info" size={16} color="#d9534f" style={styles.icon} />
@@ -87,10 +101,8 @@ const Search = () => {
                             />
                         )}
                     />
-                    {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
                 </View>
+
                 <View style={styles.inputWrapper}>
                     <Controller
                         control={control}
@@ -107,6 +119,7 @@ const Search = () => {
                         <Text style={styles.errorText}>{errors.name.message}</Text>
                     )} */}
                 </View>
+
                 <View style={styles.inputWrapper}>
                     <Text style={{ color: "#333", marginBottom: 5 }}>မှတ်ပုံတင်အမှတ်</Text>
                     <View style={styles.dropDownContainer}>
@@ -123,9 +136,6 @@ const Search = () => {
                                     />
                                 )}
                             />
-                            {/* {errors.name && (
-                                <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
                         </View>
 
                         <View>
@@ -141,10 +151,8 @@ const Search = () => {
                                     />
                                 )}
                             />
-                            {/* {errors.name && (
-                                <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
                         </View>
+
                         <View>
                             <Controller
                                 control={control}
@@ -158,10 +166,8 @@ const Search = () => {
                                     />
                                 )}
                             />
-                            {/* {errors.name && (
-                                <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
                         </View>
+
                         <View >
                             <Controller
                                 control={control}
@@ -176,9 +182,6 @@ const Search = () => {
                                     />
                                 )}
                             />
-                            {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
                         </View>
                     </View>
                 </View>
@@ -195,9 +198,6 @@ const Search = () => {
                             />
                         )}
                     />
-                    {/* {errors.name && (
-                        <Text style={styles.errorText}>{errors.name.message}</Text>
-                    )} */}
                 </View>
 
                 <View style={styles.inputWrapper}>
@@ -212,9 +212,6 @@ const Search = () => {
                             />
                         )}
                     />
-                    {/* {errors.name && (
-                              <Text style={styles.errorText}>{errors.name.message}</Text>
-                          )} */}
                 </View>
 
                 <View>

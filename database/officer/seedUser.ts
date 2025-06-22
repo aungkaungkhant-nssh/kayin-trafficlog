@@ -1,4 +1,4 @@
-import { getDatabase } from "./db";
+import { getDatabase } from "../db";
 
 
 export async function seedUser() {
@@ -22,7 +22,6 @@ export async function seedUser() {
     } catch (err) {
         console.log(err)
     }
-
 }
 
 
