@@ -1,17 +1,18 @@
 import nrcData from '@/assets/NRC_DATA.json';
-import AppButton from '@/components/ui/AppButton';
-import AppDropdown from '@/components/ui/AppDropDown';
-import AppTextInput from '@/components/ui/AppTextInput';
-import CalendarInput from '@/components/ui/CalendarInput';
+import FirstInfo from '@/components/info/FirstInfo';
+import SecondInfo from '@/components/info/SecondInfo';
+import ThirdInfo from '@/components/info/ThirdInfo';
 import Header from '@/components/ui/Header';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useMemo } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 
 const AddPunishment = () => {
+    const [currentInfo, setCurrentInfo] = useState<number>(1);
+
     const {
         watch,
         control,
@@ -36,47 +37,18 @@ const AddPunishment = () => {
 
     }
 
-    const nrcStateValue = watch('nrcState') || '3';
-
-    const filteredTownShips = useMemo(() => {
-        if (!nrcStateValue) return [];
-
-        const seen = new Set<string>();
-
-        return nrcData.nrcTownships
-            .filter((township) => township.stateCode === nrcStateValue)
-            .map((township) => ({
-                value: `${township.short.mm}`,
-                label: township.short.mm,
-            }))
-            .filter((item) => {
-                if (seen.has(item.value)) return false;
-                seen.add(item.value);
-                return true;
-            });
-    }, [nrcStateValue]);
-
-
-    const nrcNumbers = useMemo(() => {
-        return nrcData.nrcStates.map((state) => ({
-            value: state.number.en,
-            label: `${state.number.mm} /`,
-        }));
-    }, [])
-
-    const nrcTypes = useMemo(() => {
-        return nrcData.nrcTypes.map((nrcType) => ({
-            value: nrcType.name.mm,
-            label: nrcType.name.mm
-        }))
-    }, []);
 
     const getNrcStateMM = (en: string) => {
         const match = nrcData.nrcStates.find((state) => state.number.en === en);
         return `${match?.number.mm} /`;
     };
+
+    console.log(currentInfo)
     return (
-        <View>
+        <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+        >
             <Header
                 title='ပြစ်မှုထည့်မည်'
             />
@@ -88,148 +60,41 @@ const AddPunishment = () => {
 
                         </Text>
                     </View> */}
-                    <View style={styles.inputWrapper}>
-                        <Controller
-                            control={control}
-                            name="name"
-                            render={({ field: { onChange, value } }) => (
-                                <CalendarInput
-                                />
-                            )}
-                        />
-                    </View>
+                    {
+                        currentInfo === 1 && (
+                            <FirstInfo
+                                control={control}
+                                watch={watch}
+                                setCurrentInfo={setCurrentInfo}
+                            />
+                        )
+                    }
 
-                    <View style={styles.inputWrapper}>
-                        <Controller
-                            control={control}
-                            name="fatherName"
-                            render={({ field: { onChange, value } }) => (
-                                <AppTextInput
-                                    label="ဖမ်းဆည်းသည့်နေရာ"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    multiline={true}
-                                />
-                            )}
-                        />
-                        {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
-                    </View>
+                    {
+                        currentInfo === 2 && (
+                            <SecondInfo
+                                control={control}
+                                watch={watch}
+                                setCurrentInfo={setCurrentInfo}
+                            />
+                        )
+                    }
 
-                    <View style={styles.inputWrapper}>
-                        <Controller
-                            control={control}
-                            name="fatherName"
-                            render={({ field: { onChange, value } }) => (
-                                <AppTextInput
-                                    label="ဖမ်းဆည်းသည့်နေရာ"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    multiline={true}
-                                />
-                            )}
-                        />
-                        {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
-                    </View>
-
-                    <View style={styles.inputWrapper}>
-                        <Controller
-                            control={control}
-                            name="fatherName"
-                            render={({ field: { onChange, value } }) => (
-                                <AppTextInput
-                                    label="ဖမ်းဆည်းသည့်နေရာ"
-                                    value={value}
-                                    onChangeText={onChange}
-                                    multiline={true}
-                                />
-                            )}
-                        />
-                        {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
-                    </View>
+                    {
+                        currentInfo === 3 && (
+                            <ThirdInfo
+                                control={control}
+                                watch={watch}
+                                handleSubmit={() => handleSubmit(onSubmit)}
+                            />
+                        )
+                    }
 
 
-                    <View style={styles.inputWrapper}>
-                        <Text style={{ color: "#333", marginBottom: 5 }}>မှတ်ပုံတင်အမှတ်</Text>
-                        <View style={styles.dropDownContainer}>
-                            <View>
-                                <Controller
-                                    control={control}
-                                    name="nrcState"
-                                    render={({ field: { onChange, value } }) => (
-                                        <AppDropdown
-                                            selectedValue={value}
-                                            onValueChange={onChange}
-                                            options={nrcNumbers}
-                                            placeholder='၁/'
-                                        />
-                                    )}
-                                />
-                            </View>
 
-                            <View>
-                                <Controller
-                                    control={control}
-                                    name="nrcTownShip"
-                                    render={({ field: { onChange, value } }) => (
-                                        <AppDropdown
-                                            selectedValue={value}
-                                            onValueChange={onChange}
-                                            options={filteredTownShips}
-                                            placeholder={filteredTownShips[0]?.label}
-                                        />
-                                    )}
-                                />
-                            </View>
-
-                            <View>
-                                <Controller
-                                    control={control}
-                                    name="nrcType"
-                                    render={({ field: { onChange, value } }) => (
-                                        <AppDropdown
-                                            selectedValue={value}
-                                            onValueChange={onChange}
-                                            options={nrcTypes}
-                                            placeholder={nrcTypes[0]?.label}
-                                        />
-                                    )}
-                                />
-                            </View>
-
-                            <View >
-                                <Controller
-                                    control={control}
-                                    name="nrcNumber"
-                                    render={({ field: { onChange, value } }) => (
-                                        <AppTextInput
-                                            value={value}
-                                            onChangeText={onChange}
-                                            style={{ height: 50 }}
-                                            placeholder=''
-                                            keyboardType='numeric'
-                                        />
-                                    )}
-                                />
-                            </View>
-                        </View>
-                    </View>
-
-                    <View>
-                        <AppButton
-                            label='ရှာမည်'
-                            onPress={handleSubmit(onSubmit)}
-                            loading={isSubmitting}
-                        />
-                    </View>
                 </View>
             </ScrollView>
-        </View>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -287,13 +152,5 @@ const styles = StyleSheet.create({
     icon: {
         marginRight: 6,
         marginTop: 2,
-    },
-    noticeText: {
-        flex: 1,
-        fontSize: 13,
-        fontWeight: '500',
-        color: '#000',
-        lineHeight: 18,
-        textAlign: 'justify',
     },
 });

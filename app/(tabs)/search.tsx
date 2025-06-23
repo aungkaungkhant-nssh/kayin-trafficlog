@@ -1,14 +1,14 @@
 import nrcData from '@/assets/NRC_DATA.json'; // Assuming you have a JSON file with NRC data
+import NationalIdInput from '@/components/NationalIdInput';
 import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
-import AppDropdown from '@/components/ui/AppDropDown';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -35,40 +35,6 @@ const Search = () => {
 
         }
     });
-    const nrcStateValue = watch('nrcState') || '3';
-
-    const filteredTownShips = useMemo(() => {
-        if (!nrcStateValue) return [];
-
-        const seen = new Set<string>();
-
-        return nrcData.nrcTownships
-            .filter((township) => township.stateCode === nrcStateValue)
-            .map((township) => ({
-                value: `${township.short.mm}`,
-                label: township.short.mm,
-            }))
-            .filter((item) => {
-                if (seen.has(item.value)) return false;
-                seen.add(item.value);
-                return true;
-            });
-    }, [nrcStateValue]);
-
-
-    const nrcNumbers = useMemo(() => {
-        return nrcData.nrcStates.map((state) => ({
-            value: state.number.en,
-            label: `${state.number.mm} /`,
-        }));
-    }, [])
-
-    const nrcTypes = useMemo(() => {
-        return nrcData.nrcTypes.map((nrcType) => ({
-            value: nrcType.name.mm,
-            label: nrcType.name.mm
-        }))
-    }, []);
 
     const getNrcStateMM = (en: string) => {
         const match = nrcData.nrcStates.find((state) => state.number.en === en);
@@ -96,7 +62,7 @@ const Search = () => {
             router.push("/(stacks)/addPunishment");
         }
     }, [modalVisible, navigateAfterClose]);
-    
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <AlertModal
@@ -146,71 +112,10 @@ const Search = () => {
                     )} */}
                 </View>
 
-                <View style={styles.inputWrapper}>
-                    <Text style={{ color: "#333", marginBottom: 5 }}>မှတ်ပုံတင်အမှတ်</Text>
-                    <View style={styles.dropDownContainer}>
-                        <View>
-                            <Controller
-                                control={control}
-                                name="nrcState"
-                                render={({ field: { onChange, value } }) => (
-                                    <AppDropdown
-                                        selectedValue={value}
-                                        onValueChange={onChange}
-                                        options={nrcNumbers}
-                                        placeholder='၁/'
-                                    />
-                                )}
-                            />
-                        </View>
-
-                        <View>
-                            <Controller
-                                control={control}
-                                name="nrcTownShip"
-                                render={({ field: { onChange, value } }) => (
-                                    <AppDropdown
-                                        selectedValue={value}
-                                        onValueChange={onChange}
-                                        options={filteredTownShips}
-                                        placeholder={filteredTownShips[0]?.label}
-                                    />
-                                )}
-                            />
-                        </View>
-
-                        <View>
-                            <Controller
-                                control={control}
-                                name="nrcType"
-                                render={({ field: { onChange, value } }) => (
-                                    <AppDropdown
-                                        selectedValue={value}
-                                        onValueChange={onChange}
-                                        options={nrcTypes}
-                                        placeholder={nrcTypes[0]?.label}
-                                    />
-                                )}
-                            />
-                        </View>
-
-                        <View >
-                            <Controller
-                                control={control}
-                                name="nrcNumber"
-                                render={({ field: { onChange, value } }) => (
-                                    <AppTextInput
-                                        value={value}
-                                        onChangeText={onChange}
-                                        style={{ height: 50 }}
-                                        placeholder=''
-                                        keyboardType='numeric'
-                                    />
-                                )}
-                            />
-                        </View>
-                    </View>
-                </View>
+                <NationalIdInput
+                    control={control}
+                    watch={watch}
+                />
 
                 <View style={styles.inputWrapper}>
                     <Controller
