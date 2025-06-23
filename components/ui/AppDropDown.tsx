@@ -92,46 +92,45 @@ function AppDropDown(props: CustomDropdownProps) {
 
 export default AppDropDown;
 const styles = StyleSheet.create({
-    label: { fontSize: 16, marginBottom: 4 },
-    dropdown: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: '#ccc',
-      borderRadius: 6,
-      padding: 12,
-      backgroundColor: '#fff',
-    },
-    dropdownText: { fontSize: 16 },
-    overlay: {
-      flex: 1,
-      backgroundColor: '#00000077',
-      justifyContent: 'center',
-      paddingHorizontal: 32,
-    },
-    modalContent: {
-      backgroundColor: 'white',
-      borderRadius: 10,
-      maxHeight: 350,
-      padding: 10,
-    },
-    searchInput: {
-      height: 40,
-      borderColor: '#ddd',
-      borderWidth: 1,
-      borderRadius: 6,
-      paddingHorizontal: 10,
-      marginBottom: 10,
-    },
-    option: {
-      padding: 12,
-      borderBottomColor: '#eee',
-      borderBottomWidth: 1,
-    },
-    noResult: {
-      textAlign: 'center',
-      color: '#999',
-      paddingVertical: 20,
-    },
-  });
-  
+  label: { fontSize: 16, marginBottom: 4 },
+  dropdown: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 6,
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  dropdownText: { fontSize: 16 },
+  overlay: {
+    flex: 1,
+    backgroundColor: '#00000077',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    maxHeight: 350,
+    padding: 10,
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  option: {
+    padding: 12,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+  },
+  noResult: {
+    textAlign: 'center',
+    color: '#999',
+    paddingVertical: 20,
+  },
+});

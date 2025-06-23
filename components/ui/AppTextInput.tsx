@@ -9,6 +9,7 @@ interface AppTextInputProps extends TextInputProps {
     onRightIconPress?: () => void;
     leftIconName?: string;
     onLeftIconPress?: () => void;
+    multiline?: boolean;
     style?: StyleProp<TextStyle>;
 }
 
@@ -19,6 +20,7 @@ function AppTextInput({
     leftIconName,
     onLeftIconPress,
     style,
+    multiline = false,
     keyboardType = 'default',
     ...rest
 }: AppTextInputProps) {
@@ -49,12 +51,12 @@ function AppTextInput({
     return (
         <TextInput
             mode="flat"
-
             secureTextEntry={isPassword && !isPasswordVisible}
             style={[styles.input, style]}
             left={renderLeftIcon()}
             right={renderRightIcon()}
             keyboardType={keyboardType}
+            multiline={multiline}
             {...rest}
         />
     );

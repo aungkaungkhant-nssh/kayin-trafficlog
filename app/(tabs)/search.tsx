@@ -7,12 +7,15 @@ import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehi
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React, { useMemo, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 const Search = () => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [navigateAfterClose, setNavigateAfterClose] = useState(false);
+    const router = useRouter();
     const {
         watch,
         control,
@@ -75,14 +78,25 @@ const Search = () => {
     const onSubmit = async (data: SearchSchemaType) => {
         const nrcState = getNrcStateMM(data.nrcState)
         const nationalIdNumber = `${nrcState}${data.nrcTownShip}(${data.nrcType})${data.nrcNumber}`;
-        console.log(nationalIdNumber)
         // const nationalIdNumber = 
         const res = await searchOffenderVehicles({
-            name: "akk"
+            ...data,
+            nationalIdNumber,
         })
 
-        // Handle form submission logic here
+        if (!res.length) {
+            setModalVisible(true)
+            setNavigateAfterClose(true);
+        }
     }
+
+    useEffect(() => {
+        if (!modalVisible && navigateAfterClose) {
+            setNavigateAfterClose(false);
+            router.push("/(stacks)/addPunishment");
+        }
+    }, [modalVisible, navigateAfterClose]);
+    
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <AlertModal

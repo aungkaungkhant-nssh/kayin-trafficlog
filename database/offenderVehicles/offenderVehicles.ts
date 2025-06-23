@@ -13,6 +13,13 @@ export async function searchOffenderVehicles({
     vehicleNumber?: string;
     vehicleLicense?: string;
 }) {
+
+    console.log(name)
+    console.log(fatherName)
+    console.log(nationalIdNumber)
+    console.log(vehicleNumber)
+    console.log(vehicleLicense)
+
     const db = await getDatabase();
 
     try {
