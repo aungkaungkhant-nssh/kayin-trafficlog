@@ -15,7 +15,7 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="name"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="ယာဉ်မောင်းအမည်"
@@ -38,7 +38,7 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="father_name"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="အဘအမည်"
@@ -58,7 +58,7 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="address"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="နေရပ်လိပ်စာ"

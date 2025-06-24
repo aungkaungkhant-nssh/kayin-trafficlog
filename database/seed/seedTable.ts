@@ -48,8 +48,8 @@ export async function seedTable() {
         id INTEGER PRIMARY KEY NOT NULL,
         name TEXT NOT NULL,
         father_name TEXT NOT NULL,
-        national_id_number TEXT NOT NULL,
-        driver_license_number TEXT NOT NULL,
+        national_id_number TEXT,
+        driver_license_number TEXT,
         address TEXT NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now'))

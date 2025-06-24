@@ -3,7 +3,7 @@ import FirstInfo from '@/components/info/FirstInfo';
 import SecondInfo from '@/components/info/SecondInfo';
 import ThirdInfo from '@/components/info/ThirdInfo';
 import Header from '@/components/ui/Header';
-import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
+import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,22 +18,31 @@ const AddPunishment = () => {
         control,
         handleSubmit,
         formState: { errors, isSubmitting },
-    } = useForm<SearchSchemaType>({
-        resolver: zodResolver(searchSchema),
+    } = useForm<AddPunishmentSchemaType>({
+        resolver: zodResolver(addPunishmentSchema),
         defaultValues: {
             name: '',
-            fatherName: '',
+            father_name: '',
             nrcState: '3',
             nrcTownShip: 'ဘအန',
             nrcType: 'နိုင်',
             nrcNumber: "222222",
-            vehicleNumber: '',
-            vehicleLicense: '',
+            vehicle_number: '',
+            vehicle_categories_id: '',
+            vehicle_types: "",
+            wheel_tax: "",
+            vehicle_license_number: "",
+            seized_date: "",
+            seizure_location: "",
+            articleId: "",
+            committedId: "",
+            fineAmount: "",
+            address: ""
 
         }
     });
 
-    const onSubmit = async (data: SearchSchemaType) => {
+    const onSubmit = async (data: AddPunishmentSchemaType) => {
 
     }
 
@@ -83,6 +92,7 @@ const AddPunishment = () => {
                     {
                         currentInfo === 3 && (
                             <ThirdInfo
+                                setCurrentInfo={setCurrentInfo}
                                 control={control}
                                 watch={watch}
                                 handleSubmit={() => handleSubmit(onSubmit)}

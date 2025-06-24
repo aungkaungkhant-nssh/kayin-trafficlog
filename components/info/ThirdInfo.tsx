@@ -1,37 +1,30 @@
+import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles'
 import React from 'react'
 import { Controller } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
-import { ControlProps } from '../NationalIdInput'
+import DisciplinaryInput from '../DisciplinaryInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
-import CalendarInput from '../ui/CalendarInput'
+import { InfoProps } from './FirstInfo'
 
 
-export type ThirdInfoProps = ControlProps & {
+export type ThirdInfoProps = InfoProps & {
     handleSubmit: () => void;
 };
 
-const ThirdInfo = ({ control, handleSubmit }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, handleSubmit, setCurrentInfo, watch }: ThirdInfoProps) => {
+
+    const { disciplinaryArticleOptions } = useDisciplinaryArticles();
+
     return (
         <>
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="name"
-                    render={({ field: { onChange, value } }) => (
-                        <CalendarInput
-                        />
-                    )}
-                />
-            </View>
-
-            <View style={styles.inputWrapper}>
-                <Controller
-                    control={control}
-                    name="fatherName"
+                    name="vehicle_license_number"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
-                            label="ဖမ်းဆည်းသည့်နေရာ"
+                            label="ယာဉ်လိုင်စင်"
                             value={value}
                             onChangeText={onChange}
                             multiline={true}
@@ -46,7 +39,7 @@ const ThirdInfo = ({ control, handleSubmit }: ThirdInfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="ယာဉ်မောင်လိုင်စင်"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="ယာဉ်နံပါတ်"
@@ -65,10 +58,10 @@ const ThirdInfo = ({ control, handleSubmit }: ThirdInfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="wheel_tax"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
-                            label="ယာဉ်အမျိုးအစား"
+                            label="wheel tax"
                             value={value}
                             onChangeText={onChange}
                             multiline={true}
@@ -80,10 +73,23 @@ const ThirdInfo = ({ control, handleSubmit }: ThirdInfoProps) => {
                                 )} */}
             </View>
 
-            <View>
+            <DisciplinaryInput
+                control={control}
+                watch={watch}
+            />
+
+            <View style={styles.btnContainer}>
                 <AppButton
-                    label='ရှာမည်'
-                    onPress={handleSubmit}
+                    label='နောက်သို့'
+                    onPress={() => setCurrentInfo(2)}
+                    loading={false}
+                    mode={"outlined"}
+
+                />
+
+                <AppButton
+                    label='ရှေ့သို့'
+                    onPress={() => console.log("work")}
                     loading={false}
                 />
             </View>
@@ -97,5 +103,15 @@ export default ThirdInfo;
 const styles = StyleSheet.create({
     inputWrapper: {
         marginBottom: 15,
+    },
+    dropDownContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 4,
+        flexWrap: 'wrap',
+    },
+    btnContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between"
     }
 });

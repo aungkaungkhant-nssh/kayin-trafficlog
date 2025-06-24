@@ -16,7 +16,7 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="name"
+                    name="seized_date"
                     render={({ field: { onChange, value } }) => (
                         <CalendarInput
                         />
@@ -27,7 +27,7 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="seizure_location"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="ဖမ်းဆည်းသည့်နေရာ"
@@ -45,7 +45,7 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="vehicle_number"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="ယာဉ်နံပါတ်"
@@ -64,7 +64,7 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="fatherName"
+                    name="vehicle_types"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
                             label="ယာဉ်အမျိုးအစား"
