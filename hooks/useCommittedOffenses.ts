@@ -1,10 +1,9 @@
 
-import { getCommittedOffensesByArticle } from "@/database/displinaryCommitted/committedOffenses";
+import { getCommittedOffensesByArticle, getFineAmount } from "@/database/displinaryCommitted/committedOffenses";
 import { useEffect, useState } from "react";
 
 export const useCommittedOffenses = (articleId: number) => {
     const [committedOptions, setCommittedOptions] = useState([]);
-    console.log("work")
     useEffect(() => {
         if (!articleId) return;
 
@@ -20,3 +19,21 @@ export const useCommittedOffenses = (articleId: number) => {
 
     return committedOptions;
 };
+
+
+export const useFineAmount = (articleValue: number, committedValue: number) => {
+    const [fineAmount, setFineAmount] = useState([]);
+    useEffect(() => {
+        if (!articleValue || !committedValue) return;
+
+        (async () => {
+            const fineAmount = await getFineAmount(articleValue, committedValue);
+            if (fineAmount) {
+                setFineAmount(fineAmount);
+            }
+        })();
+    }, [articleValue, committedValue]);
+
+    return { fineAmount }
+};
+

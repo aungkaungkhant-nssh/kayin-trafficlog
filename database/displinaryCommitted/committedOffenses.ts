@@ -11,7 +11,21 @@ export async function getCommittedOffensesByArticle(articleId: number) {
             WHERE disciplinary_committed.disciplinary_articles_id = ?
         `, [articleId]);
     } catch (err) {
-        console.log(err);
         return [];
+    }
+}
+
+export async function getFineAmount(articleId: number, committedId: number) {
+    const database = await getDatabase();
+    try {
+        const result = await database.getFirstAsync(`
+            SELECT fine_amount FROM disciplinary_committed
+            WHERE disciplinary_articles_id = ? AND committed_offenses_id = ?
+            LIMIT 1;
+        `, [articleId, committedId]) as any;
+
+        return result?.fine_amount || null;
+    } catch (err) {
+        return null;
     }
 }

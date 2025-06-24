@@ -23,7 +23,7 @@ export const addPunishmentSchema = z.object({
 
     articleId: z.string(),
     committedId: z.string(),
-    fineAmount: z.string()
+    fine_amount: z.string()
 });
 
 export type AddPunishmentSchemaType = z.infer<typeof addPunishmentSchema>;

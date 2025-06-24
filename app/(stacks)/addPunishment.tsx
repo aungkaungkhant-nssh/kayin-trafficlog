@@ -52,7 +52,6 @@ const AddPunishment = () => {
         return `${match?.number.mm} /`;
     };
 
-    console.log(currentInfo)
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}

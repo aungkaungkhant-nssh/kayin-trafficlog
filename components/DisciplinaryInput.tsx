@@ -1,10 +1,11 @@
 
-import { useCommittedOffenses } from '@/hooks/useCommittedOffenses';
+import { useCommittedOffenses, useFineAmount } from '@/hooks/useCommittedOffenses';
 import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles';
 import React from 'react';
 import { Control, Controller, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
+import AppTextInput from './ui/AppTextInput';
 
 
 export type ControlProps = {
@@ -16,8 +17,10 @@ const DisciplinaryInput = ({ control, watch }: ControlProps) => {
     const { disciplinaryArticleOptions } = useDisciplinaryArticles();
 
     const articleValue = watch('disciplinary');
-
+    const committedValue = watch("committed");
     const committedOptions = useCommittedOffenses(articleValue);
+    const { fineAmount } = useFineAmount(articleValue, committedValue);
+
     return (
         <View style={styles.inputWrapper}>
             <View style={styles.dropDownContainer}>
@@ -47,6 +50,23 @@ const DisciplinaryInput = ({ control, watch }: ControlProps) => {
                         />
                     )}
                 />
+                <View style={styles.inputWrapper}>
+                    <Controller
+                        control={control}
+                        name="fine_amount"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="ဒဏ်ငွေ"
+                                value={String(fineAmount)}
+                                onChangeText={onChange}
+                                disable={true}
+                            />
+                        )}
+                    />
+                    {/* {errors.name && (
+                                    <Text style={styles.errorText}>{errors.name.message}</Text>
+                                )} */}
+                </View>
 
             </View>
         </View>
@@ -98,7 +118,5 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
 });
-function watch(arg0: string) {
-    throw new Error('Function not implemented.')
-}
+
 
