@@ -11,7 +11,7 @@ export const useCommittedOffenses = (articleId: number) => {
             const data = await getCommittedOffensesByArticle(articleId);
             const options = data.map((item: any) => ({
                 label: item.name,
-                value: item.id
+                value: String(item.id)
             })) as any;
             setCommittedOptions(options);
         })();

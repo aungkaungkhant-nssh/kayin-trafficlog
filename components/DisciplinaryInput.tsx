@@ -1,8 +1,9 @@
 
 import { useCommittedOffenses, useFineAmount } from '@/hooks/useCommittedOffenses';
 import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles';
-import React from 'react';
-import { Control, Controller, UseFormWatch } from 'react-hook-form';
+import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import React, { useEffect } from 'react';
+import { Control, Controller, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 import AppTextInput from './ui/AppTextInput';
@@ -11,23 +12,30 @@ import AppTextInput from './ui/AppTextInput';
 export type ControlProps = {
     control: Control<any>;
     watch: UseFormWatch<any>;
+    setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
-const DisciplinaryInput = ({ control, watch }: ControlProps) => {
+const DisciplinaryInput = ({ control, watch, setValue }: ControlProps) => {
     const { disciplinaryArticleOptions } = useDisciplinaryArticles();
 
-    const articleValue = watch('disciplinary');
-    const committedValue = watch("committed");
+    const articleValue = watch('article_id');
+    const committedValue = watch("committed_id");
     const committedOptions = useCommittedOffenses(articleValue);
     const { fineAmount } = useFineAmount(articleValue, committedValue);
 
+    useEffect(() => {
+        if (fineAmount) {
+            console.log(fineAmount)
+            setValue("fine_amount", String(fineAmount))
+        }
+    }, [fineAmount])
     return (
         <View style={styles.inputWrapper}>
             <View style={styles.dropDownContainer}>
 
                 <Controller
                     control={control}
-                    name="disciplinary"
+                    name="article_id"
                     render={({ field: { onChange, value } }) => (
                         <AppDropdown
                             selectedValue={value}
@@ -40,7 +48,7 @@ const DisciplinaryInput = ({ control, watch }: ControlProps) => {
 
                 <Controller
                     control={control}
-                    name="committed"
+                    name="committed_id"
                     render={({ field: { onChange, value } }) => (
                         <AppDropdown
                             selectedValue={value}

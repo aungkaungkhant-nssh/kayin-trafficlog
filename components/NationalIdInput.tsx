@@ -158,7 +158,4 @@ const styles = StyleSheet.create({
         marginTop: 2,
     },
 });
-function watch(arg0: string) {
-    throw new Error('Function not implemented.')
-}
 

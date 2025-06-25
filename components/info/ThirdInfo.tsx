@@ -1,21 +1,22 @@
-import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles'
+import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
 import React from 'react'
-import { Controller } from 'react-hook-form'
+import { Controller, SubmitHandler, UseFormSetValue } from 'react-hook-form'
 import { StyleSheet, View } from 'react-native'
 import DisciplinaryInput from '../DisciplinaryInput'
+import SeizedInput from '../SeizedInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
 import { InfoProps } from './FirstInfo'
 
 
 export type ThirdInfoProps = InfoProps & {
-    handleSubmit: () => void;
+    handleSubmit: (callback: SubmitHandler<AddPunishmentSchemaType>, onError?: (errors: any) => void) => () => void;
+    onSubmit: SubmitHandler<AddPunishmentSchemaType>;
+    onError: (errors: any) => void;
+    setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
-const ThirdInfo = ({ control, handleSubmit, setCurrentInfo, watch }: ThirdInfoProps) => {
-
-    const { disciplinaryArticleOptions } = useDisciplinaryArticles();
-
+const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, setValue, watch }: ThirdInfoProps) => {
     return (
         <>
             <View style={styles.inputWrapper}>
@@ -39,10 +40,10 @@ const ThirdInfo = ({ control, handleSubmit, setCurrentInfo, watch }: ThirdInfoPr
             <View style={styles.inputWrapper}>
                 <Controller
                     control={control}
-                    name="ယာဉ်မောင်လိုင်စင်"
+                    name="driver_license_number"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
-                            label="ယာဉ်နံပါတ်"
+                            label="ယာဉ်မောင်လိုင်စဉ်"
                             value={value}
                             onChangeText={onChange}
                             multiline={true}
@@ -76,6 +77,12 @@ const ThirdInfo = ({ control, handleSubmit, setCurrentInfo, watch }: ThirdInfoPr
             <DisciplinaryInput
                 control={control}
                 watch={watch}
+                setValue={setValue}
+            />
+
+            <SeizedInput
+                control={control}
+                watch={watch}
             />
 
             <View style={styles.btnContainer}>
@@ -89,7 +96,7 @@ const ThirdInfo = ({ control, handleSubmit, setCurrentInfo, watch }: ThirdInfoPr
 
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={() => console.log("work")}
+                    onPress={handleSubmit(onSubmit, onError)}
                     loading={false}
                 />
             </View>

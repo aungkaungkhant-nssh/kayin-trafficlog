@@ -17,6 +17,7 @@ const AddPunishment = () => {
         watch,
         control,
         handleSubmit,
+        setValue,
         formState: { errors, isSubmitting },
     } = useForm<AddPunishmentSchemaType>({
         resolver: zodResolver(addPunishmentSchema),
@@ -34,22 +35,27 @@ const AddPunishment = () => {
             vehicle_license_number: "",
             seized_date: "",
             seizure_location: "",
-            articleId: "",
-            committedId: "",
-            fineAmount: "",
-            address: ""
+            article_id: "",
+            committed_id: "",
+            fine_amount: "",
+            address: "",
+            driver_license_number: ""
 
         }
     });
 
     const onSubmit = async (data: AddPunishmentSchemaType) => {
-
+        console.log(data)
     }
 
 
     const getNrcStateMM = (en: string) => {
         const match = nrcData.nrcStates.find((state) => state.number.en === en);
         return `${match?.number.mm} /`;
+    };
+
+    const onError = (errors: any) => {
+        console.log("VALIDATION ERRORS", errors);
     };
 
     return (
@@ -94,7 +100,10 @@ const AddPunishment = () => {
                                 setCurrentInfo={setCurrentInfo}
                                 control={control}
                                 watch={watch}
-                                handleSubmit={() => handleSubmit(onSubmit)}
+                                handleSubmit={handleSubmit}  // Pass the method itself, not executed version
+                                onSubmit={onSubmit}
+                                onError={onError}
+                                setValue={setValue}
                             />
                         )
                     }

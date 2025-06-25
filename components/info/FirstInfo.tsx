@@ -5,12 +5,13 @@ import { ControlProps } from '../NationalIdInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
 import CalendarInput from '../ui/CalendarInput'
+import VehicleCategoriesInput from '../VehicleCategoriesInput'
 
 export type InfoProps = ControlProps & {
     setCurrentInfo: (value: any) => void;  // Define the function type as needed
 };
 
-const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
+const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
     return (
         <>
             <View style={styles.inputWrapper}>
@@ -51,7 +52,6 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
                             label="ယာဉ်နံပါတ်"
                             value={value}
                             onChangeText={onChange}
-                            multiline={true}
                         />
                     )}
                 />
@@ -67,7 +67,7 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
                     name="vehicle_types"
                     render={({ field: { onChange, value } }) => (
                         <AppTextInput
-                            label="ယာဉ်အမျိုးအစား"
+                            label="ယာဉ်မော်ဒယ်"
                             value={value}
                             onChangeText={onChange}
                             multiline={true}
@@ -78,6 +78,11 @@ const FirstInfo = ({ control, setCurrentInfo }: InfoProps) => {
                                     <Text style={styles.errorText}>{errors.name.message}</Text>
                                 )} */}
             </View>
+
+            <VehicleCategoriesInput
+                control={control}
+                watch={watch}
+            />
 
             <View style={styles.btnContainer}>
 

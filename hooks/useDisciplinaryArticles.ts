@@ -13,7 +13,7 @@ const useDisciplinaryArticles = () => {
 
     const disciplinaryArticleOptions = disciplinaryArticles.map((article: any) => ({
         label: article.number,
-        value: article.id,
+        value: String(article.id),
     }));
 
 

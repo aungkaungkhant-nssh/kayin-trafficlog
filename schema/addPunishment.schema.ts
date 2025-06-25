@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const addPunishmentSchema = z.object({
-    id: z.number().int(),
     name: z.string().min(1),
     father_name: z.string().min(1),
     nrcState: z.string(),
@@ -21,8 +20,8 @@ export const addPunishmentSchema = z.object({
     seized_date: z.string(),
     seizure_location: z.string(),
 
-    articleId: z.string(),
-    committedId: z.string(),
+    article_id: z.string(),
+    committed_id: z.string(),
     fine_amount: z.string()
 });
 

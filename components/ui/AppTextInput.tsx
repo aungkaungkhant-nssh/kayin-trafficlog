@@ -49,11 +49,10 @@ function AppTextInput({
         }
         return undefined;
     };
-    console.log(disable)
     return (
         <TextInput
             editable={!disable}
-            mode="flat"
+            mode="outlined"
             secureTextEntry={isPassword && !isPasswordVisible}
             style={[
                 styles.input,

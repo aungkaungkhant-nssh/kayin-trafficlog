@@ -21,6 +21,7 @@ interface CustomDropdownProps {
   selectedValue: string;
   onValueChange: (value: string) => void;
   placeholder?: string;
+  style?: any
 }
 
 function AppDropDown(props: CustomDropdownProps) {
@@ -30,6 +31,7 @@ function AppDropDown(props: CustomDropdownProps) {
     selectedValue,
     onValueChange,
     placeholder = 'Select an option',
+    style,
   } = props;
 
   const [visible, setVisible] = useState(false);
@@ -45,7 +47,7 @@ function AppDropDown(props: CustomDropdownProps) {
   return (
     <View>
       {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity style={styles.dropdown} onPress={() => setVisible(true)}>
+      <TouchableOpacity style={[styles.dropdown, style]} onPress={() => setVisible(true)}>
         <Text style={styles.dropdownText}>{selectedLabel}</Text>
         <MaterialIcons name="arrow-drop-down" size={24} color="#888" style={{ marginLeft: 'auto' }} />
       </TouchableOpacity>

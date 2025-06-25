@@ -52,12 +52,12 @@ export async function searchOffenderVehicles({
           vehicle_seizure_Records.seizure_location,
           vehicle_seizure_Records.fine_paid,
           vehicle_seizure_Records.caseNumber,
-          seizedItems.name AS seized_item_name
+          seized_items.name AS seized_item_name
         FROM offenders
         LEFT JOIN offender_vehicles ON offender_vehicles.offender_id = offenders.id
         LEFT JOIN vehicles ON vehicles.id = offender_vehicles.vehicle_id
         LEFT JOIN vehicle_seizure_Records ON vehicle_seizure_Records.offender_vehicles = offender_vehicles.id
-        LEFT JOIN seizedItems ON vehicle_seizure_Records.seized_item = seizedItems.id
+        LEFT JOIN seized_items ON vehicle_seizure_Records.seized_item = seized_items.id
         ${whereClause}
       `;
 

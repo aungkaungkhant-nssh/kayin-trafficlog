@@ -137,3 +137,15 @@ export async function seedTable() {
     console.error("❌ Error creating tables:", err);
   }
 }
+
+
+export async function deleteTable() {
+  try {
+    const database = await getDatabase();
+    await database.execAsync(`
+      DROP TABLE IF EXISTS seizedItems;
+  `);
+  } catch (err) {
+    console.error("❌ Error deleting tables:", err);
+  }
+}
