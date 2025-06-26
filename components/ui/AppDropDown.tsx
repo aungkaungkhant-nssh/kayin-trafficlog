@@ -45,10 +45,22 @@ function AppDropDown(props: CustomDropdownProps) {
   );
 
   return (
-    <View>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <TouchableOpacity style={[styles.dropdown, style]} onPress={() => setVisible(true)}>
-        <Text style={styles.dropdownText}>{selectedLabel}</Text>
+    <View style={[styles.wrapper,]}>
+      {label && (
+        <Text style={[
+          styles.floatingLabel,
+          selectedValue ? styles.floatingLabelActive : null
+        ]}>
+          {label}
+        </Text>
+      )}
+
+      <TouchableOpacity style={[styles.dropdown, style, { borderColor: "#000080" }]} onPress={() => setVisible(true)}>
+        <Text style={[
+          styles.dropdownText
+        ]}>
+          {selectedLabel}
+        </Text>
         <MaterialIcons name="arrow-drop-down" size={24} color="#888" style={{ marginLeft: 'auto' }} />
       </TouchableOpacity>
 
@@ -94,7 +106,23 @@ function AppDropDown(props: CustomDropdownProps) {
 
 export default AppDropDown;
 const styles = StyleSheet.create({
-  label: { fontSize: 16, marginBottom: 4 },
+  wrapper: {
+    position: 'relative',
+    marginTop: 8, // Space for label
+  },
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 12,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    fontSize: 12,
+    color: '#000080',
+    zIndex: 1,
+  },
+  floatingLabelActive: {
+    color: '#000080', // Active label color
+  },
   dropdown: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -102,9 +130,13 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 6,
     padding: 12,
-    backgroundColor: '#fff',
+    backgroundColor: '#f2f2f2',
+    minHeight: 55,
   },
-  dropdownText: { fontSize: 16 },
+  dropdownText: {
+    fontSize: 16,
+    color: '#000',
+  },
   overlay: {
     flex: 1,
     backgroundColor: '#00000077',
@@ -136,3 +168,4 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
 });
+

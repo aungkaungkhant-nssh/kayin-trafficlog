@@ -2,6 +2,7 @@ import AppButton from "@/components/ui/AppButton";
 import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/officer/auth";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
+import globalStyles from "@/styles/globalStyles";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { useRouter } from 'expo-router';
@@ -56,12 +57,12 @@ const Login = () => {
                     />
                     <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)</Text>
                     {errors.root && (
-                        <Text style={{ ...styles.errorText, marginVertical: 10 }}>
+                        <Text style={{ ...globalStyles.errorText, marginVertical: 10 }}>
                             {errors.root.message}
                         </Text>
                     )}
                     {/* Name input */}
-                    <View style={styles.inputWrapper}>
+                    <View style={globalStyles.inputWrapper}>
                         <Controller
                             control={control}
                             name="name"
@@ -74,12 +75,12 @@ const Login = () => {
                             )}
                         />
                         {errors.name && (
-                            <Text style={styles.errorText}>{errors.name.message}</Text>
+                            <Text style={globalStyles.errorText}>{errors.name.message}</Text>
                         )}
                     </View>
 
                     {/* Password input */}
-                    <View style={styles.inputWrapper}>
+                    <View style={globalStyles.inputWrapper}>
                         <Controller
                             control={control}
                             name="password"
@@ -93,7 +94,7 @@ const Login = () => {
                             )}
                         />
                         {errors.password && (
-                            <Text style={styles.errorText}>{errors.password.message}</Text>
+                            <Text style={globalStyles.errorText}>{errors.password.message}</Text>
                         )}
                     </View>
 
@@ -133,13 +134,6 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         color: "#000080",
         fontWeight: "500"
-    },
-    inputWrapper: {
-        marginBottom: 15,
-    },
-    errorText: {
-        color: "red",
-        marginTop: 4,
     },
 })
 

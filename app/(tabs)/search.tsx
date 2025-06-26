@@ -5,6 +5,7 @@ import AppButton from '@/components/ui/AppButton';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
+import globalStyles from '@/styles/globalStyles';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
@@ -73,7 +74,7 @@ const Search = () => {
                 confirmText='ပြစ်မှုထည့်မည်'
                 icon={<MaterialIcons name="check-circle" size={40} color="#28a745" />}
             />
-            <View style={styles.card}>
+            <View style={globalStyles.card}>
                 <View style={styles.noticeWrapper}>
                     <MaterialIcons name="info" size={16} color="#d9534f" style={styles.icon} />
                     <Text style={styles.noticeText}>
@@ -81,7 +82,7 @@ const Search = () => {
                     </Text>
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
                         name="name"
@@ -95,7 +96,7 @@ const Search = () => {
                     />
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
                         name="fatherName"
@@ -117,7 +118,7 @@ const Search = () => {
                     watch={watch}
                 />
 
-                <View style={styles.inputWrapper}>
+                <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
                         name="vehicleNumber"
@@ -131,7 +132,7 @@ const Search = () => {
                     />
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
                         name="vehicleLicense"
@@ -160,25 +161,14 @@ const Search = () => {
 export default Search;
 
 const styles = StyleSheet.create({
-    inputWrapper: {
-        marginBottom: 15,
-    },
+
     container: {
         flexGrow: 1,
         backgroundColor: '#f0f2f5',
         justifyContent: 'center',
         padding: 16,
     },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 5, // Android shadow
-    },
+
     title: {
         fontSize: 14,
         fontWeight: '600',

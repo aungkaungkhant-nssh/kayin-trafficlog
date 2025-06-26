@@ -1,25 +1,27 @@
 import { useSeizedItems } from '@/hooks/useSeizedItems';
+import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import globalStyles from '@/styles/globalStyles';
 import React from 'react';
-import { Control, Controller, UseFormWatch } from 'react-hook-form';
+import { Control, Controller, FieldErrors, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 
 export type ControlProps = {
   control: Control<any>;
   watch: UseFormWatch<any>;
+  errors: FieldErrors<AddPunishmentSchemaType>;
 };
 
 
-const SeizedInput = ({ control, watch }: ControlProps) => {
+const SeizedInput = ({ control, watch, errors }: ControlProps) => {
   const { seizedItems } = useSeizedItems() as any;
   return (
-    <View style={styles.inputWrapper}>
-      <Text style={{ color: "#333", marginBottom: 5 }}>သိမ်းဆည်းပစ္စည်း</Text>
+    <View style={globalStyles.inputWrapper}>
       <View style={styles.dropDownContainer}>
         <View>
           <Controller
             control={control}
-            name="nrcState"
+            name="seizedItem_id"
             render={({ field: { onChange, value } }) => (
               <AppDropdown
                 selectedValue={value}
@@ -27,9 +29,13 @@ const SeizedInput = ({ control, watch }: ControlProps) => {
                 options={seizedItems}
                 placeholder={seizedItems[0]?.label}
                 style={{ width: "100%" }}
+                label='သိမ်းဆည်းပစ္စည်း'
               />
             )}
           />
+          {errors.seizedItem_id && (
+            <Text style={globalStyles.errorText}>{errors.seizedItem_id.message}</Text>
+          )}
         </View>
       </View>
     </View>
@@ -40,9 +46,6 @@ export default SeizedInput;
 
 
 const styles = StyleSheet.create({
-  inputWrapper: {
-    marginBottom: 15
-  },
   dropDownContainer: {
     flexDirection: 'row',
     alignItems: 'center',

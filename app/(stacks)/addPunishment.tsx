@@ -4,6 +4,7 @@ import SecondInfo from '@/components/info/SecondInfo';
 import ThirdInfo from '@/components/info/ThirdInfo';
 import Header from '@/components/ui/Header';
 import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import Step from '@/utils/enum/Step';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -11,16 +12,18 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 're
 
 
 const AddPunishment = () => {
-    const [currentInfo, setCurrentInfo] = useState<number>(1);
+    const [currentInfo, setCurrentInfo] = useState<Step>(Step.First);
 
     const {
         watch,
         control,
         handleSubmit,
         setValue,
+        trigger,
         formState: { errors, isSubmitting },
     } = useForm<AddPunishmentSchemaType>({
         resolver: zodResolver(addPunishmentSchema),
+        mode: "onChange",
         defaultValues: {
             name: '',
             father_name: '',
@@ -39,7 +42,8 @@ const AddPunishment = () => {
             committed_id: "",
             fine_amount: "",
             address: "",
-            driver_license_number: ""
+            driver_license_number: "",
+            seizedItem_id: ""
 
         }
     });
@@ -75,35 +79,41 @@ const AddPunishment = () => {
                         </Text>
                     </View> */}
                     {
-                        currentInfo === 1 && (
+                        currentInfo === Step.First && (
                             <FirstInfo
                                 control={control}
                                 watch={watch}
                                 setCurrentInfo={setCurrentInfo}
+                                trigger={trigger}
+                                errors={errors}
                             />
                         )
                     }
 
                     {
-                        currentInfo === 2 && (
+                        currentInfo === Step.Second && (
                             <SecondInfo
                                 control={control}
                                 watch={watch}
                                 setCurrentInfo={setCurrentInfo}
+                                trigger={trigger}
+                                errors={errors}
                             />
                         )
                     }
 
                     {
-                        currentInfo === 3 && (
+                        currentInfo === Step.Third && (
                             <ThirdInfo
                                 setCurrentInfo={setCurrentInfo}
                                 control={control}
                                 watch={watch}
-                                handleSubmit={handleSubmit}  // Pass the method itself, not executed version
+                                handleSubmit={handleSubmit}
                                 onSubmit={onSubmit}
                                 onError={onError}
                                 setValue={setValue}
+                                trigger={trigger}
+                                errors={errors}
                             />
                         )
                     }

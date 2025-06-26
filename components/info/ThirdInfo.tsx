@@ -1,7 +1,8 @@
 import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
+import globalStyles from '@/styles/globalStyles'
 import React from 'react'
 import { Controller, SubmitHandler, UseFormSetValue } from 'react-hook-form'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import DisciplinaryInput from '../DisciplinaryInput'
 import SeizedInput from '../SeizedInput'
 import AppButton from '../ui/AppButton'
@@ -16,10 +17,10 @@ export type ThirdInfoProps = InfoProps & {
     setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
-const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, setValue, watch }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, setValue, watch, errors }: ThirdInfoProps) => {
     return (
         <>
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="vehicle_license_number"
@@ -32,12 +33,12 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, s
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.name && (
+                    <Text style={globalStyles.errorText}>{errors.name.message}</Text>
+                )}
             </View>
 
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="driver_license_number"
@@ -50,13 +51,13 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, s
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.driver_license_number && (
+                    <Text style={globalStyles.errorText}>{errors.driver_license_number.message}</Text>
+                )}
             </View>
 
 
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="wheel_tax"
@@ -69,20 +70,22 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, s
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.wheel_tax && (
+                    <Text style={globalStyles.errorText}>{errors.wheel_tax.message}</Text>
+                )}
             </View>
 
             <DisciplinaryInput
                 control={control}
                 watch={watch}
                 setValue={setValue}
+                errors={errors}
             />
 
             <SeizedInput
                 control={control}
                 watch={watch}
+                errors={errors}
             />
 
             <View style={styles.btnContainer}>
@@ -108,9 +111,6 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, s
 export default ThirdInfo;
 
 const styles = StyleSheet.create({
-    inputWrapper: {
-        marginBottom: 15,
-    },
     dropDownContainer: {
         flexDirection: 'row',
         alignItems: 'center',

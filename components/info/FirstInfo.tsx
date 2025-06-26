@@ -1,6 +1,8 @@
+import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
+import globalStyles from '@/styles/globalStyles'
 import React from 'react'
-import { Controller } from 'react-hook-form'
-import { StyleSheet, View } from 'react-native'
+import { Controller, FieldErrors, UseFormTrigger } from 'react-hook-form'
+import { StyleSheet, Text, View } from 'react-native'
 import { ControlProps } from '../NationalIdInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
@@ -8,24 +10,31 @@ import CalendarInput from '../ui/CalendarInput'
 import VehicleCategoriesInput from '../VehicleCategoriesInput'
 
 export type InfoProps = ControlProps & {
-    setCurrentInfo: (value: any) => void;  // Define the function type as needed
+    setCurrentInfo: (value: any) => void;
+    trigger: UseFormTrigger<AddPunishmentSchemaType>;
+    errors: FieldErrors<AddPunishmentSchemaType>;
 };
 
-const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
+const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors }: InfoProps) => {
     return (
         <>
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="seized_date"
                     render={({ field: { onChange, value } }) => (
                         <CalendarInput
+                            value={value}
+                            onChange={onChange}
                         />
                     )}
                 />
+                {errors.seized_date && (
+                    <Text style={globalStyles.errorText}>{errors.seized_date.message}</Text>
+                )}
             </View>
 
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="seizure_location"
@@ -38,12 +47,12 @@ const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.seizure_location && (
+                    <Text style={globalStyles.errorText}>{errors.seizure_location.message}</Text>
+                )}
             </View>
 
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="vehicle_number"
@@ -55,13 +64,12 @@ const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.vehicle_number && (
+                    <Text style={globalStyles.errorText}>{errors.vehicle_number.message}</Text>
+                )}
             </View>
 
-
-            <View style={styles.inputWrapper}>
+            <View style={globalStyles.inputWrapper}>
                 <Controller
                     control={control}
                     name="vehicle_types"
@@ -74,21 +82,31 @@ const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.vehicle_types && (
+                    <Text style={globalStyles.errorText}>{errors.vehicle_types.message}</Text>
+                )}
             </View>
 
             <VehicleCategoriesInput
                 control={control}
                 watch={watch}
+                errors={errors}
             />
 
             <View style={styles.btnContainer}>
-
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={() => setCurrentInfo(2)}
+                    onPress={async () => {
+                        const valid = await trigger([
+                            'seized_date',
+                            'seizure_location',
+                            'vehicle_number',
+                            'vehicle_types'
+                        ]);
+                        if (valid) {
+                            setCurrentInfo(2);
+                        }
+                    }}
                     loading={false}
                 />
             </View>
@@ -100,9 +118,7 @@ const FirstInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
 export default FirstInfo;
 
 const styles = StyleSheet.create({
-    inputWrapper: {
-        marginBottom: 15,
-    },
+
     btnContainer: {
         flexDirection: "row",
         justifyContent: "flex-end"

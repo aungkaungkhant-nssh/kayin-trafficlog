@@ -1,12 +1,13 @@
+import globalStyles from '@/styles/globalStyles'
 import React from 'react'
 import { Controller } from 'react-hook-form'
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native'
 import NationalIdInput from '../NationalIdInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
 import { InfoProps } from './FirstInfo'
 
-const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
+const SecondInfo = ({ control, watch, setCurrentInfo, trigger, errors }: InfoProps) => {
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -25,9 +26,9 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.name && (
+                    <Text style={globalStyles.errorText}>{errors.name.message}</Text>
+                )}
             </View>
 
             <NationalIdInput
@@ -48,9 +49,9 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.father_name && (
+                    <Text style={globalStyles.errorText}>{errors.father_name.message}</Text>
+                )}
             </View>
 
 
@@ -68,9 +69,9 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
                         />
                     )}
                 />
-                {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
+                {errors.address && (
+                    <Text style={globalStyles.errorText}>{errors.address.message}</Text>
+                )}
             </View>
             <View style={styles.btnContainer}>
                 <AppButton
@@ -83,7 +84,20 @@ const SecondInfo = ({ control, watch, setCurrentInfo }: InfoProps) => {
 
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={() => setCurrentInfo(3)}
+                    onPress={async () => {
+                        const valid = await trigger([
+                            "name",
+                            "father_name",
+                            "address",
+                            "nrcState",
+                            "nrcTownShip",
+                            "nrcType",
+                            "nrcNumber",
+                        ]);
+                        if (valid) {
+                            setCurrentInfo(3);
+                        }
+                    }}
                     loading={false}
                 />
             </View>

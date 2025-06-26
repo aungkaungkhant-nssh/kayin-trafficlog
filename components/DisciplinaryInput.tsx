@@ -2,9 +2,10 @@
 import { useCommittedOffenses, useFineAmount } from '@/hooks/useCommittedOffenses';
 import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles';
 import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import globalStyles from '@/styles/globalStyles';
 import React, { useEffect } from 'react';
-import { Control, Controller, UseFormSetValue, UseFormWatch } from 'react-hook-form';
-import { StyleSheet, View } from 'react-native';
+import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { StyleSheet, Text, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 import AppTextInput from './ui/AppTextInput';
 
@@ -13,9 +14,10 @@ export type ControlProps = {
     control: Control<any>;
     watch: UseFormWatch<any>;
     setValue: UseFormSetValue<AddPunishmentSchemaType>;
+    errors: FieldErrors<AddPunishmentSchemaType>;
 };
 
-const DisciplinaryInput = ({ control, watch, setValue }: ControlProps) => {
+const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) => {
     const { disciplinaryArticleOptions } = useDisciplinaryArticles();
 
     const articleValue = watch('article_id');
@@ -30,35 +32,47 @@ const DisciplinaryInput = ({ control, watch, setValue }: ControlProps) => {
         }
     }, [fineAmount])
     return (
-        <View style={styles.inputWrapper}>
+        <View style={globalStyles.inputWrapper}>
             <View style={styles.dropDownContainer}>
-
-                <Controller
-                    control={control}
-                    name="article_id"
-                    render={({ field: { onChange, value } }) => (
-                        <AppDropdown
-                            selectedValue={value}
-                            onValueChange={onChange}
-                            options={disciplinaryArticleOptions}
-                            placeholder='ပုဒ်မ'
-                        />
+                <View>
+                    <Controller
+                        control={control}
+                        name="article_id"
+                        render={({ field: { onChange, value } }) => (
+                            <AppDropdown
+                                selectedValue={value}
+                                onValueChange={onChange}
+                                options={disciplinaryArticleOptions}
+                                placeholder='ပုဒ်မ'
+                                label='ပုဒ်မ'
+                            />
+                        )}
+                    />
+                    {errors.article_id && (
+                        <Text style={globalStyles.errorText}>{errors.article_id.message}</Text>
                     )}
-                />
+                </View>
 
-                <Controller
-                    control={control}
-                    name="committed_id"
-                    render={({ field: { onChange, value } }) => (
-                        <AppDropdown
-                            selectedValue={value}
-                            onValueChange={onChange}
-                            options={committedOptions}
-                            placeholder={"ကျူးလွန်ပြစ်မှု"}
-                        />
+                <View>
+                    <Controller
+                        control={control}
+                        name="committed_id"
+                        render={({ field: { onChange, value } }) => (
+                            <AppDropdown
+                                selectedValue={value}
+                                onValueChange={onChange}
+                                options={committedOptions}
+                                placeholder={"ကျူးလွန်ပြစ်မှု"}
+                                label="ကျူးလွန်ပြစ်မှု"
+                            />
+                        )}
+                    />
+                    {errors.committed_id && (
+                        <Text style={globalStyles.errorText}>{errors.committed_id.message}</Text>
                     )}
-                />
-                <View style={styles.inputWrapper}>
+                </View>
+
+                <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
                         name="fine_amount"
@@ -68,6 +82,7 @@ const DisciplinaryInput = ({ control, watch, setValue }: ControlProps) => {
                                 value={String(fineAmount)}
                                 onChangeText={onChange}
                                 disable={true}
+                              
                             />
                         )}
                     />
@@ -85,9 +100,6 @@ const DisciplinaryInput = ({ control, watch, setValue }: ControlProps) => {
 export default DisciplinaryInput;
 
 const styles = StyleSheet.create({
-    inputWrapper: {
-        marginBottom: 15,
-    },
     container: {
         flexGrow: 1,
         backgroundColor: '#f0f2f5',
