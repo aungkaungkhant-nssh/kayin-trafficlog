@@ -13,11 +13,10 @@ import { InfoProps } from './FirstInfo'
 export type ThirdInfoProps = InfoProps & {
     handleSubmit: (callback: SubmitHandler<AddPunishmentSchemaType>, onError?: (errors: any) => void) => () => void;
     onSubmit: SubmitHandler<AddPunishmentSchemaType>;
-    onError: (errors: any) => void;
     setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
-const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, setValue, watch, errors }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, handleSubmit, onSubmit, setCurrentInfo, setValue, watch, errors }: ThirdInfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>
@@ -99,7 +98,7 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, onError, setCurrentInfo, s
 
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={handleSubmit(onSubmit, onError)}
+                    onPress={handleSubmit(onSubmit)}
                     loading={false}
                 />
             </View>

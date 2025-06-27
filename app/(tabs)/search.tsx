@@ -1,4 +1,3 @@
-import nrcData from '@/assets/NRC_DATA.json'; // Assuming you have a JSON file with NRC data
 import NationalIdInput from '@/components/NationalIdInput';
 import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
@@ -7,6 +6,7 @@ import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehi
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import globalStyles from '@/styles/globalStyles';
 import { MaterialIcons } from '@expo/vector-icons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -37,20 +37,9 @@ const Search = () => {
         }
     });
 
-    const getNrcStateMM = (en: string) => {
-        const match = nrcData.nrcStates.find((state) => state.number.en === en);
-        return `${match?.number.mm} /`;
-    };
 
     const onSubmit = async (data: SearchSchemaType) => {
-        const nrcState = getNrcStateMM(data.nrcState)
-        const nationalIdNumber = `${nrcState}${data.nrcTownShip}(${data.nrcType})${data.nrcNumber}`;
-        // const nationalIdNumber = 
-        const res = await searchOffenderVehicles({
-            ...data,
-            nationalIdNumber,
-        })
-
+        const res = await searchOffenderVehicles(data);
         if (!res.length) {
             setModalVisible(true)
             setNavigateAfterClose(true);
@@ -72,7 +61,7 @@ const Search = () => {
                 onConfirm={() => setModalVisible(false)}
                 message="ပြစ်မှုကြူးလွန်ထားခြင်းမရှိပါ။"
                 confirmText='ပြစ်မှုထည့်မည်'
-                icon={<MaterialIcons name="check-circle" size={40} color="#28a745" />}
+                icon={<Ionicons name="shield-checkmark" size={70} color="#4CAF50" />}
             />
             <View style={globalStyles.card}>
                 <View style={styles.noticeWrapper}>

@@ -2,18 +2,24 @@ import nrcData from '@/assets/NRC_DATA.json';
 import FirstInfo from '@/components/info/FirstInfo';
 import SecondInfo from '@/components/info/SecondInfo';
 import ThirdInfo from '@/components/info/ThirdInfo';
+import { AlertModal } from '@/components/ui/AlertModal';
 import Header from '@/components/ui/Header';
+import { useSession } from '@/context/SessionContext';
+import { storePunishment } from '@/database/offenderVehicles/offenderVehicles';
 import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
 import Step from '@/utils/enum/Step';
+import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
-
 const AddPunishment = () => {
     const [currentInfo, setCurrentInfo] = useState<Step>(Step.First);
-
+    const [modalVisible, setModalVisible] = useState<boolean>(false);
+    const { officer } = useSession();
+    const router = useRouter()
     const {
         watch,
         control,
@@ -48,19 +54,20 @@ const AddPunishment = () => {
         }
     });
 
+
+
     const onSubmit = async (data: AddPunishmentSchemaType) => {
-        console.log(data)
+        const res = await storePunishment(data, officer.id);
+        if (res.success) {
+            setModalVisible(true)
+        }
     }
 
 
-    const getNrcStateMM = (en: string) => {
-        const match = nrcData.nrcStates.find((state) => state.number.en === en);
-        return `${match?.number.mm} /`;
-    };
 
-    const onError = (errors: any) => {
-        console.log("VALIDATION ERRORS", errors);
-    };
+    // const onError = (errors: any) => {
+    //     console.log("VALIDATION ERRORS", errors);
+    // };
 
     return (
         <KeyboardAvoidingView
@@ -70,7 +77,21 @@ const AddPunishment = () => {
             <Header
                 title='ပြစ်မှုထည့်မည်'
             />
-
+            <AlertModal
+                visible={modalVisible}
+                onCancel={() => {
+                    router.push("/(tabs)");
+                    setModalVisible(false)
+                }}
+                onConfirm={() => {
+                    router.push("/(tabs)/search");
+                    setModalVisible(false)
+                }}
+                message="ပြစ်မှု ထည့်ခြင်း အောင်မြင်ပါသည်။"
+                confirmText='ဆက်လက် ရှာဖွေမည်'
+                cancelText='မူလ စာမျက်နှာ'
+                icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
+            />
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.card}>
                     {/* <View style={styles.noticeWrapper}>
@@ -110,7 +131,7 @@ const AddPunishment = () => {
                                 watch={watch}
                                 handleSubmit={handleSubmit}
                                 onSubmit={onSubmit}
-                                onError={onError}
+                                // onError={onError}
                                 setValue={setValue}
                                 trigger={trigger}
                                 errors={errors}

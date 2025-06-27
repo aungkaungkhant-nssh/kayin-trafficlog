@@ -53,7 +53,7 @@ export function AlertModal({
                 </View>
 
 
-                <Text style={{ textAlign: 'center', fontSize: 16, marginBottom: 20, fontWeight: 'bold' }}>
+                <Text style={{ textAlign: 'center', fontSize: 18, marginBottom: 20, fontWeight: 'bold' }}>
                     {message}
                 </Text>
 

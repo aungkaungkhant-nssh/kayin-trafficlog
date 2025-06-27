@@ -1,22 +1,15 @@
-import useLoadSession from '@/hooks/useLoadSession';
+import { SessionProvider, useSession } from '@/context/SessionContext'; // Adjust path as needed
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
-import {
-  DefaultTheme,
-  PaperProvider
-} from 'react-native-paper';
-import 'react-native-reanimated';
+import { DefaultTheme, PaperProvider } from 'react-native-paper';
 
 export default function RootLayout() {
-  const { officer, loading } = useLoadSession();
-
-
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
 
-  if (!fontsLoaded || loading) {
+  if (!fontsLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" />
@@ -24,6 +17,15 @@ export default function RootLayout() {
     );
   }
 
+  return (
+    <SessionProvider>
+      <AppContent />
+    </SessionProvider>
+  );
+}
+
+function AppContent() {
+  const { officer, loading } = useSession();
 
   const customTheme = {
     ...DefaultTheme,
@@ -32,6 +34,15 @@ export default function RootLayout() {
       primary: '#000080',
     },
   };
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
   return (
     <PaperProvider theme={customTheme}>
       <Stack
@@ -43,19 +54,12 @@ export default function RootLayout() {
           },
         }}
       >
-        {
-          !officer ? (
-            <Stack.Screen
-              name="(auth)"
-            />
-          ) : (
-            <Stack.Screen
-              name="(tabs)"
-            ></Stack.Screen>
-          )
-        }
-
+        {!officer ? (
+          <Stack.Screen name="(auth)" />
+        ) : (
+          <Stack.Screen name="(tabs)" />
+        )}
       </Stack>
-    </PaperProvider >
+    </PaperProvider>
   );
 }

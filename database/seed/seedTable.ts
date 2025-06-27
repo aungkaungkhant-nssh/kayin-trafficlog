@@ -5,114 +5,114 @@ export async function seedTable() {
     const database = await getDatabase();
 
     // 1. disciplinary_articles
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS disciplinary_articles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        number TEXT UNIQUE NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS disciplinary_articles (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     number TEXT UNIQUE NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now'))
+    //   );
+    // `);
 
-    // 2. committed_offenses
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS committed_offenses (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
+    // // 2. committed_offenses
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS committed_offenses (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     name TEXT NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now'))
+    //   );
+    // `);
 
-    // 3. disciplinary_committed
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS disciplinary_committed (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        disciplinary_articles_id INTEGER NOT NULL,
-        committed_offenses_id INTEGER NOT NULL,
-        fine_amount REAL NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now')),
-        FOREIGN KEY (disciplinary_articles_id) REFERENCES disciplinary_articles(id),
-        FOREIGN KEY (committed_offenses_id) REFERENCES committed_offenses(id)
-      );
-    `);
+    // // 3. disciplinary_committed
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS disciplinary_committed (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     disciplinary_articles_id INTEGER NOT NULL,
+    //     committed_offenses_id INTEGER NOT NULL,
+    //     fine_amount REAL NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now')),
+    //     FOREIGN KEY (disciplinary_articles_id) REFERENCES disciplinary_articles(id),
+    //     FOREIGN KEY (committed_offenses_id) REFERENCES committed_offenses(id)
+    //   );
+    // `);
 
-    // 4. offenders
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS offenders (
-        id INTEGER PRIMARY KEY NOT NULL,
-        name TEXT NOT NULL,
-        father_name TEXT NOT NULL,
-        national_id_number TEXT,
-        driver_license_number TEXT,
-        address TEXT NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
+    // // 4. offenders
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS offenders (
+    //     id INTEGER PRIMARY KEY NOT NULL,
+    //     name TEXT NOT NULL,
+    //     father_name TEXT NOT NULL,
+    //     national_id_number TEXT,
+    //     driver_license_number TEXT,
+    //     address TEXT NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now'))
+    //   );
+    // `);
 
-    // 5. vehicleCategories
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS vehicle_categories (
-        id INTEGER PRIMARY KEY NOT NULL,
-        name TEXT NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
+    // // 5. vehicleCategories
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS vehicle_categories (
+    //     id INTEGER PRIMARY KEY NOT NULL,
+    //     name TEXT NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now'))
+    //   );
+    // `);
 
-    // 6. vehicles
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS vehicles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        vehicle_number INTEGER NOT NULL,
-        vehicle_categories_id INTEGER NOT NULL,
-        vehicle_types TEXT NOT NULL,
-        wheel_tax TEXT,
-        vehicle_license_number TEXT,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now')),
-        FOREIGN KEY (vehicle_categories_id) REFERENCES vehicleCategories(id)
-      );
-    `);
+    // // 6. vehicles
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS vehicles (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     vehicle_number INTEGER NOT NULL,
+    //     vehicle_categories_id INTEGER NOT NULL,
+    //     vehicle_types TEXT NOT NULL,
+    //     wheel_tax TEXT,
+    //     vehicle_license_number TEXT,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now')),
+    //     FOREIGN KEY (vehicle_categories_id) REFERENCES vehicleCategories(id)
+    //   );
+    // `);
 
-    // 7. offenderVehicles
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS offender_vehicles (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        offender_id INTEGER NOT NULL,
-        vehicle_id INTEGER NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now')),
-        FOREIGN KEY (offender_id) REFERENCES offenders(id),
-        FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
-      );
-    `);
+    // // 7. offenderVehicles
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS offender_vehicles (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     offender_id INTEGER NOT NULL,
+    //     vehicle_id INTEGER NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now')),
+    //     FOREIGN KEY (offender_id) REFERENCES offenders(id),
+    //     FOREIGN KEY (vehicle_id) REFERENCES vehicles(id)
+    //   );
+    // `);
 
-    // 8. seizedItems
-    await database.execAsync(`
-      PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS seized_items (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        created_at TEXT DEFAULT (datetime('now')),
-        updated_at TEXT DEFAULT (datetime('now'))
-      );
-    `);
+    // // 8. seizedItems
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS seized_items (
+    //     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //     name TEXT NOT NULL,
+    //     created_at TEXT DEFAULT (datetime('now')),
+    //     updated_at TEXT DEFAULT (datetime('now'))
+    //   );
+    // `);
 
 
     // 10. vehicleSeizureRecords
     await database.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS vehicle_seizure_Records (
+      CREATE TABLE IF NOT EXISTS vehicle_seizure_records (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         offender_vehicles INTEGER NOT NULL,
         disciplinary_commited_id INTEGER NOT NULL,
@@ -121,7 +121,7 @@ export async function seedTable() {
         seizure_location TEXT NOT NULL,
         fine_paid INTEGER DEFAULT 0,
         action_date TEXT,
-        caseNumber INTEGER,
+        case_number INTEGER,
         seized_item INTEGER NOT NULL,
         created_at TEXT DEFAULT (datetime('now')),
         updated_at TEXT DEFAULT (datetime('now')),
@@ -142,9 +142,14 @@ export async function seedTable() {
 export async function deleteTable() {
   try {
     const database = await getDatabase();
+    // await database.execAsync(`
+    //     DROP TABLE IF EXISTS seizedItems;
+    // `);
+
     await database.execAsync(`
-      DROP TABLE IF EXISTS seizedItems;
-  `);
+    DROP TABLE IF EXISTS vehicle_seizure_records;
+` );
+    console.log("Drop success")
   } catch (err) {
     console.error("❌ Error deleting tables:", err);
   }
