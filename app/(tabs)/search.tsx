@@ -40,6 +40,7 @@ const Search = () => {
 
     const onSubmit = async (data: SearchSchemaType) => {
         const res = await searchOffenderVehicles(data);
+        console.log(res)
         if (!res.length) {
             setModalVisible(true)
             setNavigateAfterClose(true);

@@ -1,7 +1,7 @@
 import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
 import globalStyles from '@/styles/globalStyles'
 import React from 'react'
-import { Controller, SubmitHandler, UseFormSetValue } from 'react-hook-form'
+import { Controller, UseFormSetValue } from 'react-hook-form'
 import { StyleSheet, Text, View } from 'react-native'
 import DisciplinaryInput from '../DisciplinaryInput'
 import SeizedInput from '../SeizedInput'
@@ -11,12 +11,11 @@ import { InfoProps } from './FirstInfo'
 
 
 export type ThirdInfoProps = InfoProps & {
-    handleSubmit: (callback: SubmitHandler<AddPunishmentSchemaType>, onError?: (errors: any) => void) => () => void;
-    onSubmit: SubmitHandler<AddPunishmentSchemaType>;
     setValue: UseFormSetValue<AddPunishmentSchemaType>;
+    setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ThirdInfo = ({ control, handleSubmit, onSubmit, setCurrentInfo, setValue, watch, errors }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConfirm }: ThirdInfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>
@@ -85,6 +84,7 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, setCurrentInfo, setValue, 
                 control={control}
                 watch={watch}
                 errors={errors}
+                setValue={setValue}
             />
 
             <View style={styles.btnContainer}>
@@ -98,7 +98,7 @@ const ThirdInfo = ({ control, handleSubmit, onSubmit, setCurrentInfo, setValue, 
 
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={handleSubmit(onSubmit)}
+                    onPress={() => setIsConfirm(true)}
                     loading={false}
                 />
             </View>

@@ -22,7 +22,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
 
     const articleValue = watch('article_id');
     const committedValue = watch("committed_id");
-    const committedOptions = useCommittedOffenses(articleValue);
+    const committedOptions: { value: string; label: string }[] = useCommittedOffenses(articleValue);
     const { fineAmount } = useFineAmount(articleValue, committedValue);
 
     useEffect(() => {
@@ -30,7 +30,17 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
             console.log(fineAmount)
             setValue("fine_amount", String(fineAmount))
         }
-    }, [fineAmount])
+        
+        const selectedArticle = disciplinaryArticleOptions.find(item => item.value === articleValue);
+        if (selectedArticle) {
+            setValue("article_label", selectedArticle.label);
+        }
+    
+        const selectedCommitted = committedOptions.find(item => item.value === committedValue);
+        if (selectedCommitted) {
+            setValue("committed_label", selectedCommitted.label);
+        }
+    }, [fineAmount, articleValue, committedValue, disciplinaryArticleOptions, committedOptions, setValue])
     return (
         <View style={globalStyles.inputWrapper}>
             <View style={styles.dropDownContainer}>

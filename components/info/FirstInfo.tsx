@@ -1,7 +1,7 @@
 import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
 import globalStyles from '@/styles/globalStyles'
 import React from 'react'
-import { Controller, FieldErrors, UseFormTrigger } from 'react-hook-form'
+import { Controller, FieldErrors, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
 import { StyleSheet, Text, View } from 'react-native'
 import { ControlProps } from '../NationalIdInput'
 import AppButton from '../ui/AppButton'
@@ -13,9 +13,10 @@ export type InfoProps = ControlProps & {
     setCurrentInfo: (value: any) => void;
     trigger: UseFormTrigger<AddPunishmentSchemaType>;
     errors: FieldErrors<AddPunishmentSchemaType>;
+    setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
-const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors }: InfoProps) => {
+const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors,setValue }: InfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>
@@ -91,6 +92,7 @@ const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors }: InfoProp
                 control={control}
                 watch={watch}
                 errors={errors}
+                setValue={setValue}
             />
 
             <View style={styles.btnContainer}>

@@ -1,8 +1,8 @@
 import { useSeizedItems } from '@/hooks/useSeizedItems';
 import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
 import globalStyles from '@/styles/globalStyles';
-import React from 'react';
-import { Control, Controller, FieldErrors, UseFormWatch } from 'react-hook-form';
+import React, { useEffect } from 'react';
+import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 
@@ -10,11 +10,30 @@ export type ControlProps = {
   control: Control<any>;
   watch: UseFormWatch<any>;
   errors: FieldErrors<AddPunishmentSchemaType>;
+  setValue: UseFormSetValue<AddPunishmentSchemaType>;
 };
 
 
-const SeizedInput = ({ control, watch, errors }: ControlProps) => {
+const SeizedInput = ({ control, watch, errors, setValue }: ControlProps) => {
   const { seizedItems } = useSeizedItems() as any;
+
+  const selectedId = watch('seizedItem_id');
+
+  useEffect(() => {
+    if (seizedItems.length) {
+      setValue('seizedItem_id', seizedItems[0].value);
+      setValue('seizedItem_label', seizedItems[0].label);
+    }
+  }, [seizedItems, setValue]);
+
+  // Update vehicle_categories when user changes dropdown
+  useEffect(() => {
+    const selected = seizedItems.find((item: any) => item.value === selectedId);
+    if (selected) {
+      setValue('seizedItem_label', selected.label);
+    }
+  }, [selectedId, seizedItems, setValue]);
+
   return (
     <View style={globalStyles.inputWrapper}>
       <View style={styles.dropDownContainer}>
@@ -58,3 +77,5 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 });
+
+

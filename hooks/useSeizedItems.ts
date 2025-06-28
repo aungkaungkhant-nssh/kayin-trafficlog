@@ -9,7 +9,7 @@ export const useSeizedItems = () => {
             const data = await getSeizedItems() as any;
             const options = data.map((item: any) => ({
                 label: item.name,
-                value: item.id
+                value: String(item.id)
             })) as any;
             setSeizedItems(options);
         })();
