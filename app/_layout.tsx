@@ -7,6 +7,8 @@ import { DefaultTheme, PaperProvider } from 'react-native-paper';
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    'Myanmar-Regular': require('../assets/fonts/NotoSansMyanmar-Regular.ttf'),
+    'Myanmar-Bold': require('../assets/fonts/NotoSansMyanmar-Bold.ttf'),
   });
 
   if (!fontsLoaded) {

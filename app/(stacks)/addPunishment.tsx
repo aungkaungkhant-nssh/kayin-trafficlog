@@ -7,6 +7,7 @@ import Header from '@/components/ui/Header';
 import { useSession } from '@/context/SessionContext';
 import { storePunishment } from '@/database/offenderVehicles/offenderVehicles';
 import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import globalStyles from '@/styles/globalStyles';
 import Step from '@/utils/enum/Step';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -120,7 +121,7 @@ const AddPunishment = () => {
             />
 
             <ScrollView contentContainerStyle={styles.container}>
-                <View style={styles.card}>
+                <View style={globalStyles.card}>
                     {/* <View style={styles.noticeWrapper}>
                         <Text style={styles.noticeText}>
 
@@ -187,18 +188,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: "center",
         padding: 16,
-    },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 12,
-        padding: 20,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 6,
-        elevation: 5,
-        width: '100%',   // Full width with padding
-        maxWidth: 400,   // Max width for better design
     },
     title: {
         fontSize: 14,

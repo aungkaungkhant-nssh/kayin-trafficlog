@@ -1,15 +1,19 @@
-import React from 'react'
-import { StyleSheet } from 'react-native'
-import { Button } from 'react-native-paper'
+import { Entypo } from '@expo/vector-icons';
+import React from 'react';
+import { ActivityIndicator, GestureResponderEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 
 interface AppButtonProps {
-  onPress: () => void
-  label: string
-  icon?: string
+  onPress: (event: GestureResponderEvent) => void;
+  label: string;
+  icon?: string | ((props: IconProps) => React.ReactNode); // Supports string name or custom component
   disabled?: boolean;
   loading?: boolean;
-  mode?: "contained" | "text" | "outlined" | "elevated" | "contained-tonal"
+  mode?: "contained" | "outlined";
+  fullWidth?: boolean;
 }
+
+const PRIMARY_COLOR = '#000080';
 
 const AppButton: React.FC<AppButtonProps> = ({
   onPress,
@@ -17,42 +21,66 @@ const AppButton: React.FC<AppButtonProps> = ({
   icon,
   disabled = false,
   loading = false,
-  mode = "contained"
+  mode = "contained",
+  fullWidth = false,
 }) => {
   const isOutlined = mode === "outlined";
+
+  const backgroundColor = isOutlined ? 'transparent' : PRIMARY_COLOR;
+  const borderColor = isOutlined ? 'gray' : PRIMARY_COLOR;
+  const textColor = isOutlined ? 'gray' : '#fff';
+
   return (
-    <Button
-      icon={icon}
-      mode={mode}
+    <TouchableOpacity
       onPress={onPress}
-      disabled={disabled}
+      disabled={disabled || loading}
       style={[
         styles.button,
-        isOutlined && { borderColor: 'gray', borderWidth: 1 }, // Optional: for border color
+        { backgroundColor, borderColor },
+        fullWidth ? { width: '100%' } : { flexBasis: '48%', flexGrow: 1 },
+        disabled && { opacity: 0.5 },
       ]}
-      labelStyle={[
-        styles.label,
-        isOutlined && { color: 'gray' },
-      ]}
-      contentStyle={styles.content}
-      loading={loading}
+      activeOpacity={0.8}
     >
-      {label}
-    </Button>
+      {loading ? (
+        <ActivityIndicator color={textColor} />
+      ) : (
+        <View style={styles.content}>
+          {icon && typeof icon === 'string' && (
+            <Entypo name={icon} size={18} color={textColor} style={{ marginRight: 8 }} />
+          )}
+          {icon && typeof icon === 'function' && icon({
+            size: 18, color: textColor,
+            name: undefined,
+            direction: 'ltr',
+          })}
+          <Text style={[styles.label, { color: textColor }]}>
+            {label}
+          </Text>
+        </View>
+      )}
+    </TouchableOpacity>
   )
 }
 
 const styles = StyleSheet.create({
   button: {
     borderRadius: 10,
+    borderWidth: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginBottom: 8,
   },
   label: {
-    fontSize: 18,
-    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   content: {
-    height: 50,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap:6
   },
 })
 
-export default AppButton
+export default AppButton;

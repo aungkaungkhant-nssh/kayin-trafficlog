@@ -9,10 +9,13 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 
     const db = await getDatabase();
 
-    const { name, fatherName, nrcState, nrcNumber, nrcTownShip, nrcType, vehicleNumber, vehicleLicense } = data;
+    let { name, fatherName, nrcState, nrcNumber, nrcTownShip, nrcType, vehicleNumber, vehicleLicense } = data;
     const nrcNumberMM = toBurmeseNumber(nrcNumber);
     const nationalIdNumber = `${getNrcStateMM(nrcState)}${nrcTownShip}(${nrcType})${nrcNumberMM}`;
-
+    if (name?.startsWith('ဦး')) {
+        name = name.slice(1); // Remove first character
+    }
+   
     try {
         const searchFields = [
             { input: name, column: "offenders.name" },

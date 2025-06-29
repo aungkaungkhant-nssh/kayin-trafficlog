@@ -40,11 +40,14 @@ const Search = () => {
 
     const onSubmit = async (data: SearchSchemaType) => {
         const res = await searchOffenderVehicles(data);
-        console.log(res)
-        if (!res.length) {
-            setModalVisible(true)
-            setNavigateAfterClose(true);
-        }
+        // console.log(res)
+        // if (!res.length) {
+        //     setModalVisible(true);
+        //     setNavigateAfterClose(true);
+        // }else{
+
+        // }
+        router.push("/(stacks)/searchResults");
     }
 
     useEffect(() => {
@@ -58,7 +61,11 @@ const Search = () => {
         <ScrollView contentContainerStyle={styles.container}>
             <AlertModal
                 visible={modalVisible}
-                onCancel={() => setModalVisible(false)}
+                onCancel={() => {
+                    setNavigateAfterClose(false);
+                    setModalVisible(false);
+
+                }}
                 onConfirm={() => setModalVisible(false)}
                 message="ပြစ်မှုကြူးလွန်ထားခြင်းမရှိပါ။"
                 confirmText='ပြစ်မှုထည့်မည်'

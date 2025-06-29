@@ -1,5 +1,3 @@
-import DisciplinaryCommitted from "@/constants/DiscplinaryCommitteds";
-import seizedItems from "@/constants/SeizedItems";
 import vehicleCategories from "@/constants/VehicleCategories";
 import { getDatabase } from "../db";
 
