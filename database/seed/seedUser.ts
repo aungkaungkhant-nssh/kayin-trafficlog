@@ -2,7 +2,8 @@ import { getDatabase } from "../db";
 
 
 export async function seedUser() {
-    const name = process.env.EXPO_PUBLIC_SEED_USER;
+    const name = process.env.EXPO_PUBLIC_SEED_NAME;
+    const user_name = process.env.EXPO_PUBLIC_SEED_USER_NAME;
     const password = process.env.EXPO_PUBLIC_SEED_PASSWORD;
     try {
         const database = await getDatabase();
@@ -12,11 +13,12 @@ export async function seedUser() {
             officers (
                         id INTEGER PRIMARY KEY NOT NULL,  
                         name TEXT NOT NULL,
+                        user_name TEXT NOT NULL,
                         password TEXT NOT NULL,
                         created_at TEXT,
                         updated_at TEXT
                     );
-            INSERT INTO officers (name, password) VALUES ('${name}','${password}');
+            INSERT INTO officers (name,user_name, password) VALUES ('${name}','${user_name}','${password}');
             `);
         console.log("Ok")
     } catch (err) {

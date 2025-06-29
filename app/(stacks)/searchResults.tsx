@@ -1,11 +1,12 @@
 import AppButton from '@/components/ui/AppButton';
 import Header from '@/components/ui/Header';
+import { toBurmeseNumber } from '@/helpers/toBurmeseNumber';
 import globalStyles from '@/styles/globalStyles';
 import { Entypo } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-
 
 const dummyData = [
     {
@@ -38,42 +39,45 @@ const dummyData = [
 ]
 
 const SearchResults = () => {
+    const { results } = useLocalSearchParams();
+    const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
+    console.log(searchData)
 
-    const renderItem = ({ item }: { item: typeof dummyData[number] }) => (
-        <View style={[globalStyles.card]}>
+    const renderItem = ({ item }: any) => (
+        <View style={[globalStyles.card]} key={item.id}>
             <View style={styles.headerRow}>
                 <TouchableOpacity style={styles.starButton}>
                     <AntDesign name="staro" size={24} color="#fff" />
                     <Text style={{ color: "#fff", marginLeft: 10 }}>
-                        {item.officer}
+                        {item.officer_name}
                     </Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.infoRow}>
                 <Text style={styles.label}>ယာဉ်မောင်းအမည် -</Text>
-                <Text style={styles.value}>{item.driverName}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
-                <Text style={styles.value}>{item.vehicle}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>ယာဉ်နံပါတ် -</Text>
-                <Text style={styles.value}>{item.plateNumber}</Text>
+                <Text style={styles.value}>{item.offender_name}</Text>
             </View>
 
             <View style={styles.infoRow}>
                 <Text style={styles.label}>မှတ်ပုံတင်နံပါတ် -</Text>
-                <Text style={styles.value}>{item.nrc}</Text>
+                <Text style={styles.value}>{item.national_id_number}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
+                <Text style={styles.value}>{item.vehicle_types}</Text>
+            </View>
+
+            <View style={styles.infoRow}>
+                <Text style={styles.label}>ယာဉ်နံပါတ် -</Text>
+                <Text style={styles.value}>{item.vehicle_number}</Text>
             </View>
 
             <View style={styles.infoRow}>
                 <Text style={[styles.label, { color: "red" }]}>ပြစ်မှုအကြိမ်အရေအတွက် -</Text>
                 <Text style={[styles.value, { color: "red" }]}>
-                    ({item.offenceCount} ကြိမ်)
+                    ({toBurmeseNumber(String(item.seizure_count))} ကြိမ်)
                 </Text>
             </View>
 
@@ -98,7 +102,7 @@ const SearchResults = () => {
 
     return (
         <FlatList
-            data={dummyData}
+            data={searchData}
             renderItem={({ item }) => (
                 <View style={styles.itemContainer}>
                     {renderItem({ item })}

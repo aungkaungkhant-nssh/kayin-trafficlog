@@ -27,15 +27,14 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
 
     useEffect(() => {
         if (fineAmount) {
-            console.log(fineAmount)
             setValue("fine_amount", String(fineAmount))
         }
-        
+
         const selectedArticle = disciplinaryArticleOptions.find(item => item.value === articleValue);
         if (selectedArticle) {
             setValue("article_label", selectedArticle.label);
         }
-    
+
         const selectedCommitted = committedOptions.find(item => item.value === committedValue);
         if (selectedCommitted) {
             setValue("committed_label", selectedCommitted.label);
@@ -92,7 +91,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                                 value={String(fineAmount)}
                                 onChangeText={onChange}
                                 disable={true}
-                              
+
                             />
                         )}
                     />

@@ -152,7 +152,7 @@ export async function deleteTable() {
     await db.execAsync(`PRAGMA foreign_keys = OFF;`);
     await db.execAsync(`DROP TABLE IF EXISTS offender_vehicles;`);
     await db.execAsync(`DROP TABLE IF EXISTS vehicles;`);
-    await db.execAsync(`DROP TABLE IF EXISTS vehicle_categories;`);
+    // // await db.execAsync(`DROP TABLE IF EXISTS vehicle_categories;`);
     await db.execAsync(`DROP TABLE IF EXISTS offenders;`);
     await db.execAsync(`DROP TABLE IF EXISTS vehicle_seizure_records`);
     await db.execAsync(`PRAGMA foreign_keys = ON;`);

@@ -37,7 +37,7 @@ const AppButton: React.FC<AppButtonProps> = ({
       style={[
         styles.button,
         { backgroundColor, borderColor },
-        fullWidth ? { width: '100%' } : { flexBasis: '48%', flexGrow: 1 },
+        fullWidth && { width: '100%' },
         disabled && { opacity: 0.5 },
       ]}
       activeOpacity={0.8}
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap:6
+    gap: 6
   },
 })
 

@@ -2,6 +2,7 @@ import NationalIdInput from '@/components/NationalIdInput';
 import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppTextInput from '@/components/ui/AppTextInput';
+import { getOffenders } from '@/database/offender/offenders';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import globalStyles from '@/styles/globalStyles';
@@ -40,14 +41,14 @@ const Search = () => {
 
     const onSubmit = async (data: SearchSchemaType) => {
         const res = await searchOffenderVehicles(data);
-        // console.log(res)
-        // if (!res.length) {
-        //     setModalVisible(true);
-        //     setNavigateAfterClose(true);
-        // }else{
+        const offenders = await getOffenders();
+        if (!res.length) {
+            setModalVisible(true);
+            setNavigateAfterClose(true);
+        } else {
+            router.push({ pathname: "/(stacks)/searchResults", params: { results: JSON.stringify(res) } });
+        }
 
-        // }
-        router.push("/(stacks)/searchResults");
     }
 
     useEffect(() => {

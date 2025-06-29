@@ -15,7 +15,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
     if (name?.startsWith('ဦး')) {
         name = name.slice(1); // Remove first character
     }
-   
+
     try {
         const searchFields = [
             { input: name, column: "offenders.name" },
@@ -39,25 +39,56 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 
         const sql = `
         SELECT
-          offenders.id AS offender_id,
-          offenders.name AS offender_name,
-          offenders.father_name,
-          offenders.national_id_number,
-          offenders.driver_license_number,
-          vehicles.id AS vehicle_id,
-          vehicles.vehicle_number,
-          vehicles.vehicle_license_number,
-          vehicle_seizure_records.id AS seizure_id,
-          vehicle_seizure_records.seized_date,
-          vehicle_seizure_records.seizure_location,
-          vehicle_seizure_records.fine_paid,
-          vehicle_seizure_records.case_number,
-          seized_items.name AS seized_item_name
-        FROM offenders
-        LEFT JOIN offender_vehicles ON offender_vehicles.offender_id = offenders.id
-        LEFT JOIN vehicles ON vehicles.id = offender_vehicles.vehicle_id
-        LEFT JOIN vehicle_seizure_records ON vehicle_seizure_records.offender_vehicles = offender_vehicles.id
-        LEFT JOIN seized_items ON vehicle_seizure_records.seized_item = seized_items.id
+            offenders.id AS offender_id,
+            offenders.name AS offender_name,
+            offenders.father_name,
+            offenders.national_id_number,
+            offenders.driver_license_number,
+
+            vehicles.id AS vehicle_id,
+            vehicles.vehicle_number,
+            vehicles.vehicle_license_number,
+            vehicles.vehicle_types,
+
+            (
+                    SELECT COUNT(*)
+                    FROM vehicle_seizure_records vsr
+                    JOIN offender_vehicles ov_sub ON ov_sub.id = vsr.offender_vehicles
+                    WHERE ov_sub.vehicle_id = vehicles.id
+             ) AS seizure_count,
+
+            vehicle_seizure_records.id AS seizure_id,
+            vehicle_seizure_records.seized_date,
+            vehicle_seizure_records.seizure_location,
+            vehicle_seizure_records.fine_paid,
+            vehicle_seizure_records.case_number,
+
+            seized_items.name AS seized_item_name,
+
+            disciplinary_committed.id AS disciplinary_committed_id,
+            disciplinary_committed.fine_amount,
+
+            disciplinary_articles.id AS article_id,
+            disciplinary_articles.number AS article_number,
+
+            committed_offenses.id AS offense_id,
+            committed_offenses.name AS offense_name,
+
+            officers.id AS officer_id,
+            officers.name AS officer_name
+
+            FROM offenders
+
+            LEFT JOIN offender_vehicles ON offender_vehicles.offender_id = offenders.id
+            LEFT JOIN vehicles ON vehicles.id = offender_vehicles.vehicle_id
+            LEFT JOIN vehicle_seizure_records ON vehicle_seizure_records.offender_vehicles = offender_vehicles.id
+            LEFT JOIN seized_items ON vehicle_seizure_records.seized_item = seized_items.id
+
+            LEFT JOIN disciplinary_committed ON vehicle_seizure_records.disciplinary_committed_id = disciplinary_committed.id
+            LEFT JOIN disciplinary_articles ON disciplinary_committed.disciplinary_articles_id = disciplinary_articles.id
+            LEFT JOIN committed_offenses ON disciplinary_committed.committed_offenses_id = committed_offenses.id
+
+            LEFT JOIN officers ON vehicle_seizure_records.officer_id = officers.id
         ${whereClause}
       `;
 
@@ -199,7 +230,6 @@ export async function storePunishment(data: AddPunishmentSchemaType, officerId: 
             `SELECT last_insert_rowid() as id`
         )) as any;
         if (!seizureRecordId) throw new Error("Failed to insert vehicle_seizure_record.");
-        console.log('work')
 
         return {
             success: true,

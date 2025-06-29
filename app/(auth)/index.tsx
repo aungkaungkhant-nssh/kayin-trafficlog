@@ -27,7 +27,7 @@ const Login = () => {
 
     const onSubmit = async (data: LoginSchemaType) => {
         const trimmedData = {
-            name: data.name.trim(),
+            user_name: data.name.trim(),
             password: data.password.trim(),
         };
 

@@ -1,12 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
 import { getDatabase } from "../db";
 
-export async function loginOfficer({ name, password }: { name: string, password: string }) {
+export async function loginOfficer({ user_name, password }: { user_name: string, password: string }) {
     try {
         const database = await getDatabase();
         const result = await database.getFirstAsync(
-            "SELECT * FROM officers WHERE name = ? AND password = ?",
-            [name, password]
+            "SELECT * FROM officers WHERE user_name = ? AND password = ?",
+            [user_name, password]
         ) as any;
 
         if (!result) return { success: false, error: "အမည် သို့မဟုတ် စကားဝှက်မှားနေသည်" };

@@ -99,7 +99,6 @@ export function ConfirmModal({
                         textColor={theme.colors.primary}
                         style={{ flex: 1, borderRightWidth: 1, borderRightColor: '#ccc' }}
                         mode="text"
-                        onPressOut={onCancel}
                     >
                         {cancelText}
                     </Button>
@@ -114,7 +113,6 @@ export function ConfirmModal({
                         textColor={theme.colors.error}
                         style={{ flex: 1 }}
                         mode="text"
-                        onPressOut={onConfirm}
                     >
                         {confirmText}
                     </Button>
