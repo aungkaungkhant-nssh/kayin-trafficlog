@@ -15,7 +15,7 @@ export type ThirdInfoProps = InfoProps & {
     setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConfirm }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConfirm, trigger }: ThirdInfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>
@@ -98,7 +98,16 @@ const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConf
 
                 <AppButton
                     label='ရှေ့သို့'
-                    onPress={() => setIsConfirm(true)}
+                    onPress={async () => {
+                        const valid = await trigger([
+                            "article_id",
+                            "committed_id",
+                            "address",
+                        ]);
+                        if (valid) {
+                            setIsConfirm(true)
+                        }
+                    }}
                     loading={false}
                 />
             </View>

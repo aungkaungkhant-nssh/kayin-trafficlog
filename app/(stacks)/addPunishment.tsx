@@ -60,8 +60,6 @@ const AddPunishment = () => {
         }
     });
 
-
-
     const onSubmit = async (data: AddPunishmentSchemaType) => {
         setIsConfirm(false);
 
@@ -70,11 +68,6 @@ const AddPunishment = () => {
             setIsSuccess(true)
         }
     }
-
-
-    // const onError = (errors: any) => {
-    //     console.log("VALIDATION ERRORS", errors);
-    // };
 
     return (
         <KeyboardAvoidingView
@@ -106,12 +99,10 @@ const AddPunishment = () => {
             <ConfirmModal
                 visible={isConfirm}
                 onCancel={() => {
-                    // router.push("/(tabs)");
                     setIsConfirm(false)
                 }}
                 onConfirm={async () => {
                     await handleSubmit(onSubmit)()
-                    // router.push("/(tabs)/search");
 
                 }}
                 message="အချက်အလက်များ သေချာပါသလား။"
@@ -121,11 +112,6 @@ const AddPunishment = () => {
 
             <ScrollView contentContainerStyle={styles.container}>
                 <View style={styles.card}>
-                    {/* <View style={styles.noticeWrapper}>
-                        <Text style={styles.noticeText}>
-
-                        </Text>
-                    </View> */}
                     {
                         currentInfo === Step.First && (
                             <FirstInfo

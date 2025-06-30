@@ -42,6 +42,8 @@ const Search = () => {
     const onSubmit = async (data: SearchSchemaType) => {
         const res = await searchOffenderVehicles(data);
         const offenders = await getOffenders();
+
+        console.log(offenders)
         if (!res.length) {
             setModalVisible(true);
             setNavigateAfterClose(true);
@@ -94,6 +96,11 @@ const Search = () => {
                     />
                 </View>
 
+                <NationalIdInput
+                    control={control}
+                    watch={watch}
+                />
+
                 <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
@@ -111,10 +118,7 @@ const Search = () => {
                     )} */}
                 </View>
 
-                <NationalIdInput
-                    control={control}
-                    watch={watch}
-                />
+
 
                 <View style={globalStyles.inputWrapper}>
                     <Controller

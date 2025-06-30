@@ -2,7 +2,7 @@ import nrcData from '@/assets/NRC_DATA.json';
 import globalStyles from '@/styles/globalStyles';
 import React, { useMemo } from 'react';
 import { Control, Controller, UseFormWatch } from 'react-hook-form';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 import AppTextInput from './ui/AppTextInput';
 
@@ -48,7 +48,7 @@ const NationalIdInput = ({ control, watch }: ControlProps) => {
     }, []);
     return (
         <View style={globalStyles.inputWrapper}>
-            <Text style={{ color: "#333", }}>မှတ်ပုံတင်အမှတ်</Text>
+            {/* <Text style={{ color: "#333", }}>မှတ်ပုံတင်အမှတ်</Text> */}
             <View style={styles.dropDownContainer}>
                 <View>
                     <Controller

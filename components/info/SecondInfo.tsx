@@ -1,13 +1,16 @@
 import globalStyles from '@/styles/globalStyles'
-import React from 'react'
+import { ExistenceStatus } from '@/utils/enum/ExistenceStatus'
+import React, { useState } from 'react'
 import { Controller } from 'react-hook-form'
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from 'react-native'
+import { RadioButton } from 'react-native-paper'
 import NationalIdInput from '../NationalIdInput'
 import AppButton from '../ui/AppButton'
 import AppTextInput from '../ui/AppTextInput'
 import { InfoProps } from './FirstInfo'
 
 const SecondInfo = ({ control, watch, setCurrentInfo, trigger, errors }: InfoProps) => {
+    const [checked, setChecked] = useState(ExistenceStatus.No);
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -31,10 +34,38 @@ const SecondInfo = ({ control, watch, setCurrentInfo, trigger, errors }: InfoPro
                 )}
             </View>
 
-            <NationalIdInput
-                control={control}
-                watch={watch}
-            />
+            <View>
+                <Text style={{ color: "#333", }}>မှတ်ပုံတင်အမှတ်</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginRight: 8 }}>
+                        <RadioButton
+                            value={checked}
+                            status={checked === ExistenceStatus.No ? 'checked' : 'unchecked'}
+                            onPress={() => setChecked(ExistenceStatus.No)}
+                        />
+                        <Text onPress={() => setChecked(ExistenceStatus.No)}>မရှိ</Text>
+                    </View>
+                    <Text>{" / "}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <RadioButton
+                            value={checked}
+                            status={checked === ExistenceStatus.Yes ? 'checked' : 'unchecked'}
+                            onPress={() => setChecked(ExistenceStatus.Yes)}
+                        />
+                        <Text onPress={() => setChecked(ExistenceStatus.Yes)}>ရှိ</Text>
+                    </View>
+                </View>
+            </View>
+
+            {
+                checked === ExistenceStatus.Yes && (
+                    <NationalIdInput
+                        control={control}
+                        watch={watch}
+                    />
+                )
+            }
+
 
             <View style={styles.inputWrapper}>
                 <Controller
@@ -89,10 +120,6 @@ const SecondInfo = ({ control, watch, setCurrentInfo, trigger, errors }: InfoPro
                             "name",
                             "father_name",
                             "address",
-                            "nrcState",
-                            "nrcTownShip",
-                            "nrcType",
-                            "nrcNumber",
                         ]);
                         if (valid) {
                             setCurrentInfo(3);
