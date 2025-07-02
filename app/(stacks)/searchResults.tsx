@@ -4,7 +4,7 @@ import { toBurmeseNumber } from '@/helpers/toBurmeseNumber';
 import globalStyles from '@/styles/globalStyles';
 import { Entypo } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -41,7 +41,7 @@ const dummyData = [
 const SearchResults = () => {
     const { results } = useLocalSearchParams();
     const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
-    console.log(searchData)
+    const router = useRouter()
 
     const renderItem = ({ item }: any) => (
         <View style={[globalStyles.card]} key={item.id}>
@@ -91,7 +91,7 @@ const SearchResults = () => {
                 />
                 <AppButton
                     label='အသေးစိတ်ကြည့်မည်။'
-                    onPress={() => console.log("Detail")}
+                    onPress={() => router.push({ pathname: "/(stacks)/details", params: { result: JSON.stringify(item) } })}
                     loading={false}
                     icon={(props) => <Entypo name="eye" size={props.size} color={props.color} />}
                     fullWidth={true}

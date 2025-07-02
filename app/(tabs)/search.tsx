@@ -2,7 +2,6 @@ import NationalIdInput from '@/components/NationalIdInput';
 import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppTextInput from '@/components/ui/AppTextInput';
-import { getOffenders } from '@/database/offender/offenders';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import globalStyles from '@/styles/globalStyles';
@@ -40,10 +39,8 @@ const Search = () => {
 
 
     const onSubmit = async (data: SearchSchemaType) => {
-        const res = await searchOffenderVehicles(data);
-        const offenders = await getOffenders();
 
-        console.log(offenders)
+        const res = await searchOffenderVehicles(data);
         if (!res.length) {
             setModalVisible(true);
             setNavigateAfterClose(true);
