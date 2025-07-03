@@ -11,8 +11,6 @@ interface DetailListsProp {
 const DetailLists = ({ labelType, data }: DetailListsProp) => {
 
     const labels = confirmLabels.filter((label) => label.type === labelType);
-
-    console.log(data)
     return (
         <View>
             {
@@ -51,7 +49,7 @@ const styles = StyleSheet.create({
     },
     value: {
         fontSize: 16,
-        fontWeight: 'bold',
+        // fontWeight: 'bold',
     },
 });
 

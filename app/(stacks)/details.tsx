@@ -12,7 +12,7 @@ const Details = () => {
 
   const searchData = JSON.parse(Array.isArray(result) ? result[0] : result);
 
-  console.log(searchData)
+  console.log(searchData.national_id_number)
   return (
     <View>
       <Header

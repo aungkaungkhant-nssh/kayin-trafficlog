@@ -45,18 +45,24 @@ const confirmLabels = [
     },
     {
         id: 8,
-        name: "vehicle_categories_label",
-        label: "ယာဉ်အမျိုးအစား",
+        name: "vehicle_number",
+        label: "ယာဉ်နံပါတ်",
         type: LabelTypeEnum.Vehicle
     },
     {
         id: 9,
+        name: "vehicle_categories",
+        label: "ယာဉ်အမျိုးအစား",
+        type: LabelTypeEnum.Vehicle
+    },
+    {
+        id: 10,
         name: "vehicle_license_number",
         label: "ယာဉ်လိုင်စင်",
         type: LabelTypeEnum.Vehicle
     },
     {
-        id: 10,
+        id: 11,
         name: "driver_license_number",
         label: "ယာဉ်မောင်းလိုင်စင်",
         type: LabelTypeEnum.Offender

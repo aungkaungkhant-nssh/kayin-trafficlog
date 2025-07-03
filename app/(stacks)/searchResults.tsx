@@ -41,22 +41,21 @@ const dummyData = [
 const SearchResults = () => {
     const { results } = useLocalSearchParams();
     const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
-    const router = useRouter()
-
+    const router = useRouter();
     const renderItem = ({ item }: any) => (
         <View style={[globalStyles.card]} key={item.id}>
             <View style={styles.headerRow}>
                 <TouchableOpacity style={styles.starButton}>
                     <AntDesign name="staro" size={24} color="#fff" />
                     <Text style={{ color: "#fff", marginLeft: 10 }}>
-                        {item.officer_name}
+                        {item.vehicle_seizure_records?.[0].officer_name}
                     </Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.infoRow}>
                 <Text style={styles.label}>ယာဉ်မောင်းအမည် -</Text>
-                <Text style={styles.value}>{item.offender_name}</Text>
+                <Text style={styles.value}>{item.name}</Text>
             </View>
 
             <View style={styles.infoRow}>
