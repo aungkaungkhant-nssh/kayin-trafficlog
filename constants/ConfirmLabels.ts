@@ -5,7 +5,6 @@ const confirmLabels = [
         id: 1,
         name: "seized_date",
         label: "ဖမ်းဆည်းသည့်နေ့",
-        type: LabelTypeEnum.Record
     },
     {
         id: 2,

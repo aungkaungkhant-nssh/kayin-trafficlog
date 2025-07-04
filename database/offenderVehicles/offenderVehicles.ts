@@ -113,6 +113,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                 LEFT JOIN committed_offenses ON disciplinary_committed.committed_offenses_id = committed_offenses.id
                 LEFT JOIN officers ON vehicle_seizure_records.officer_id = officers.id
                 WHERE vehicle_seizure_records.offender_vehicles IN (${placeholders})
+                ORDER BY vehicle_seizure_records.seized_date DESC
             `;
 
             const seizureRecords = await db.getAllAsync(seizureSql, offenderVehicleIds);
@@ -126,7 +127,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                     seizure_location: record.seizure_location,
                     fine_paid: record.fine_paid,
                     case_number: record.case_number,
-                    seized_item_name: record.seized_item_name,
+                    seizedItem_label: record.seized_item_name,
                     disciplinary_committed_id: record.disciplinary_committed_id,
                     fine_amount: record.fine_amount,
                     article_id: record.article_id,
