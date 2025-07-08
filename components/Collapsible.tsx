@@ -71,6 +71,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     paddingVertical: 8,
     borderRadius: 10,
+    backgroundColor: "#F5F5F5",
+    elevation: 3,
   },
   heading: {
     flexDirection: 'row',
@@ -83,10 +85,12 @@ const styles = StyleSheet.create({
   title: {
     flex: 1,
     fontSize: 16,
-    fontFamily: 'Myanmar-Bold'
+    fontFamily: 'Myanmar-Bold',
+    color: "#000"
   },
   content: {
     marginTop: 8,
     paddingHorizontal: 12,
+    backgroundColor: "#F5F5F5"
   },
 });

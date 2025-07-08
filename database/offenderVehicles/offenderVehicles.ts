@@ -316,11 +316,22 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 export async function addPunishment(data: AddPunishmentSchemaType, offenderVehicleId: number, officerId: number) {
     const db = await getDatabase(); // Ensure your DB connection is initialized properly
 
+    const {
+        seized_date,
+        seizure_location,
+        committed_id,
+        fine_amount,
+        seizedItem_id,
+    } = data;
+
+    const committedIdInt = parseInt(committed_id, 10);
+    const seizedItemIdInt = parseInt(seizedItem_id, 10);
+
     try {
         // 1. Check if offender_vehicle_id exists
         const checkResult = await db.getAllAsync(
             'SELECT id FROM offender_vehicles WHERE id = ?',
-            [offenderVehicleId]
+            [+offenderVehicleId]
         );
 
         if (checkResult.length === 0) {
@@ -328,13 +339,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, offenderVehic
         }
 
         // 2. Insert into vehicle_seizure_records
-        const {
-            seized_date,
-            seizure_location,
-            committed_id,
-            fine_amount,
-            seizedItem_id,
-        } = data;
+
 
         await db.runAsync(
             `INSERT INTO vehicle_seizure_records (
@@ -345,15 +350,15 @@ export async function addPunishment(data: AddPunishmentSchemaType, offenderVehic
           seizure_location,
           fine_paid,
           seized_item
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [
                 offenderVehicleId,
-                committed_id,
+                committedIdInt,
                 officerId,
                 seized_date,
                 seizure_location,
                 fine_amount || 0,
-                seizedItem_id
+                seizedItemIdInt
             ]
         );
 

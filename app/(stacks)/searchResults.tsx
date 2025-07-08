@@ -1,30 +1,53 @@
+import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import Header from '@/components/ui/Header';
 import PunishmentFormModal from '@/components/ui/PunishmentFormModal';
 import { toBurmeseNumber } from '@/helpers/toBurmeseNumber';
 import globalStyles from '@/styles/globalStyles';
-import { Entypo } from '@expo/vector-icons';
+import { Entypo, MaterialIcons } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const SearchResults = () => {
-    const [isPunishmentModalOpen, setIsPunishmentModalOpen] = useState<boolean>(false);
+    const [modalState, setModalState] = useState<{
+        open: boolean;
+        success: boolean;
+    }>({
+        open: false,
+        success: false,
+    });
     const { results } = useLocalSearchParams();
     const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
     const router = useRouter();
+
     const renderItem = ({ item }: any) => (
         <>
+            {/* success modal */}
+            <AlertModal
+                visible={modalState.success}
+                onCancel={() => {
+                    router.push("/(tabs)");
+                    setModalState({ open: false, success: false });
+                }}
+                onConfirm={() => {
+                    router.push("/(tabs)/search");
+                    setModalState({ open: false, success: false });
+                }}
+                message="ပြစ်မှု ထည့်ခြင်း အောင်မြင်ပါသည်။"
+                confirmText='ဆက်လက် ရှာဖွေမည်'
+                cancelText='မူလ စာမျက်နှာ'
+                icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
+            />
             <PunishmentFormModal
                 item={item}
-                visible={isPunishmentModalOpen}
+                visible={modalState.open}
                 onCancel={() => {
-                    setIsPunishmentModalOpen(false)
+                    setModalState({ open: false, success: false });
                 }}
                 onConfirm={async () => {
-                    console.log("work")
-
+                    setModalState({ open: false, success: true });
                 }}
             />
             <View style={[globalStyles.card]} key={item.id}>
@@ -67,7 +90,7 @@ const SearchResults = () => {
                 <View style={styles.buttonRow}>
                     <AppButton
                         label='ပြစ်မှုထည့်မည်။'
-                        onPress={() => setIsPunishmentModalOpen(true)}
+                        onPress={() => setModalState({ open: true, success: false })}
                         loading={false}
                         icon={(props) => <AntDesign name="pluscircle" size={props.size} color={props.color} />}
                         fullWidth={true}

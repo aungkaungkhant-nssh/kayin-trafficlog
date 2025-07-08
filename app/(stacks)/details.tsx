@@ -13,8 +13,6 @@ const Details = () => {
   const { result } = useLocalSearchParams();
 
   const searchData = JSON.parse(Array.isArray(result) ? result[0] : result);
-
-  console.log(searchData.vehicle_seizure_records)
   return (
     <View>
       <Header
@@ -62,24 +60,6 @@ const Details = () => {
             ))
           )
         }
-
-        {
-          searchData?.vehicle_seizure_records && (
-            searchData?.vehicle_seizure_records.map((record: any, index: number) => (
-              <View style={styles.collapseItem} key={index}>
-                <Collapsible title={record.seized_date}>
-                  <OffenderVehicleDetails
-                    labelType={LabelTypeEnum.Record}
-                    data={record}
-                  />
-                </Collapsible>
-              </View>
-            ))
-          )
-        }
-
-
-
       </ScrollView>
 
     </View>

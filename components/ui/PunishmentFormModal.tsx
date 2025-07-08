@@ -1,10 +1,13 @@
+import { useSession } from '@/context/SessionContext';
+import { addPunishment } from '@/database/offenderVehicles/offenderVehicles';
 import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
 import globalStyles from '@/styles/globalStyles';
+import Entypo from '@expo/vector-icons/Entypo';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Text, View } from 'react-native';
-import { Modal, Portal } from 'react-native-paper';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Modal, Portal, useTheme } from 'react-native-paper';
 import DisciplinaryInput from '../DisciplinaryInput';
 import SeizedInput from '../SeizedInput';
 import AppButton from './AppButton';
@@ -26,6 +29,8 @@ const PunishmentFormModal = (
         item,
     }: PunishmentFormModalProps
 ) => {
+    const { officer } = useSession();
+    const theme = useTheme();
 
     const {
         watch,
@@ -51,12 +56,12 @@ const PunishmentFormModal = (
 
 
     const onSubmit = async (data: AddPunishmentSchemaType) => {
-        console.log(data)
-
+        const res = await addPunishment(data, item.offender_vehicle_id, officer.id)
+        if (res.success) {
+            onConfirm()
+        }
     };
 
-
-    console.log(item.offender_vehicle_id)
     return (
         <Portal>
             <Modal
@@ -71,17 +76,25 @@ const PunishmentFormModal = (
                 }}
             >
                 <View>
-                    <Text
-                        style={{
-                            fontSize: 18,
-                            fontFamily: 'Myanmar-Bold',
-                            color: '#333',
-                            textAlign: 'center',
-                            marginBottom: 16,
-                        }}
-                    >
-                        ပြစ်မှု အသစ်ထည့်မည်
-                    </Text>
+                    <View style={styles.titleContainer}>
+                        <Text
+                            style={{
+                                fontSize: 18,
+                                fontFamily: 'Myanmar-Bold',
+                                color: '#333',
+                                textAlign: 'center',
+                            }}
+                        >
+                            ပြစ်မှု ထည့်မည်
+                        </Text>
+                        <TouchableOpacity
+                            onPress={onCancel}
+                        >
+                            <Entypo name="circle-with-cross" size={24} color={theme.colors.primary} />
+                        </TouchableOpacity>
+
+                    </View>
+
                     <View style={globalStyles.inputWrapper}>
                         <Controller
                             control={control}
@@ -137,11 +150,19 @@ const PunishmentFormModal = (
                     />
 
                 </View>
-
             </Modal>
         </Portal>
     )
 }
 
 export default PunishmentFormModal;
+
+const styles = StyleSheet.create({
+    titleContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 16,
+        justifyContent: "space-between"
+    }
+})
 
