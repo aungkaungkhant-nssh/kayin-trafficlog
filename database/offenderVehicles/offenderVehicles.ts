@@ -1,6 +1,7 @@
 import { getNrcStateMM } from "@/helpers/nrcStateMM";
 import { toBurmeseNumber } from "@/helpers/toBurmeseNumber";
 import { AddPunishmentSchemaType } from "@/schema/addPunishment.schema";
+import { AddPunishmentInfoSchemaType } from "@/schema/addPunishmentInfo.schema";
 import { SearchSchemaType } from "@/schema/search.schema";
 import { getDatabase } from "../db";
 
@@ -155,6 +156,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
             vehicle_types: o.vehicle_types,
             vehicle_categories: o.vehicle_category_name,
             seizure_count: o.seizure_count || 0,
+            offender_vehicle_id: o.offender_vehicle_id,
             vehicle_seizure_records: seizureRecordsByVehicle[o.offender_vehicle_id] || []
         }));
 
@@ -167,7 +169,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 }
 
 
-export async function storePunishment(data: AddPunishmentSchemaType, officerId: number) {
+export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
     const db = await getDatabase();
 
     try {
@@ -311,3 +313,53 @@ export async function storePunishment(data: AddPunishmentSchemaType, officerId: 
     }
 }
 
+export async function addPunishment(data: AddPunishmentSchemaType, offenderVehicleId: number, officerId: number) {
+    const db = await getDatabase(); // Ensure your DB connection is initialized properly
+
+    try {
+        // 1. Check if offender_vehicle_id exists
+        const checkResult = await db.getAllAsync(
+            'SELECT id FROM offender_vehicles WHERE id = ?',
+            [offenderVehicleId]
+        );
+
+        if (checkResult.length === 0) {
+            throw new Error('Invalid offender vehicle ID');
+        }
+
+        // 2. Insert into vehicle_seizure_records
+        const {
+            seized_date,
+            seizure_location,
+            committed_id,
+            fine_amount,
+            seizedItem_id,
+        } = data;
+
+        await db.runAsync(
+            `INSERT INTO vehicle_seizure_records (
+          offender_vehicles,
+          disciplinary_committed_id,
+          officer_id,
+          seized_date,
+          seizure_location,
+          fine_paid,
+          seized_item
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                offenderVehicleId,
+                committed_id,
+                officerId,
+                seized_date,
+                seizure_location,
+                fine_amount || 0,
+                seizedItem_id
+            ]
+        );
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error adding punishment:', error);
+        return { success: false, message: error.message };
+    }
+}

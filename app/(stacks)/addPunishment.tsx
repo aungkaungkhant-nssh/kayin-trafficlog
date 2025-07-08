@@ -6,7 +6,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import Header from '@/components/ui/Header';
 import { useSession } from '@/context/SessionContext';
 import { storePunishment } from '@/database/offenderVehicles/offenderVehicles';
-import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import { addPunishmentInfoSchema,AddPunishmentInfoSchemaType} from '@/schema/addPunishmentInfo.schema';
 import Step from '@/utils/enum/Step';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -29,8 +29,8 @@ const AddPunishment = () => {
         trigger,
         getValues,
         formState: { errors, isSubmitting },
-    } = useForm<AddPunishmentSchemaType>({
-        resolver: zodResolver(addPunishmentSchema),
+    } = useForm<AddPunishmentInfoSchemaType>({
+        resolver: zodResolver(addPunishmentInfoSchema),
         mode: "onChange",
         defaultValues: {
             name: '',
@@ -60,7 +60,7 @@ const AddPunishment = () => {
         }
     });
 
-    const onSubmit = async (data: AddPunishmentSchemaType) => {
+    const onSubmit = async (data: AddPunishmentInfoSchemaType) => {
         setIsConfirm(false);
 
         const res = await storePunishment(data, officer.id);

@@ -1,102 +1,88 @@
 import AppButton from '@/components/ui/AppButton';
 import Header from '@/components/ui/Header';
+import PunishmentFormModal from '@/components/ui/PunishmentFormModal';
 import { toBurmeseNumber } from '@/helpers/toBurmeseNumber';
 import globalStyles from '@/styles/globalStyles';
 import { Entypo } from '@expo/vector-icons';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React from 'react';
+import React, { useState } from 'react';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-const dummyData = [
-    {
-        id: '1',
-        officer: "ဒုရဲမှူးမျိုးကျော်ညွှန့်",
-        driverName: "မောင်မောင်",
-        vehicle: "Honda (Fit) / အနက်ရောင်",
-        plateNumber: "7W/222222",
-        nrc: "၉/တာမွေ(၁)၂၂၂၂၂",
-        offenceCount: 1,
-    },
-    {
-        id: '2',
-        officer: "ဒုရဲမှူးမျိုးကျော်ညွှန့်",
-        driverName: "မောင်မောင်",
-        vehicle: "Honda (Fit) / အနက်ရောင်",
-        plateNumber: "7W/222222",
-        nrc: "၉/တာမွေ(၁)၂၂၂၂၂",
-        offenceCount: 1,
-    },
-    {
-        id: '3',
-        officer: "ဒုရဲမှူးမျိုးကျော်ညွှန့်",
-        driverName: "မောင်မောင်",
-        vehicle: "Honda (Fit) / အနက်ရောင်",
-        plateNumber: "7W/222222",
-        nrc: "၉/တာမွေ(၁)၂၂၂၂၂",
-        offenceCount: 1,
-    }
-]
-
 const SearchResults = () => {
+    const [isPunishmentModalOpen, setIsPunishmentModalOpen] = useState<boolean>(false);
     const { results } = useLocalSearchParams();
     const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
     const router = useRouter();
     const renderItem = ({ item }: any) => (
-        <View style={[globalStyles.card]} key={item.id}>
-            <View style={styles.headerRow}>
-                <TouchableOpacity style={styles.starButton}>
-                    <AntDesign name="staro" size={24} color="#fff" />
-                    <Text style={{ color: "#fff", marginLeft: 10 }}>
-                        {item.vehicle_seizure_records?.[0].officer_name}
+        <>
+            <PunishmentFormModal
+                item={item}
+                visible={isPunishmentModalOpen}
+                onCancel={() => {
+                    setIsPunishmentModalOpen(false)
+                }}
+                onConfirm={async () => {
+                    console.log("work")
+
+                }}
+            />
+            <View style={[globalStyles.card]} key={item.id}>
+                <View style={styles.headerRow}>
+                    <TouchableOpacity style={styles.starButton}>
+                        <AntDesign name="staro" size={24} color="#fff" />
+                        <Text style={{ color: "#fff", marginLeft: 10 }}>
+                            {item.vehicle_seizure_records?.[0].officer_name}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>ယာဉ်မောင်းအမည် -</Text>
+                    <Text style={styles.value}>{item.name}</Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>မှတ်ပုံတင်နံပါတ် -</Text>
+                    <Text style={styles.value}>{item.national_id_number}</Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
+                    <Text style={styles.value}>{item.vehicle_types}</Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={styles.label}>ယာဉ်နံပါတ် -</Text>
+                    <Text style={styles.value}>{item.vehicle_number}</Text>
+                </View>
+
+                <View style={styles.infoRow}>
+                    <Text style={[styles.label, { color: "red" }]}>ပြစ်မှုအကြိမ်အရေအတွက် -</Text>
+                    <Text style={[styles.value, { color: "red" }]}>
+                        ({toBurmeseNumber(String(item.seizure_count))} ကြိမ်)
                     </Text>
-                </TouchableOpacity>
-            </View>
+                </View>
 
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>ယာဉ်မောင်းအမည် -</Text>
-                <Text style={styles.value}>{item.name}</Text>
+                <View style={styles.buttonRow}>
+                    <AppButton
+                        label='ပြစ်မှုထည့်မည်။'
+                        onPress={() => setIsPunishmentModalOpen(true)}
+                        loading={false}
+                        icon={(props) => <AntDesign name="pluscircle" size={props.size} color={props.color} />}
+                        fullWidth={true}
+                    />
+                    <AppButton
+                        label='အသေးစိတ်ကြည့်မည်။'
+                        onPress={() => router.push({ pathname: "/(stacks)/details", params: { result: JSON.stringify(item) } })}
+                        loading={false}
+                        icon={(props) => <Entypo name="eye" size={props.size} color={props.color} />}
+                        fullWidth={true}
+                    />
+                </View>
             </View>
+        </>
 
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>မှတ်ပုံတင်နံပါတ် -</Text>
-                <Text style={styles.value}>{item.national_id_number}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
-                <Text style={styles.value}>{item.vehicle_types}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-                <Text style={styles.label}>ယာဉ်နံပါတ် -</Text>
-                <Text style={styles.value}>{item.vehicle_number}</Text>
-            </View>
-
-            <View style={styles.infoRow}>
-                <Text style={[styles.label, { color: "red" }]}>ပြစ်မှုအကြိမ်အရေအတွက် -</Text>
-                <Text style={[styles.value, { color: "red" }]}>
-                    ({toBurmeseNumber(String(item.seizure_count))} ကြိမ်)
-                </Text>
-            </View>
-
-            <View style={styles.buttonRow}>
-                <AppButton
-                    label='ပြစ်မှုထည့်မည်။'
-                    onPress={() => console.log("Add")}
-                    loading={false}
-                    icon={(props) => <AntDesign name="pluscircle" size={props.size} color={props.color} />}
-                    fullWidth={true}
-                />
-                <AppButton
-                    label='အသေးစိတ်ကြည့်မည်။'
-                    onPress={() => router.push({ pathname: "/(stacks)/details", params: { result: JSON.stringify(item) } })}
-                    loading={false}
-                    icon={(props) => <Entypo name="eye" size={props.size} color={props.color} />}
-                    fullWidth={true}
-                />
-            </View>
-        </View>
     );
 
     return (

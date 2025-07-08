@@ -1,4 +1,4 @@
-import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
+import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema'
 import globalStyles from '@/styles/globalStyles'
 import React from 'react'
 import { Controller, FieldErrors, UseFormSetValue, UseFormTrigger } from 'react-hook-form'
@@ -11,12 +11,12 @@ import VehicleCategoriesInput from '../VehicleCategoriesInput'
 
 export type InfoProps = ControlProps & {
     setCurrentInfo: (value: any) => void;
-    trigger: UseFormTrigger<AddPunishmentSchemaType>;
-    errors: FieldErrors<AddPunishmentSchemaType>;
-    setValue: UseFormSetValue<AddPunishmentSchemaType>;
+    trigger: UseFormTrigger<AddPunishmentInfoSchemaType>;
+    errors: FieldErrors<AddPunishmentInfoSchemaType>;
+    setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
 };
 
-const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors,setValue }: InfoProps) => {
+const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors, setValue }: InfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>

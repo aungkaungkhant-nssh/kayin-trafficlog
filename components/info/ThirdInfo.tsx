@@ -1,4 +1,4 @@
-import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema'
+import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema'
 import globalStyles from '@/styles/globalStyles'
 import React from 'react'
 import { Controller, UseFormSetValue } from 'react-hook-form'
@@ -11,7 +11,7 @@ import { InfoProps } from './FirstInfo'
 
 
 export type ThirdInfoProps = InfoProps & {
-    setValue: UseFormSetValue<AddPunishmentSchemaType>;
+    setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
     setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 };
 

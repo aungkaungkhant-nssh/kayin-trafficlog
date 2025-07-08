@@ -1,7 +1,7 @@
 
 import { useCommittedOffenses, useFineAmount } from '@/hooks/useCommittedOffenses';
 import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles';
-import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema';
 import globalStyles from '@/styles/globalStyles';
 import React, { useEffect } from 'react';
 import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
@@ -13,8 +13,8 @@ import AppTextInput from './ui/AppTextInput';
 export type ControlProps = {
     control: Control<any>;
     watch: UseFormWatch<any>;
-    setValue: UseFormSetValue<AddPunishmentSchemaType>;
-    errors: FieldErrors<AddPunishmentSchemaType>;
+    setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
+    errors: FieldErrors<AddPunishmentInfoSchemaType>;
 };
 
 const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) => {

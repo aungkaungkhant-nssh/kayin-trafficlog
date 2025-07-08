@@ -1,7 +1,7 @@
 import confirmLabels from '@/constants/ConfirmLabels';
 import getDisciplinaryFormat from '@/helpers/getDisplinaryFormat';
 import getNrcFormat from '@/helpers/getNrcFormat';
-import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
@@ -16,7 +16,7 @@ type ConfirmModalProps = {
     confirmText?: string;
     cancelText?: string;
     icon?: React.ReactNode;
-    data: AddPunishmentSchemaType
+    data: AddPunishmentInfoSchemaType
 };
 
 export function ConfirmModal({
@@ -74,7 +74,7 @@ export function ConfirmModal({
                                                 ? getNrcFormat(data.nrcNumber, data.nrcState, data.nrcType, data.nrcTownShip)
                                                 : name === "disciplinary_input"
                                                     ? getDisciplinaryFormat(data.article_label, data.committed_label)
-                                                    : data[name as keyof AddPunishmentSchemaType] || "မရှိ"
+                                                    : data[name as keyof AddPunishmentInfoSchemaType] || "မရှိ"
                                         }
                                     </Text>
                                 </View>

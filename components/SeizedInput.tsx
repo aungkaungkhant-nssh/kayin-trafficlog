@@ -1,5 +1,5 @@
 import { useSeizedItems } from '@/hooks/useSeizedItems';
-import { AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import { AddPunishmentSchemaType } from '@/schema/addPunishmentInfo.schema';
 import globalStyles from '@/styles/globalStyles';
 import React, { useEffect } from 'react';
 import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
