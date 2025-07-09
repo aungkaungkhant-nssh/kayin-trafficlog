@@ -45,7 +45,13 @@ const Search = () => {
             setModalVisible(true);
             setNavigateAfterClose(true);
         } else {
-            router.push({ pathname: "/(stacks)/searchResults", params: { results: JSON.stringify(res) } });
+            router.push({
+                pathname: "/(stacks)/searchResults",
+                params: {
+                    results: JSON.stringify(res),
+                    formData: JSON.stringify(data)
+                }
+            });
         }
 
     }
@@ -114,8 +120,6 @@ const Search = () => {
                         <Text style={styles.errorText}>{errors.name.message}</Text>
                     )} */}
                 </View>
-
-
 
                 <View style={globalStyles.inputWrapper}>
                     <Controller

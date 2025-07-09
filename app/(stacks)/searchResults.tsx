@@ -1,14 +1,9 @@
-import { AlertModal } from '@/components/ui/AlertModal';
-import AppButton from '@/components/ui/AppButton';
 import Header from '@/components/ui/Header';
-import PunishmentFormModal from '@/components/ui/PunishmentFormModal';
-import { toBurmeseNumber } from '@/helpers/toBurmeseNumber';
-import globalStyles from '@/styles/globalStyles';
-import { Entypo, MaterialIcons } from '@expo/vector-icons';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import SearchResultCard from '@/components/ui/SearchResultCard';
+import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { FlatList, StyleSheet, View } from 'react-native';
 
 const SearchResults = () => {
     const [modalState, setModalState] = useState<{
@@ -18,93 +13,30 @@ const SearchResults = () => {
         open: false,
         success: false,
     });
-    const { results } = useLocalSearchParams();
-    const searchData = JSON.parse(Array.isArray(results) ? results[0] : results);
+    const { results, formData } = useLocalSearchParams();
+
+    const [searchData, setSearchData] = useState<any[]>(() =>
+        JSON.parse(Array.isArray(results) ? results[0] : results)
+    );
+    const searchFormData = JSON.parse(Array.isArray(formData) ? formData[0] : formData);
+
+    const handleAddPunishment = useCallback(async () => {
+        setModalState({ open: false, success: true });
+        const freshResults = await searchOffenderVehicles(searchFormData);
+        setSearchData(freshResults);
+    }, []);
+
     const router = useRouter();
 
     const renderItem = ({ item }: any) => (
-        <>
-            {/* success modal */}
-            <AlertModal
-                visible={modalState.success}
-                onCancel={() => {
-                    router.push("/(tabs)");
-                    setModalState({ open: false, success: false });
-                }}
-                onConfirm={() => {
-                    router.push("/(tabs)/search");
-                    setModalState({ open: false, success: false });
-                }}
-                message="ပြစ်မှု ထည့်ခြင်း အောင်မြင်ပါသည်။"
-                confirmText='ဆက်လက် ရှာဖွေမည်'
-                cancelText='မူလ စာမျက်နှာ'
-                icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
-            />
-            <PunishmentFormModal
-                item={item}
-                visible={modalState.open}
-                onCancel={() => {
-                    setModalState({ open: false, success: false });
-                }}
-                onConfirm={async () => {
-                    setModalState({ open: false, success: true });
-                }}
-            />
-            <View style={[globalStyles.card]} key={item.id}>
-                <View style={styles.headerRow}>
-                    <TouchableOpacity style={styles.starButton}>
-                        <AntDesign name="staro" size={24} color="#fff" />
-                        <Text style={{ color: "#fff", marginLeft: 10 }}>
-                            {item.vehicle_seizure_records?.[0].officer_name}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>ယာဉ်မောင်းအမည် -</Text>
-                    <Text style={styles.value}>{item.name}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>မှတ်ပုံတင်နံပါတ် -</Text>
-                    <Text style={styles.value}>{item.national_id_number}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
-                    <Text style={styles.value}>{item.vehicle_types}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={styles.label}>ယာဉ်နံပါတ် -</Text>
-                    <Text style={styles.value}>{item.vehicle_number}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                    <Text style={[styles.label, { color: "red" }]}>ပြစ်မှုအကြိမ်အရေအတွက် -</Text>
-                    <Text style={[styles.value, { color: "red" }]}>
-                        ({toBurmeseNumber(String(item.seizure_count))} ကြိမ်)
-                    </Text>
-                </View>
-
-                <View style={styles.buttonRow}>
-                    <AppButton
-                        label='ပြစ်မှုထည့်မည်။'
-                        onPress={() => setModalState({ open: true, success: false })}
-                        loading={false}
-                        icon={(props) => <AntDesign name="pluscircle" size={props.size} color={props.color} />}
-                        fullWidth={true}
-                    />
-                    <AppButton
-                        label='အသေးစိတ်ကြည့်မည်။'
-                        onPress={() => router.push({ pathname: "/(stacks)/details", params: { result: JSON.stringify(item) } })}
-                        loading={false}
-                        icon={(props) => <Entypo name="eye" size={props.size} color={props.color} />}
-                        fullWidth={true}
-                    />
-                </View>
-            </View>
-        </>
+        <SearchResultCard
+            formData={formData}
+            item={item}
+            onAddPunishment={handleAddPunishment}
+            modalState={modalState}
+            setModalState={setModalState}
+            router={router}
+        />
 
     );
 

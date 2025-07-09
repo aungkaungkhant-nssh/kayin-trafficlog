@@ -1,6 +1,5 @@
-import { useSession } from '@/context/SessionContext';
-import { addPunishment } from '@/database/offenderVehicles/offenderVehicles';
-import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunishment.schema';
+import { addCase } from '@/database/offenderVehicles/offenderVehicles';
+import { addCaseSchema, AddCaseSchemaType } from '@/schema/addCase.schema';
 import globalStyles from '@/styles/globalStyles';
 import Entypo from '@expo/vector-icons/Entypo';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -8,55 +7,37 @@ import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Modal, Portal, useTheme } from 'react-native-paper';
-import DisciplinaryInput from '../DisciplinaryInput';
-import SeizedInput from '../SeizedInput';
 import AppButton from './AppButton';
 import AppTextInput from './AppTextInput';
 import CalendarInput from './CalendarInput';
+import { FormModalProps } from './PunishmentFormModal';
 
-export type FormModalProps = {
-    visible: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
-    item: any
-};
-
-const PunishmentFormModal = (
+const AddCaseFormModal = (
     {
+
         visible,
         onConfirm,
         onCancel,
         item,
     }: FormModalProps
 ) => {
-    const { officer } = useSession();
     const theme = useTheme();
-
     const {
-        watch,
         control,
         handleSubmit,
-        setValue,
         formState: { errors, isSubmitting },
-    } = useForm<AddPunishmentSchemaType>({
-        resolver: zodResolver(addPunishmentSchema),
+    } = useForm<AddCaseSchemaType>({
+        resolver: zodResolver(addCaseSchema),
         mode: "onChange",
         defaultValues: {
-            seized_date: "",
-            seizure_location: "",
-            article_id: "",
-            article_label: "",
-            committed_id: "",
-            committed_label: "",
-            fine_amount: "",
-            seizedItem_id: "",
-            seizedItem_label: ""
+            case_number: "",
+            action_date: ""
         }
     });
 
+    const onSubmit = async (data: AddCaseSchemaType) => {
 
-    const onSubmit = async (data: AddPunishmentSchemaType) => {
-        const res = await addPunishment(data, item.offender_vehicle_id, officer.id)
+        const res = await addCase(data, item.seizure_id);
         if (res.success) {
             onConfirm()
         }
@@ -85,7 +66,7 @@ const PunishmentFormModal = (
                                 textAlign: 'center',
                             }}
                         >
-                            ပြစ်မှု ထည့်မည်
+                            တရားစွဲ အမှတ် ထည့်ရန်
                         </Text>
                         <TouchableOpacity
                             onPress={onCancel}
@@ -98,53 +79,43 @@ const PunishmentFormModal = (
                     <View style={globalStyles.inputWrapper}>
                         <Controller
                             control={control}
-                            name="seized_date"
+                            name="action_date"
                             render={({ field: { onChange, value } }) => (
                                 <CalendarInput
                                     value={value}
                                     onChange={onChange}
+                                    label='လုပ်ဆောင်သည့်ရက်စွဲ'
                                 />
                             )}
                         />
-                        {errors.seized_date && (
-                            <Text style={globalStyles.errorText}>{errors.seized_date.message}</Text>
+                        {errors.action_date && (
+                            <Text style={globalStyles.errorText}>{errors.action_date.message}</Text>
                         )}
                     </View>
 
                     <View style={globalStyles.inputWrapper}>
                         <Controller
                             control={control}
-                            name="seizure_location"
+                            name="case_number"
                             render={({ field: { onChange, value } }) => (
                                 <AppTextInput
-                                    label="ဖမ်းဆည်းသည့်နေရာ"
+                                    label="တရားစွဲအမှတ်"
                                     value={value}
                                     onChangeText={onChange}
                                     multiline={true}
+                                    keyboardType='numeric'
                                 />
                             )}
                         />
-                        {errors.seizure_location && (
-                            <Text style={globalStyles.errorText}>{errors.seizure_location.message}</Text>
+                        {errors.case_number && (
+                            <Text style={globalStyles.errorText}>{errors.case_number.message}</Text>
                         )}
                     </View>
 
-                    <DisciplinaryInput
-                        control={control}
-                        watch={watch}
-                        setValue={setValue}
-                        errors={errors}
-                    />
 
-                    <SeizedInput
-                        control={control}
-                        watch={watch}
-                        errors={errors}
-                        setValue={setValue}
-                    />
 
                     <AppButton
-                        label='ပြစ်မှုထည့်မည်။'
+                        label='ထည့်မည်။'
                         loading={isSubmitting}
                         onPress={handleSubmit(onSubmit)}
                     />
@@ -155,7 +126,7 @@ const PunishmentFormModal = (
     )
 }
 
-export default PunishmentFormModal;
+export default AddCaseFormModal;
 
 const styles = StyleSheet.create({
     titleContainer: {
@@ -165,4 +136,3 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     }
 })
-

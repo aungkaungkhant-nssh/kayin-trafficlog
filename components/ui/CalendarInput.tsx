@@ -6,16 +6,21 @@ import { TextInput } from 'react-native-paper';
 interface CalendarInputProps {
     value: string;  // Assuming you store date as string in form state
     onChange: (val: string) => void;
+    label?: string;
 }
 
-export default function CalendarInput({ value, onChange }: CalendarInputProps) {
+export default function CalendarInput({ 
+    value, 
+    onChange,
+    label = "ဖမ်းဆည်းသည့်နေ့",
+}: CalendarInputProps) {
     const [show, setShow] = useState(false);
 
     return (
         <View>
             <TextInput
                 style={[styles.input]}
-                label="ဖမ်းဆည်းသည့်နေ့"
+                label={label}
                 value={value}
                 onFocus={() => setShow(true)}
                 left={<TextInput.Icon icon="calendar" onPress={() => setShow(true)} />}

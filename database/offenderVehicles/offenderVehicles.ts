@@ -1,5 +1,6 @@
 import { getNrcStateMM } from "@/helpers/nrcStateMM";
 import { toBurmeseNumber } from "@/helpers/toBurmeseNumber";
+import { AddCaseSchemaType } from "@/schema/addCase.schema";
 import { AddPunishmentSchemaType } from "@/schema/addPunishment.schema";
 import { AddPunishmentInfoSchemaType } from "@/schema/addPunishmentInfo.schema";
 import { SearchSchemaType } from "@/schema/search.schema";
@@ -92,6 +93,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                     vehicle_seizure_records.seizure_location,
                     vehicle_seizure_records.fine_paid,
                     vehicle_seizure_records.case_number,
+                    vehicle_seizure_records.action_date,
 
                     seized_items.name AS seized_item_name,
 
@@ -125,6 +127,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                 acc[record.offender_vehicle_id].push({
                     seizure_id: record.seizure_id,
                     seized_date: record.seized_date,
+                    action_date: record.action_date,
                     seizure_location: record.seizure_location,
                     fine_paid: record.fine_paid,
                     case_number: record.case_number,
@@ -314,7 +317,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 }
 
 export async function addPunishment(data: AddPunishmentSchemaType, offenderVehicleId: number, officerId: number) {
-    const db = await getDatabase(); // Ensure your DB connection is initialized properly
+    const db = await getDatabase();
 
     const {
         seized_date,
@@ -363,6 +366,46 @@ export async function addPunishment(data: AddPunishmentSchemaType, offenderVehic
         );
 
         return { success: true };
+    } catch (error: any) {
+        console.error('Error adding punishment:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+
+export async function addCase(data: AddCaseSchemaType, seizure_id: number) {
+    const db = await getDatabase();
+
+    const {
+        case_number,
+        action_date,
+    } = data;
+
+    const caseNumberInt = parseInt(case_number);
+
+    try {
+        // 1. Check if offender_vehicle_id exists
+        const checkResult = await db.getAllAsync(
+            'SELECT id FROM vehicle_seizure_records WHERE id = ?',
+            [+seizure_id]
+        );
+
+        if (checkResult.length === 0) {
+            throw new Error('Invalid Seizure ID');
+        }
+
+        await db.runAsync(
+            `
+              UPDATE vehicle_seizure_records
+              SET case_number = ?, action_date = ?, updated_at = datetime('now')
+              WHERE id = ?
+            `,
+            [caseNumberInt, action_date, seizure_id]
+        );
+
+        return { success: true, message: 'Case updated successfully.' };
+
+
     } catch (error: any) {
         console.error('Error adding punishment:', error);
         return { success: false, message: error.message };
