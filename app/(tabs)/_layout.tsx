@@ -59,13 +59,17 @@ export default function TabLayout() {
             tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
           }}
         />
+
         <Tabs.Screen
-          name="record"
+          name="case"
           options={{
-            title: 'Record',
+            title: 'တရားစွဲပြီးသော မှတ်တမ်းများ',
+            tabBarLabel: 'တရားစွဲ မှတ်တမ်း',
+            headerLeft: () => <LeftHeader />,
             tabBarIcon: ({ color }) => <AntDesign name="filetext1" size={24} color={color} />,
           }}
         />
+
         <Tabs.Screen
           name="search"
           options={{

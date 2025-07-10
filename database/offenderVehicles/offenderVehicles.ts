@@ -411,3 +411,99 @@ export async function addCase(data: AddCaseSchemaType, seizure_id: number) {
         return { success: false, message: error.message };
     }
 }
+
+export async function caseFilterWithDate(
+    startDate: string,
+    endDate: string,
+    limit = 20,
+    offset = 0
+) {
+    const db = await getDatabase();
+
+    try {
+        const results = await db.getAllAsync(
+            `
+        SELECT
+          vsr.*,
+          ov.id AS offender_vehicle_id,
+          o.name AS offender_name,
+          o.father_name AS offender_father_name,
+          o.national_id_number,
+          o.address,
+          v.vehicle_number,
+          v.vehicle_license_number,
+          v.vehicle_types,
+          da.number AS article_number,
+          co.name AS offense_name,
+          of.name AS officer_name,
+          si.name AS seized_item_name
+        FROM vehicle_seizure_records vsr
+        LEFT JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
+        LEFT JOIN offenders o ON ov.offender_id = o.id
+        LEFT JOIN vehicles v ON ov.vehicle_id = v.id
+        LEFT JOIN disciplinary_committed dc ON vsr.disciplinary_committed_id = dc.id
+        LEFT JOIN disciplinary_articles da ON dc.disciplinary_articles_id = da.id
+        LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
+        LEFT JOIN officers of ON vsr.officer_id = of.id
+        LEFT JOIN seized_items si ON vsr.seized_item = si.id
+        WHERE vsr.action_date IS NOT NULL
+          AND vsr.case_number IS NOT NULL
+          AND vsr.action_date BETWEEN ? AND ?
+        ORDER BY vsr.action_date DESC
+        LIMIT ? OFFSET ?
+        `,
+            [startDate, endDate, limit, offset]
+        );
+
+        return results;
+    } catch (error: any) {
+        console.error('Error fetching case records:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+
+export async function caseFilterWithDate2(startDate: string, endDate: string) {
+    const db = await getDatabase();
+
+    try {
+        const results = await db.getAllAsync(
+            `
+        SELECT
+          vsr.*,
+          ov.id AS offender_vehicle_id,
+          o.name AS offender_name,
+          o.father_name AS offender_father_name,
+          o.national_id_number,
+          o.address,
+          v.vehicle_number,
+          v.vehicle_license_number,
+          v.vehicle_types,
+          da.number AS article_number,
+          co.name AS offense_name,
+          of.name AS officer_name,
+          si.name AS seized_item_name
+        FROM vehicle_seizure_records vsr
+        LEFT JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
+        LEFT JOIN offenders o ON ov.offender_id = o.id
+        LEFT JOIN vehicles v ON ov.vehicle_id = v.id
+        LEFT JOIN disciplinary_committed dc ON vsr.disciplinary_committed_id = dc.id
+        LEFT JOIN disciplinary_articles da ON dc.disciplinary_articles_id = da.id
+        LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
+        LEFT JOIN officers of ON vsr.officer_id = of.id
+        LEFT JOIN seized_items si ON vsr.seized_item = si.id
+        WHERE vsr.action_date IS NOT NULL
+          AND vsr.case_number IS NOT NULL
+          AND vsr.action_date BETWEEN ? AND ?
+        `,
+            [startDate, endDate]
+        );
+
+        return results;
+    } catch (error: any) {
+        console.error('Error fetching case records:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+
