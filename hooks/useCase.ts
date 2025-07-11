@@ -1,4 +1,4 @@
-import { caseFilterWithDate } from "@/database/offenderVehicles/offenderVehicles";
+import { caseFilterWithDatePaginateData } from "@/database/offenderVehicles/offenderVehicles";
 import { useCallback, useEffect, useState } from "react";
 
 const PAGE_SIZE = 10;
@@ -27,7 +27,7 @@ export const useCaseFilterWithDate = (
             setError(null);
 
             try {
-                const data = await caseFilterWithDate(
+                const data = await caseFilterWithDatePaginateData(
                     startDateStr,
                     endDateStr,
                     vehicleCategoryIdStr,

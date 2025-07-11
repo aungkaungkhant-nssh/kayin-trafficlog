@@ -412,7 +412,7 @@ export async function addCase(data: AddCaseSchemaType, seizure_id: number) {
     }
 }
 
-export async function caseFilterWithDate(
+export async function caseFilterWithDatePaginateData(
     startDate: string,
     endDate: string,
     vehicleCategoryIdStr: string,
@@ -467,10 +467,16 @@ export async function caseFilterWithDate(
 }
 
 
-export async function caseFilterWithDate2(startDate: string, endDate: string) {
+export async function caseFilterWithDateData(
+    startDate: string,
+    endDate: string,
+    vehicleCategoryIdStr: string
+) {
     const db = await getDatabase();
 
     try {
+        const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
+
         const results = await db.getAllAsync(
             `
         SELECT
@@ -499,6 +505,8 @@ export async function caseFilterWithDate2(startDate: string, endDate: string) {
         WHERE vsr.action_date IS NOT NULL
           AND vsr.case_number IS NOT NULL
           AND vsr.action_date BETWEEN ? AND ?
+        
+        ORDER BY vsr.action_date DESC
         `,
             [startDate, endDate]
         );

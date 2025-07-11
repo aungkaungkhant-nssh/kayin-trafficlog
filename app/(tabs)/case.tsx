@@ -4,6 +4,7 @@ import ExportButton from '@/components/ui/ExportButton';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import NotFound from '@/components/ui/NotFound';
 import VehicleCategoriesFilter from '@/components/ui/VehicleCategoriesFilter';
+import { caseFilterWithDateData } from '@/database/offenderVehicles/offenderVehicles';
 import { useCaseFilterWithDate } from '@/hooks/useCase';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories';
 import { format, subDays } from 'date-fns';
@@ -25,14 +26,15 @@ const Case = () => {
     }, [vehicleCategories]);
 
 
-    const { cases, loading, error, loadMore, hasMore } = useCaseFilterWithDate(
+    const { cases, loading, loadMore, hasMore } = useCaseFilterWithDate(
         fromDate,
         toDate,
         vehicleCategoryId
     );
 
-    if (loading && cases.length === 0) {
-        return <LoadingSpinner />
+    const handleExport = async () => {
+        const data = await caseFilterWithDateData(fromDate, toDate, vehicleCategoryId) as any;
+        console.log(data.length)
     }
 
     return (
@@ -64,8 +66,7 @@ const Case = () => {
                 )
 
             }
-
-            <ExportButton />
+            <ExportButton onPress={handleExport} />
         </View>
     )
 }

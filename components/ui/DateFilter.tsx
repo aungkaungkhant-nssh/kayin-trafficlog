@@ -24,8 +24,6 @@ const DateFilter = (
         [setToDate]
     );
 
-    console.log("DateFilter render");
-
     return (
         <View style={styles.headerContainer}>
             <CalendarInput
