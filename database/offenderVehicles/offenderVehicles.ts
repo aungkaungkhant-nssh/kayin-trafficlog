@@ -415,12 +415,15 @@ export async function addCase(data: AddCaseSchemaType, seizure_id: number) {
 export async function caseFilterWithDate(
     startDate: string,
     endDate: string,
+    vehicleCategoryIdStr: string,
     limit = 20,
     offset = 0
 ) {
     const db = await getDatabase();
 
     try {
+        const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
+
         const results = await db.getAllAsync(
             `
         SELECT
@@ -449,10 +452,11 @@ export async function caseFilterWithDate(
         WHERE vsr.action_date IS NOT NULL
           AND vsr.case_number IS NOT NULL
           AND vsr.action_date BETWEEN ? AND ?
+          AND (? = '' OR v.vehicle_categories_id = ?)
         ORDER BY vsr.action_date DESC
         LIMIT ? OFFSET ?
         `,
-            [startDate, endDate, limit, offset]
+            [startDate, endDate, vehicleCategoryId, vehicleCategoryId, limit, offset]
         );
 
         return results;

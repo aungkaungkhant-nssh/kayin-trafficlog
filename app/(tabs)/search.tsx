@@ -39,7 +39,6 @@ const Search = () => {
 
 
     const onSubmit = async (data: SearchSchemaType) => {
-
         const res = await searchOffenderVehicles(data);
         if (!res.length) {
             setModalVisible(true);

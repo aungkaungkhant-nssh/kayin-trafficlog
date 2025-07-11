@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StyleSheet, View } from 'react-native';
 import CalendarInput from './CalendarInput';
 
@@ -14,23 +14,37 @@ interface DateFilterProps {
 const DateFilter = (
     { fromDate, toDate, setFromDate, setToDate }: DateFilterProps
 ) => {
+    const handleFromDateChange = useCallback(
+        (value: string) => setFromDate(value),
+        [setFromDate]
+    );
+
+    const handleToDateChange = useCallback(
+        (value: string) => setToDate(value),
+        [setToDate]
+    );
+
+    console.log("DateFilter render");
+
     return (
         <View style={styles.headerContainer}>
             <CalendarInput
                 value={fromDate}
-                onChange={(value) => setFromDate(value)}
+                onChange={handleFromDateChange}
                 label='ရက်နေ့မှ'
             />
             <CalendarInput
                 value={toDate}
-                onChange={(value) => setToDate(value)}
+                onChange={handleToDateChange}
                 label='ရက်နေ့အထိ'
             />
         </View>
-    )
-}
+    );
+};
 
-export default DateFilter;
+
+
+export default React.memo(DateFilter);
 
 
 const styles = StyleSheet.create({

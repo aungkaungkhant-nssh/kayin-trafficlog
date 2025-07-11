@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 export const useVehicleCategories = () => {
     const [vehicleCategories, setVehicleCategories] = useState([]);
+    
     useEffect(() => {
         (async () => {
             const data = await getVehicleCategories() as any;
