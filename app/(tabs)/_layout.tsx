@@ -61,10 +61,10 @@ export default function TabLayout() {
         />
 
         <Tabs.Screen
-          name="case"
+          name="records"
           options={{
-            title: 'တရားစွဲပြီးသော မှတ်တမ်းများ',
-            tabBarLabel: 'တရားစွဲ မှတ်တမ်း',
+            title: 'မှတ်တမ်းများ',
+            tabBarLabel: 'မှတ်တမ်းများ',
             headerLeft: () => <LeftHeader />,
             tabBarIcon: ({ color }) => <AntDesign name="filetext1" size={24} color={color} />,
           }}

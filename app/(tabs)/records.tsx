@@ -11,7 +11,7 @@ import { format, subDays } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-const Case = () => {
+const Records = () => {
     const today = new Date();
     const tenDaysAgo = subDays(today, 10);
     const { vehicleCategories } = useVehicleCategories() as any;
@@ -36,7 +36,7 @@ const Case = () => {
         const data = await caseFilterWithDateData(fromDate, toDate, vehicleCategoryId) as any;
         console.log(data.length)
     }
-
+    console.log(cases)
     return (
         <View style={styles.container}>
             <DateFilter
@@ -71,7 +71,7 @@ const Case = () => {
     )
 }
 
-export default Case;
+export default Records;
 
 const styles = StyleSheet.create({
     container: {

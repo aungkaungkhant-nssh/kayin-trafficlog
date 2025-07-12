@@ -3,6 +3,7 @@ import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Badge } from 'react-native-paper';
 import { Collapsible } from '../Collapsible';
+import CaseInfo from './CaseInfo';
 
 interface PropsType {
     data: any[],
@@ -14,7 +15,7 @@ interface PropsType {
 const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
     const renderItem = ({ item }: any) => (
         <View style={styles.collapseItem}>
-            <Collapsible title={`📆 ${item.action_date} | 👤 ${item.offender_name}`}>
+            <Collapsible title={`🚗 ${item.vehicle_number} | 👤 ${item.offender_name}`}>
                 <View style={styles.row}>
                     <View style={styles.labelRow}>
                         <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
@@ -71,20 +72,18 @@ const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
                     </View>
                     <Text style={styles.value}>{item.seized_date}</Text>
                 </View>
-                <View style={styles.row}>
-                    <View style={styles.labelRow}>
-                        <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
-                        <Text style={styles.label}>ရာကြီးအမှတ်</Text>
-                    </View>
-                    <Text style={styles.value}>{item.case_number}</Text>
-                </View>
-                <View style={styles.row}>
-                    <View style={styles.labelRow}>
-                        <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
-                        <Text style={styles.label}>ဒဏ်ငွေ</Text>
-                    </View>
-                    <Text style={styles.value}>{item.fine_paid}</Text>
-                </View>
+                {
+                    item.case_number && item.action_date && (
+                        <View style={styles.row}>
+                            <View style={styles.labelRow}>
+                                <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
+                                <Text style={styles.label}>ဒဏ်ငွေ</Text>
+                            </View>
+                            <Text style={styles.value}>{item.fine_amount}</Text>
+                        </View>
+                    )
+                }
+
                 <View style={styles.row}>
                     <View style={styles.labelRow}>
                         <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
@@ -92,6 +91,16 @@ const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
                     </View>
                     <Text style={styles.value}>{item.seized_item_name}</Text>
                 </View>
+
+                {
+                    item.case_number && item.action_date && (
+                        <CaseInfo
+                            caseNumber={item.case_number}
+                            actionDate={item.action_date}
+                        />
+                    )
+                }
+
 
             </Collapsible>
         </View>
@@ -170,5 +179,25 @@ const styles = StyleSheet.create({
         color: 'white',
         fontWeight: 'bold',
         paddingHorizontal: 10,
+    },
+
+    caseInfoContainer: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#e0f7fa',
+        borderRadius: 8,
+    },
+    caseInfoText: {
+        fontSize: 16,
+        marginBottom: 4,
+        color: '#00796b',
+    },
+    caseNumber: {
+        fontWeight: 'bold',
+        color: '#004d40',
+    },
+    caseDate: {
+        fontWeight: 'bold',
+        color: '#00695c',
     },
 })

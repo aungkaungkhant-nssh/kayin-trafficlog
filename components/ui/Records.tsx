@@ -5,6 +5,7 @@ import { LabelTypeEnum } from '@/utils/enum/LabelEnum';
 import React from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { Collapsible } from '../Collapsible';
+import CaseInfo from './CaseInfo';
 
 const recordHeader = () => (
     <View style={styles.stickyRecordHeader}>
@@ -29,14 +30,10 @@ const Records = ({ records, onAddCase }: { records: any[]; onAddCase: (id: numbe
                             loading={false}
                         />
                     ) : (
-                        <View style={styles.caseInfoContainer}>
-                            <Text style={styles.caseInfoText}>
-                                🧾 တရားစွဲအမှတ်: <Text style={styles.caseNumber}>{item.case_number}</Text>
-                            </Text>
-                            <Text style={styles.caseInfoText}>
-                                📅 လုပ်ဆောင်သည့်ရက်စွဲ: <Text style={styles.caseDate}>{item.action_date}</Text>
-                            </Text>
-                        </View>
+                        <CaseInfo
+                            caseNumber={item.case_number}
+                            actionDate={item.actionDate}
+                        />
                     )}
                 </Collapsible>
             </View>
@@ -72,25 +69,6 @@ const styles = StyleSheet.create({
         color: 'red',
         fontWeight: '700',
         textAlign: 'center',
-    },
-    caseInfoContainer: {
-        marginTop: 10,
-        padding: 10,
-        backgroundColor: '#e0f7fa',
-        borderRadius: 8,
-    },
-    caseInfoText: {
-        fontSize: 16,
-        marginBottom: 4,
-        color: '#00796b',
-    },
-    caseNumber: {
-        fontWeight: 'bold',
-        color: '#004d40',
-    },
-    caseDate: {
-        fontWeight: 'bold',
-        color: '#00695c',
     },
     recordScrollContent: {
         paddingBottom: 20,

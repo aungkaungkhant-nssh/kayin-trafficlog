@@ -426,7 +426,7 @@ export async function caseFilterWithDatePaginateData(
 
         const results = await db.getAllAsync(
             `
-        SELECT
+        SELECT DISTINCT vsr.id,
           vsr.*,
           ov.id AS offender_vehicle_id,
           o.name AS offender_name,
@@ -437,6 +437,7 @@ export async function caseFilterWithDatePaginateData(
           v.vehicle_license_number,
           v.vehicle_types,
           da.number AS article_number,
+          dc.fine_amount AS fine_amount,
           co.name AS offense_name,
           of.name AS officer_name,
           si.name AS seized_item_name
@@ -449,14 +450,25 @@ export async function caseFilterWithDatePaginateData(
         LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
         LEFT JOIN officers of ON vsr.officer_id = of.id
         LEFT JOIN seized_items si ON vsr.seized_item = si.id
-        WHERE vsr.action_date IS NOT NULL
-          AND vsr.case_number IS NOT NULL
-          AND vsr.action_date BETWEEN ? AND ?
+        WHERE (
+          (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
+          OR
+          (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
+        )
           AND (? = '' OR v.vehicle_categories_id = ?)
-        ORDER BY vsr.action_date DESC
+        ORDER BY COALESCE(vsr.action_date, vsr.seized_date) DESC
         LIMIT ? OFFSET ?
         `,
-            [startDate, endDate, vehicleCategoryId, vehicleCategoryId, limit, offset]
+            [
+                startDate,
+                endDate,
+                startDate,
+                endDate,
+                vehicleCategoryId,
+                vehicleCategoryId,
+                limit,
+                offset,
+            ]
         );
 
         return results;
@@ -465,6 +477,7 @@ export async function caseFilterWithDatePaginateData(
         return { success: false, message: error.message };
     }
 }
+
 
 
 export async function caseFilterWithDateData(
