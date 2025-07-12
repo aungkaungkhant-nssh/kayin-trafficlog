@@ -4,6 +4,7 @@ import { AddCaseSchemaType } from "@/schema/addCase.schema";
 import { AddPunishmentSchemaType } from "@/schema/addPunishment.schema";
 import { AddPunishmentInfoSchemaType } from "@/schema/addPunishmentInfo.schema";
 import { SearchSchemaType } from "@/schema/search.schema";
+import { ExportTypeEnum } from "@/utils/enum/ExportType";
 import { getDatabase } from "../db";
 
 
@@ -478,31 +479,62 @@ export async function caseFilterWithDatePaginateData(
     }
 }
 
-
-
 export async function caseFilterWithDateData(
     startDate: string,
     endDate: string,
-    vehicleCategoryIdStr: string
-) {
+    vehicleCategoryIdStr: string,
+    exportType: ExportTypeEnum
+  ) {
     const db = await getDatabase();
-
+  
     try {
-        const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
-
-        const results = await db.getAllAsync(
-            `
+      const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
+  
+      // Build base condition
+      let dateFilter = '';
+      const params: any[] = [];
+  
+      switch (exportType) {
+        case ExportTypeEnum.Filed:
+          dateFilter = `vsr.action_date IS NOT NULL AND vsr.case_number IS NOT NULL AND vsr.action_date BETWEEN ? AND ?`;
+          params.push(startDate, endDate);
+          break;
+  
+        case ExportTypeEnum.UnFiled:
+          dateFilter = `vsr.action_date IS NULL AND vsr.case_number IS NULL AND vsr.seized_date BETWEEN ? AND ?`;
+          params.push(startDate, endDate);
+          break;
+  
+        case ExportTypeEnum.All:
+        default:
+          dateFilter = `
+            (
+              (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
+              OR
+              (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
+            )
+          `;
+          params.push(startDate, endDate, startDate, endDate);
+          break;
+      }
+  
+      params.push(vehicleCategoryId, vehicleCategoryId);
+  
+      const results = await db.getAllAsync(
+        `
         SELECT
-          vsr.*,
-          ov.id AS offender_vehicle_id,
+          vsr.action_date,
+          vsr.case_number,
+          vsr.seized_date,
+          vsr.seizure_location,
           o.name AS offender_name,
           o.father_name AS offender_father_name,
           o.national_id_number,
           o.address,
           v.vehicle_number,
-          v.vehicle_license_number,
           v.vehicle_types,
           da.number AS article_number,
+          dc.fine_amount,
           co.name AS offense_name,
           of.name AS officer_name,
           si.name AS seized_item_name
@@ -515,20 +547,19 @@ export async function caseFilterWithDateData(
         LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
         LEFT JOIN officers of ON vsr.officer_id = of.id
         LEFT JOIN seized_items si ON vsr.seized_item = si.id
-        WHERE vsr.action_date IS NOT NULL
-          AND vsr.case_number IS NOT NULL
-          AND vsr.action_date BETWEEN ? AND ?
-        
-        ORDER BY vsr.action_date DESC
+        WHERE ${dateFilter}
+          AND (? = '' OR v.vehicle_categories_id = ?)
+        ORDER BY COALESCE(vsr.action_date, vsr.seized_date) DESC
         `,
-            [startDate, endDate]
-        );
-
-        return results;
+        params
+      );
+  
+      return results;
     } catch (error: any) {
-        console.error('Error fetching case records:', error);
-        return { success: false, message: error.message };
+      console.error('Error fetching case records:', error);
+      return { success: false, message: error.message };
     }
-}
+  }
+  
 
 

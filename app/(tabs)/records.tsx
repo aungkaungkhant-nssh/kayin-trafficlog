@@ -1,12 +1,16 @@
 import CaseRecord from '@/components/ui/CaseRecords';
 import DateFilter from '@/components/ui/DateFilter';
 import ExportButton from '@/components/ui/ExportButton';
+import ExportModal from '@/components/ui/ExportModal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import NotFound from '@/components/ui/NotFound';
 import VehicleCategoriesFilter from '@/components/ui/VehicleCategoriesFilter';
+import vehicleCategoriesData from '@/constants/VehicleCategories';
 import { caseFilterWithDateData } from '@/database/offenderVehicles/offenderVehicles';
+import { saveExcelToDownloads } from '@/helpers/saveExcelToDownLoad';
 import { useCaseFilterWithDate } from '@/hooks/useCase';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories';
+import { ExportTypeEnum } from '@/utils/enum/ExportType';
 import { format, subDays } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
@@ -18,6 +22,8 @@ const Records = () => {
     const [fromDate, setFromDate] = useState(format(tenDaysAgo, 'yyyy-MM-dd'));
     const [toDate, setToDate] = useState(format(today, 'yyyy-MM-dd'));
     const [vehicleCategoryId, setVehicleCategoryId] = useState("");
+    const [exportType, setExportType] = useState(ExportTypeEnum.All);
+    const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         if (vehicleCategories.length && !vehicleCategoryId) {
@@ -33,12 +39,22 @@ const Records = () => {
     );
 
     const handleExport = async () => {
-        const data = await caseFilterWithDateData(fromDate, toDate, vehicleCategoryId) as any;
-        console.log(data.length)
+        const data = await caseFilterWithDateData(fromDate, toDate, vehicleCategoryId, exportType) as any;
+        if (data?.length) {
+            const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
+            await saveExcelToDownloads(data, fileName)
+        }
+
     }
-    console.log(cases)
     return (
         <View style={styles.container}>
+            <ExportModal
+                exportType={exportType}
+                setExportType={setExportType}
+                visible={visible}
+                onCancel={() => setVisible(false)}
+                onConfirm={() => handleExport()}
+            />
             <DateFilter
                 fromDate={fromDate}
                 toDate={toDate}
@@ -66,7 +82,7 @@ const Records = () => {
                 )
 
             }
-            <ExportButton onPress={handleExport} />
+            <ExportButton onPress={() => setVisible(true)} />
         </View>
     )
 }
