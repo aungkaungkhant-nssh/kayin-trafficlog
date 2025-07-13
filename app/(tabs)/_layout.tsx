@@ -98,7 +98,9 @@ export default function TabLayout() {
         <Tabs.Screen
           name="import"
           options={{
-            title: 'Import',
+            title: 'ဒေတာဖိုင်ထည့်ပါ', // Top header title
+            tabBarLabel: 'ထည့်သွင်းမှု',
+            headerLeft: () => <LeftHeader />,
             tabBarIcon: ({ color }) => <AntDesign name="filetext1" size={24} color={color} />,
           }}
         />

@@ -53,7 +53,8 @@
     "tailwindcss": "^3.4.17",
     "xlsx": "^0.18.5",
     "zod": "^3.25.67",
-    "expo-sharing": "~13.1.5"
+    "expo-sharing": "~13.1.5",
+    "expo-document-picker": "~13.1.6"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
