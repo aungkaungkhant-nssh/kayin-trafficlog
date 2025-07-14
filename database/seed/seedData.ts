@@ -8,13 +8,13 @@ export async function seedData() {
 
 
     // seed vehicleCategories data
-    await Promise.all(
-      vehicleCategories.map(async (category) => {
-        await database.execAsync(`
-                    INSERT INTO vehicle_categories (name) VALUES ('${category}');
-                `);
-      })
-    )
+    // await Promise.all(
+    //   vehicleCategories.map(async (category) => {
+    //     await database.execAsync(`
+    //                 INSERT INTO vehicle_categories (name) VALUES ('${category}');
+    //             `);
+    //   })
+    // )
 
     // seed seizedItems data
     // await Promise.all(

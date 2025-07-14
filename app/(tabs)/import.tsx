@@ -1,6 +1,9 @@
+import { AlertModal } from '@/components/ui/AlertModal';
 import { importData } from '@/database/offenderVehicles/offenderVehicles';
 import { pickAndParseExcelFile } from '@/helpers/pickUpAndParseExcelFile';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories'; // Adjust path if needed
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
     StyleSheet,
@@ -12,16 +15,34 @@ import {
 const Import = () => {
     const { vehicleCategories } = useVehicleCategories();
     const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-
+    const router = useRouter();
+    const [isSuccess, setIsSuccess] = useState(false);
 
     const handleImport = async () => {
         const jsonData = await pickAndParseExcelFile();
         if (!jsonData || !selectedCategoryId) return;
-        await importData(jsonData, selectedCategoryId)
+        const res = await importData(jsonData, selectedCategoryId);
+        if (res?.success) {
+            setIsSuccess(true)
+        }
     }
 
     return (
         <View style={styles.container}>
+            <AlertModal
+                visible={isSuccess}
+                onCancel={() => {
+                    setIsSuccess(false)
+                }}
+                onConfirm={() => {
+                    router.push("/(tabs)");
+                    setIsSuccess(false)
+                }}
+                message="ဒေတာဖိုင်ထည့်ခြင်း အောင်မြင်ပါသည်။"
+                confirmText='မူလ စာမျက်နှာ'
+                cancelText='ပိတ်မည်'
+                icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
+            />
             <Text style={styles.title}>ဒေတာဖိုင် အမျိုးအစားရွေးချယ်ရန်</Text>
 
             <View style={styles.buttonGroup}>

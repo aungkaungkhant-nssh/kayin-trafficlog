@@ -6,7 +6,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import Header from '@/components/ui/Header';
 import { useSession } from '@/context/SessionContext';
 import { storePunishment } from '@/database/offenderVehicles/offenderVehicles';
-import { addPunishmentInfoSchema,AddPunishmentInfoSchemaType} from '@/schema/addPunishmentInfo.schema';
+import { addPunishmentInfoSchema, AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema';
 import Step from '@/utils/enum/Step';
 import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +38,7 @@ const AddPunishment = () => {
             nrcState: '3',
             nrcTownShip: 'ဘအန',
             nrcType: 'နိုင်',
-            nrcNumber: "222222",
+            nrcNumber: "",
             vehicle_number: '',
             vehicle_categories_id: '',
             vehicle_categories_label: "",

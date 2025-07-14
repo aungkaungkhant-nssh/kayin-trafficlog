@@ -30,6 +30,7 @@ const SearchResults = () => {
 
     const renderItem = ({ item }: any) => (
         <SearchResultCard
+            key={item.offender_id}
             formData={formData}
             item={item}
             onAddPunishment={handleAddPunishment}
@@ -39,7 +40,6 @@ const SearchResults = () => {
         />
 
     );
-
     return (
         <FlatList
             data={searchData}
@@ -48,7 +48,7 @@ const SearchResults = () => {
                     {renderItem({ item })}
                 </View>
             )}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.offender_id}
             ListHeaderComponent={<Header title="ရှာမည်" />}
             stickyHeaderIndices={[0]}
         />

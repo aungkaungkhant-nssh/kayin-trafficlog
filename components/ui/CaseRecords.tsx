@@ -35,7 +35,7 @@ const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
                         <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
                         <Text style={styles.label}>မှတ်ပုံတင်အမှတ်</Text>
                     </View>
-                    <Text style={styles.value}>{item.national_id_number}</Text>
+                    <Text style={styles.value}>{item.national_id_number || "မရှိ"}</Text>
                 </View>
                 <View style={styles.row}>
                     <View style={styles.labelRow}>

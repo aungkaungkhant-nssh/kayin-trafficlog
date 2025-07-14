@@ -104,7 +104,7 @@ const NationalIdInput = ({ control, watch }: ControlProps) => {
                                 value={value}
                                 onChangeText={onChange}
                                 style={{ height: 50 }}
-                                placeholder=''
+                                placeholder='222222'
                                 keyboardType='numeric'
                             />
                         )}

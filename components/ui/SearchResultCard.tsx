@@ -67,7 +67,7 @@ const SearchResultCard = ({
 
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>မှတ်ပုံတင်နံပါတ် -</Text>
-                    <Text style={styles.value}>{item.national_id_number}</Text>
+                    <Text style={styles.value}>{item.national_id_number || "မရှိ"}</Text>
                 </View>
 
                 <View style={styles.infoRow}>

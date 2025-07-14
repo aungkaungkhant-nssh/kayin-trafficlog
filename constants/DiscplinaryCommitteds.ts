@@ -40,7 +40,7 @@ const DisciplinaryCommitted = [
     },
 
     {
-        article: "၉၁ က",
+        article: "၉၁က",
         committed: [
             {
                 title: "သတ်မှတ်မမောင်း",
