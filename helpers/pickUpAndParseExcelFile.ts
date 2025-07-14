@@ -1,8 +1,31 @@
+import { ImportEnum } from '@/utils/enum/ImportEnum';
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system';
 import * as XLSX from 'xlsx';
 import excelDateToJSDate from './excelDatetoJsDate';
 import removeSpacesFromKeysAndValues from './removeSpaceKeysAndValues';
+
+function cleanKeysAndValues(data: any[]): any[] {
+    return data.map(item => {
+        const newItem: any = {};
+        for (const key in item) {
+            if (Object.prototype.hasOwnProperty.call(item, key)) {
+                const cleanKey = key
+                    .replace(/[\n\r]/g, '')
+                    .replace(/[\u200B-\u200D\uFEFF]/g, '')
+                    .trim();
+
+                let value = item[key];
+                if (typeof value === 'string') {
+                    value = value.trim();
+                }
+
+                newItem[cleanKey] = value;
+            }
+        }
+        return newItem;
+    });
+}
 
 
 export async function pickAndParseExcelFile(): Promise<any[] | null> {
@@ -29,10 +52,13 @@ export async function pickAndParseExcelFile(): Promise<any[] | null> {
         let jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
 
         // Convert Excel serial dates in specific fields
+
+        jsonData = cleanKeysAndValues(jsonData);
+
         jsonData = jsonData.map(row => ({
             ...row,
-            "ရက်စွဲ": typeof row["ရက်စွဲ"] === 'number' ? excelDateToJSDate(row["ရက်စွဲ"]) : row["ရက်စွဲ"],
-            "အရေးယူရက်စွဲ": typeof row["အရေးယူရက်စွဲ"] === 'number' ? excelDateToJSDate(row["အရေးယူရက်စွဲ"]) : row["အရေးယူရက်စွဲ"],
+            "ရက်စွဲ": typeof row[ImportEnum.Date] === 'number' ? excelDateToJSDate(row[ImportEnum.Date]) : row[ImportEnum.Date],
+            "အရေးယူရက်စွဲ": typeof row[ImportEnum.ActionTakenDate] === 'number' ? excelDateToJSDate(row[ImportEnum.ActionTakenDate]) : row[ImportEnum.ActionTakenDate],
         }));
 
 

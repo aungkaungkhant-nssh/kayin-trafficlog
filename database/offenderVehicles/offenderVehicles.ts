@@ -1,4 +1,5 @@
 import getArticleAndOffense from "@/helpers/getArticleAndOffense";
+import getNormalizedValue from "@/helpers/normalize";
 import { getNrcStateMM } from "@/helpers/nrcStateMM";
 import sanitize from "@/helpers/sanitize";
 import { toBurmeseNumber } from "@/helpers/toBurmeseNumber";
@@ -31,9 +32,11 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
     const conditions: string[] = [];
     const params: any[] = [];
 
-    // const r = await db.getAllAsync("DELETE FROM offenders WHERE id =11");
+    // const r = await db.runAsync("DELETE FROM offenders WHERE id=5");
+    // await db.execAsync("PRAGMA foreign_keys = ON;");
 
-
+    // await db.runAsync("DELETE FROM offender_vehicles WHERE offender_id = 14");
+    // await db.runAsync("DELETE FROM offenders WHERE id = 14");
 
     try {
         // Handle name variants specially
@@ -582,21 +585,25 @@ export async function caseFilterWithDateData(
 
 export async function importData(data: any[], vehicleCategoryId: number) {
     const db = await getDatabase();
+
     try {
         for (const item of data) {
-            const name = item[ImportEnum.Name];
-            const fatherName = item[ImportEnum.FatherName];
-            const nationalId = (item[ImportEnum.NRC] === "မရှိ" || "") ? "" : item[ImportEnum.NRC];
-            const address = item[ImportEnum.Address];
-            const disciplinaryCommitted = item[ImportEnum.ActionTakenSection];
-            const actionOfficer = item[ImportEnum.ActionOfficer];
-            const seizedItem = item[ImportEnum.SeizedItems];
-            const vehicleNumber = item[ImportEnum.VehicleNumber];
-            const vehicleTypes = item[ImportEnum.VehicleTypeAndColor];
-            const seizedLocation = item[ImportEnum.Location];
-            const seizedDate = item[ImportEnum.Date]
-            const actionDate = item[ImportEnum.ActionTakenDate];
-            const caseNumber = item[ImportEnum.CaseNumber];
+            const name = getNormalizedValue(item, ImportEnum.Name);
+            const fatherName = getNormalizedValue(item, ImportEnum.FatherName);
+
+            const nationalIdRaw = getNormalizedValue(item, ImportEnum.NRC);
+            const nationalId = (nationalIdRaw === "မရှိ" || nationalIdRaw === "") ? "" : nationalIdRaw;
+
+            const address = getNormalizedValue(item, ImportEnum.Address);
+            const disciplinaryCommitted = getNormalizedValue(item, ImportEnum.ActionTakenSection);
+            const actionOfficer = getNormalizedValue(item, ImportEnum.ActionOfficer);
+            const seizedItem = getNormalizedValue(item, ImportEnum.SeizedItems);
+            const vehicleNumber = getNormalizedValue(item, ImportEnum.VehicleNumber);
+            const vehicleTypes = getNormalizedValue(item, ImportEnum.VehicleTypeAndColor);
+            const seizedLocation = getNormalizedValue(item, ImportEnum.Location);
+            const seizedDate = getNormalizedValue(item, ImportEnum.Date);
+            const actionDate = getNormalizedValue(item, ImportEnum.ActionTakenDate);
+            const caseNumber = getNormalizedValue(item, ImportEnum.CaseNumber);
 
             // 1. Check or insert offender
             const existingOffender = await db.getFirstAsync(
@@ -688,7 +695,6 @@ export async function importData(data: any[], vehicleCategoryId: number) {
 
             }
 
-
             // officerProcess
             let officerId: number | null = null;
             officerId = await db.getFirstAsync(
@@ -710,6 +716,7 @@ export async function importData(data: any[], vehicleCategoryId: number) {
 
 
             if (offenderId && vehicleId && offenderVehicleId && disciplinaryCommittedId && officerId && seizedItemId) {
+
                 const existingRecord = await db.getFirstAsync(
                     `
                     SELECT id FROM vehicle_seizure_records 
