@@ -28,7 +28,6 @@ const PunishmentFormModal = ({
     onCancel,
     item,
 }: FormModalProps) => {
-    console.log("item", item)
     const { officer } = useSession();
     const theme = useTheme();
 

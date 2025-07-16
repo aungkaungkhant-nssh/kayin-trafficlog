@@ -30,7 +30,6 @@ export function ConfirmModal({
     data
 }: ConfirmModalProps) {
     const theme = useTheme();
-    console.log(data)
     return (
         <Portal>
             <Modal

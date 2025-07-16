@@ -37,7 +37,6 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 
     // await db.runAsync("DELETE FROM offender_vehicles WHERE offender_id = 14");
     // await db.runAsync("DELETE FROM offenders WHERE id = 14");
-
     try {
         // Handle name variants specially
         if (normalizedName) {

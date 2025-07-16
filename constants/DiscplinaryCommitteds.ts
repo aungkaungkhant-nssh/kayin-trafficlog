@@ -17,7 +17,7 @@ const DisciplinaryCommitted = [
         article: "၉၆",
         committed: [
             {
-                title: "ယာဉ်ကြောပိတ်ဆို",
+                title: "ယာဉ်ကြောပိတ်ဆို့",
                 fineAmount: "၃၀၀၀၀",
             },
             {
