@@ -27,43 +27,69 @@ function cleanKeysAndValues(data: any[]): any[] {
     });
 }
 
+export async function pickAndParseExcelFiles(files: any): Promise<any[]> {
+    const allData: any[] = [];
 
-export async function pickAndParseExcelFile(): Promise<any[] | null> {
+    for (const file of files) {
+        try {
+            const base64Data = await FileSystem.readAsStringAsync(file.uri, {
+                encoding: FileSystem.EncodingType.Base64,
+            });
+
+            const workbook = XLSX.read(base64Data, { type: 'base64' });
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+
+            let jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
+
+            jsonData = cleanKeysAndValues(jsonData);
+
+            jsonData = jsonData.map(row => ({
+                ...row,
+                "ရက်စွဲ": typeof row[ImportEnum.Date] === 'number' ? excelDateToJSDate(row[ImportEnum.Date]) : row[ImportEnum.Date],
+                "အရေးယူရက်စွဲ": typeof row[ImportEnum.ActionTakenDate] === 'number' ? excelDateToJSDate(row[ImportEnum.ActionTakenDate]) : row[ImportEnum.ActionTakenDate],
+            }));
+
+            const cleanedData = removeSpacesFromKeysAndValues(jsonData);
+
+            allData.push(...cleanedData);
+        } catch (error) {
+            console.error(`Failed to parse file ${file.name}:`, error);
+        }
+    }
+
+    // Sort by ရက်စွဲ ascending
+    allData.sort((a, b) => {
+        const dateA = new Date(a["ရက်စွဲ"]);
+        const dateB = new Date(b["ရက်စွဲ"]);
+
+        if (isNaN(dateA.getTime())) return 1;
+        if (isNaN(dateB.getTime())) return -1;
+
+        return dateA.getTime() - dateB.getTime();
+    });
+
+    return allData;
+}
+
+
+/**
+ * This helper picks multiple Excel files and returns their parsed combined data.
+ */
+export async function pickMultipleAndParseExcelFiles(): Promise<any[] | null> {
     try {
         const fileResult = await DocumentPicker.getDocumentAsync({
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             copyToCacheDirectory: true,
+            multiple: true,   // Enable multiple selection
         });
 
         if (fileResult.canceled || !fileResult.assets?.length) return null;
 
-        const file = fileResult.assets[0];
+        // fileResult.assets is an array of selected files
+        const parsedData = await pickAndParseExcelFiles(fileResult.assets);
 
-        // Read file content as base64 string
-        const base64Data = await FileSystem.readAsStringAsync(file.uri, {
-            encoding: FileSystem.EncodingType.Base64,
-        });
-
-        // Parse Excel workbook and get first worksheet
-        const workbook = XLSX.read(base64Data, { type: 'base64' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-
-        let jsonData: any[] = XLSX.utils.sheet_to_json(worksheet);
-
-        // Convert Excel serial dates in specific fields
-
-        jsonData = cleanKeysAndValues(jsonData);
-
-        jsonData = jsonData.map(row => ({
-            ...row,
-            "ရက်စွဲ": typeof row[ImportEnum.Date] === 'number' ? excelDateToJSDate(row[ImportEnum.Date]) : row[ImportEnum.Date],
-            "အရေးယူရက်စွဲ": typeof row[ImportEnum.ActionTakenDate] === 'number' ? excelDateToJSDate(row[ImportEnum.ActionTakenDate]) : row[ImportEnum.ActionTakenDate],
-        }));
-
-
-        const cleanedData = removeSpacesFromKeysAndValues(jsonData);
-        return cleanedData
+        return parsedData;
     } catch (error) {
         console.error('Excel import error:', error);
         return null;

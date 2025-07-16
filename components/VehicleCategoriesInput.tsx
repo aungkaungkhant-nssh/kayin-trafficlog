@@ -11,16 +11,17 @@ import AppDropdown from './ui/AppDropDown';
 const VehicleCategoriesInput = ({ control, watch, errors, setValue }: ControlProps) => {
   const { vehicleCategories } = useVehicleCategories() as any;
 
-  const selectedId = watch('seizedItem_id');
+  const selectedId = watch('vehicle_categories_id');
 
+  // Only auto-select the first category if none is already selected
   useEffect(() => {
-    if (vehicleCategories.length) {
+    if (vehicleCategories.length && !selectedId) {
       setValue('vehicle_categories_id', vehicleCategories[0].value);
       setValue('vehicle_categories_label', vehicleCategories[0].label);
     }
-  }, [vehicleCategories, setValue]);
+  }, [vehicleCategories, selectedId, setValue]);
 
-  // Update vehicle_categories when user changes dropdown
+  // Update label when user selects a category
   useEffect(() => {
     const selected = vehicleCategories.find((item: any) => item.value === selectedId);
     if (selected) {
@@ -31,29 +32,28 @@ const VehicleCategoriesInput = ({ control, watch, errors, setValue }: ControlPro
   return (
     <View style={styles.inputWrapper}>
       <View style={styles.dropDownContainer}>
-        <View>
-          <Controller
-            control={control}
-            name="vehicle_categories_id"
-            render={({ field: { onChange, value } }) => (
-              <AppDropdown
-                selectedValue={value}
-                onValueChange={onChange}
-                options={vehicleCategories}
-                placeholder={vehicleCategories[0]?.label}
-                style={{ width: "100%" }}
-                label='ယာဉ်အမျိုးအစား'
-              />
-            )}
-          />
-          {errors.vehicle_categories_id && (
-            <Text style={globalStyles.errorText}>{errors.vehicle_categories_id.message}</Text>
+        <Controller
+          control={control}
+          name="vehicle_categories_id"
+          render={({ field: { onChange, value } }) => (
+            <AppDropdown
+              selectedValue={value}
+              onValueChange={onChange}
+              options={vehicleCategories}
+              placeholder="ယာဉ်အမျိုးအစား ရွေးပါ"
+              style={{ width: "100%" }}
+              label="ယာဉ်အမျိုးအစား"
+            />
           )}
-        </View>
+        />
+        {errors.vehicle_categories_id && (
+          <Text style={globalStyles.errorText}>{errors.vehicle_categories_id.message}</Text>
+        )}
       </View>
     </View>
-  )
-}
+  );
+};
+
 
 export default VehicleCategoriesInput;
 

@@ -1,4 +1,5 @@
 import Header from '@/components/ui/Header';
+import PunishmentFormModal from '@/components/ui/PunishmentFormModal';
 import SearchResultCard from '@/components/ui/SearchResultCard';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -6,13 +7,9 @@ import React, { useCallback, useState } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 const SearchResults = () => {
-    const [modalState, setModalState] = useState<{
-        open: boolean;
-        success: boolean;
-    }>({
-        open: false,
-        success: false,
-    });
+    const [modalState, setModalState] = useState(false);
+    const [selectedData, setSelectedData] = useState(null);
+
     const { results, formData } = useLocalSearchParams();
 
     const [searchData, setSearchData] = useState<any[]>(() =>
@@ -21,7 +18,7 @@ const SearchResults = () => {
     const searchFormData = JSON.parse(Array.isArray(formData) ? formData[0] : formData);
 
     const handleAddPunishment = useCallback(async () => {
-        setModalState({ open: false, success: true });
+        setModalState(true);
         const freshResults = await searchOffenderVehicles(searchFormData);
         setSearchData(freshResults);
     }, []);
@@ -33,25 +30,34 @@ const SearchResults = () => {
             key={item.offender_id}
             formData={formData}
             item={item}
-            onAddPunishment={handleAddPunishment}
             modalState={modalState}
             setModalState={setModalState}
+            setSelectedData={setSelectedData}
             router={router}
         />
 
     );
     return (
-        <FlatList
-            data={searchData}
-            renderItem={({ item }) => (
-                <View style={styles.itemContainer}>
-                    {renderItem({ item })}
-                </View>
-            )}
-            keyExtractor={(item) => item.offender_id}
-            ListHeaderComponent={<Header title="ရှာမည်" />}
-            stickyHeaderIndices={[0]}
-        />
+        <>
+            <PunishmentFormModal
+                item={selectedData}
+                visible={selectedData ? true : false}
+                onCancel={() => setSelectedData(null)}
+                onConfirm={handleAddPunishment}
+            />
+            <FlatList
+                data={searchData}
+                renderItem={({ item }) => (
+                    <View style={styles.itemContainer}>
+                        {renderItem({ item })}
+                    </View>
+                )}
+                keyExtractor={(item) => item.offender_vehicle_id}
+                ListHeaderComponent={<Header title="ရှာမည်" />}
+                stickyHeaderIndices={[0]}
+            />
+        </>
+
     );
 }
 

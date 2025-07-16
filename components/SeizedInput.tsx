@@ -2,7 +2,7 @@ import { useSeizedItems } from '@/hooks/useSeizedItems';
 import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema';
 import globalStyles from '@/styles/globalStyles';
 import React, { useEffect } from 'react';
-import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Control, Controller, FieldErrors, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 
@@ -10,7 +10,7 @@ export type ControlProps = {
   control: Control<any>;
   watch: UseFormWatch<any>;
   errors: FieldErrors<AddPunishmentInfoSchemaType>;
-  setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
+  setValue: any;
 };
 
 

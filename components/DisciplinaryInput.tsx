@@ -13,7 +13,7 @@ import AppTextInput from './ui/AppTextInput';
 export type ControlProps = {
     control: Control<any>;
     watch: UseFormWatch<any>;
-    setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
+    setValue: UseFormSetValue<any>;
     errors: FieldErrors<AddPunishmentInfoSchemaType>;
 };
 

@@ -4,12 +4,13 @@ import { addPunishmentSchema, AddPunishmentSchemaType } from '@/schema/addPunish
 import globalStyles from '@/styles/globalStyles';
 import Entypo from '@expo/vector-icons/Entypo';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Modal, Portal, useTheme } from 'react-native-paper';
 import DisciplinaryInput from '../DisciplinaryInput';
 import SeizedInput from '../SeizedInput';
+import VehicleCategoriesInput from '../VehicleCategoriesInput';
 import AppButton from './AppButton';
 import AppTextInput from './AppTextInput';
 import CalendarInput from './CalendarInput';
@@ -21,14 +22,13 @@ export type FormModalProps = {
     item: any
 };
 
-const PunishmentFormModal = (
-    {
-        visible,
-        onConfirm,
-        onCancel,
-        item,
-    }: FormModalProps
-) => {
+const PunishmentFormModal = ({
+    visible,
+    onConfirm,
+    onCancel,
+    item,
+}: FormModalProps) => {
+    console.log("item", item)
     const { officer } = useSession();
     const theme = useTheme();
 
@@ -37,6 +37,7 @@ const PunishmentFormModal = (
         control,
         handleSubmit,
         setValue,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm<AddPunishmentSchemaType>({
         resolver: zodResolver(addPunishmentSchema),
@@ -50,15 +51,29 @@ const PunishmentFormModal = (
             committed_label: "",
             fine_amount: "",
             seizedItem_id: "",
-            seizedItem_label: ""
+            seizedItem_label: "",
+            vehicle_categories_id: "",
+            vehicle_categories_label: "",
+            vehicle_number: "",
+            vehicle_types: ""
         }
     });
 
+    // Set values from `item` when modal becomes visible
+    useEffect(() => {
+        if (visible && item) {
+            setValue('vehicle_number', item.vehicle_number || '');
+            setValue('vehicle_types', item.vehicle_types || '');
+            if (item.vehicle_categories_id) {
+                setValue('vehicle_categories_id', String(item.vehicle_categories_id));
+            }
+        }
+    }, [visible, item, setValue]);
 
     const onSubmit = async (data: AddPunishmentSchemaType) => {
-        const res = await addPunishment(data, item.offender_vehicle_id, officer.id)
+        const res = await addPunishment(data, item, officer.id);
         if (res.success) {
-            onConfirm()
+            onConfirm();
         }
     };
 
@@ -87,12 +102,9 @@ const PunishmentFormModal = (
                         >
                             ပြစ်မှု ထည့်မည်
                         </Text>
-                        <TouchableOpacity
-                            onPress={onCancel}
-                        >
+                        <TouchableOpacity onPress={onCancel}>
                             <Entypo name="circle-with-cross" size={24} color={theme.colors.primary} />
                         </TouchableOpacity>
-
                     </View>
 
                     <View style={globalStyles.inputWrapper}>
@@ -100,10 +112,7 @@ const PunishmentFormModal = (
                             control={control}
                             name="seized_date"
                             render={({ field: { onChange, value } }) => (
-                                <CalendarInput
-                                    value={value}
-                                    onChange={onChange}
-                                />
+                                <CalendarInput value={value} onChange={onChange} />
                             )}
                         />
                         {errors.seized_date && (
@@ -120,7 +129,7 @@ const PunishmentFormModal = (
                                     label="ဖမ်းဆည်းသည့်နေရာ"
                                     value={value}
                                     onChangeText={onChange}
-                                    multiline={true}
+                                    multiline
                                 />
                             )}
                         />
@@ -143,17 +152,59 @@ const PunishmentFormModal = (
                         setValue={setValue}
                     />
 
+                    <View style={globalStyles.inputWrapper}>
+                        <Controller
+                            control={control}
+                            name="vehicle_number"
+                            render={({ field: { onChange, value } }) => (
+                                <AppTextInput
+                                    label="ယာဉ်နံပါတ်"
+                                    value={value}
+                                    onChangeText={onChange}
+                                />
+                            )}
+                        />
+                        {errors.vehicle_number && (
+                            <Text style={globalStyles.errorText}>{errors.vehicle_number.message}</Text>
+                        )}
+                    </View>
+
+                    <View style={globalStyles.inputWrapper}>
+                        <Controller
+                            control={control}
+                            name="vehicle_types"
+                            render={({ field: { onChange, value } }) => (
+                                <AppTextInput
+                                    label="ယာဉ်မော်ဒယ်"
+                                    value={value}
+                                    onChangeText={onChange}
+                                    multiline
+                                />
+                            )}
+                        />
+                        {errors.vehicle_types && (
+                            <Text style={globalStyles.errorText}>{errors.vehicle_types.message}</Text>
+                        )}
+                    </View>
+
+                    <VehicleCategoriesInput
+                        control={control}
+                        watch={watch}
+                        errors={errors}
+                        setValue={setValue}
+                    />
+
                     <AppButton
-                        label='ပြစ်မှုထည့်မည်။'
+                        label="ပြစ်မှုထည့်မည်။"
                         loading={isSubmitting}
                         onPress={handleSubmit(onSubmit)}
                     />
-
                 </View>
             </Modal>
         </Portal>
-    )
-}
+    );
+};
+
 
 export default PunishmentFormModal;
 

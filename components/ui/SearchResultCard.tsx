@@ -6,15 +6,14 @@ import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { AlertModal } from './AlertModal';
 import AppButton from './AppButton';
-import PunishmentFormModal from './PunishmentFormModal';
 
 
 interface Props {
     item: any;
     formData: any;
-    modalState: { open: boolean; success: boolean };
-    setModalState: React.Dispatch<React.SetStateAction<{ open: boolean; success: boolean }>>;
-    onAddPunishment: () => void;
+    modalState: boolean;
+    setModalState: React.Dispatch<React.SetStateAction<any>>;
+    setSelectedData: React.Dispatch<React.SetStateAction<any>>;
     router: any;
 }
 
@@ -23,19 +22,21 @@ const SearchResultCard = ({
     formData,
     modalState,
     setModalState,
-    onAddPunishment,
+    setSelectedData,
     router,
 }: Props) => {
     return (
         <View style={styles.itemContainer}>
             <AlertModal
-                visible={modalState.success}
+                visible={modalState}
                 onCancel={() => {
                     router.push('/(tabs)');
-                    setModalState({ open: false, success: false });
+                    setModalState(false);
+                    setSelectedData(null)
                 }}
                 onConfirm={() => {
-                    setModalState({ open: false, success: false });
+                    setModalState(false);
+                    setSelectedData(null)
                 }}
                 message="ပြစ်မှု ထည့်ခြင်း အောင်မြင်ပါသည်။"
                 confirmText="ပိတ်မည်။"
@@ -43,12 +44,7 @@ const SearchResultCard = ({
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
             />
 
-            <PunishmentFormModal
-                item={item}
-                visible={modalState.open}
-                onCancel={() => setModalState({ open: false, success: false })}
-                onConfirm={onAddPunishment}
-            />
+
 
             <View style={globalStyles.card}>
                 <View style={styles.headerRow}>
@@ -90,7 +86,7 @@ const SearchResultCard = ({
                 <View style={styles.buttonRow}>
                     <AppButton
                         label="ပြစ်မှုထည့်မည်။"
-                        onPress={() => setModalState({ open: true, success: false })}
+                        onPress={() => setSelectedData(item)}
                         icon={(props) => <AntDesign name="pluscircle" size={props.size} color={props.color} />}
                         fullWidth
                     />

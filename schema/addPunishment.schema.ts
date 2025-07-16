@@ -11,7 +11,12 @@ export const addPunishmentSchema = z.object({
     fine_amount: z.string(),
 
     seizedItem_id: z.string(),
-    seizedItem_label: z.string()
+    seizedItem_label: z.string(),
+
+    vehicle_number: z.string().optional(), // was: isOptional() → use .optional()
+    vehicle_categories_id: z.string().optional(),
+    vehicle_categories_label: z.string(),
+    vehicle_types: z.string().optional(),
 });
 
 export type AddPunishmentSchemaType = z.infer<typeof addPunishmentSchema>;
