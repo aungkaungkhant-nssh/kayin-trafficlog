@@ -639,6 +639,141 @@ export async function caseFilterWithDateData(
     }
 }
 
+export async function caseFilterWithDateData2(
+    startDate: string,
+    endDate: string,
+    vehicleCategoryIdStr: string,
+    exportType: ExportTypeEnum
+) {
+    const db = await getDatabase();
+
+    try {
+        const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : null;
+
+        let dateFilter = '';
+        const params: any[] = [];
+
+        switch (exportType) {
+            case ExportTypeEnum.Filed:
+                dateFilter = `
+            vsr.action_date IS NOT NULL
+            AND vsr.case_number IS NOT NULL
+            AND vsr.action_date BETWEEN ? AND ?
+          `;
+                params.push(startDate, endDate);
+                break;
+
+            case ExportTypeEnum.UnFiled:
+                dateFilter = `
+            vsr.action_date IS NULL
+            AND vsr.case_number IS NULL
+            AND vsr.seized_date BETWEEN ? AND ?
+          `;
+                params.push(startDate, endDate);
+                break;
+
+            case ExportTypeEnum.All:
+            default:
+                dateFilter = `
+            (
+              (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
+              OR
+              (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
+            )
+          `;
+                params.push(startDate, endDate, startDate, endDate);
+                break;
+        }
+
+        if (vehicleCategoryId !== null) {
+            dateFilter += ` AND v.vehicle_categories_id = ?`;
+            params.push(vehicleCategoryId);
+        }
+
+        const results = await db.getAllAsync(
+            `
+        SELECT
+          vsr.id AS seizure_id,
+          vsr.seized_date,
+          vsr.action_date,
+          vsr.case_number,
+          vsr.seizure_location,
+          vsr.fine_paid,
+          vsr.created_at AS seizure_created_at,
+          vsr.updated_at AS seizure_updated_at,
+  
+          -- offender_vehicles
+          ov.id AS offender_vehicle_id,
+          ov.created_at AS offender_vehicle_created_at,
+          ov.updated_at AS offender_vehicle_updated_at,
+  
+          -- offenders
+          o.id AS offender_id,
+          o.name AS offender_name,
+          o.father_name AS offender_father_name,
+          o.national_id_number,
+          o.driver_license_number,
+          o.address AS offender_address,
+          o.created_at AS offender_created_at,
+          o.updated_at AS offender_updated_at,
+  
+          -- vehicles
+          v.id AS vehicle_id,
+          v.vehicle_number,
+          v.vehicle_categories_id,
+          v.vehicle_types,
+          v.wheel_tax,
+          v.vehicle_license_number,
+          v.created_at AS vehicle_created_at,
+          v.updated_at AS vehicle_updated_at,
+  
+          -- disciplinary_committed
+          dc.id AS disciplinary_committed_id,
+          dc.fine_amount,
+          dc.created_at AS dc_created_at,
+          dc.updated_at AS dc_updated_at,
+  
+          -- disciplinary_articles
+          da.id AS article_id,
+          da.number AS article_number,
+  
+          -- committed_offenses
+          co.id AS offense_id,
+          co.name AS offense_name,
+  
+          -- officers
+          of.id AS officer_id,
+          of.name AS officer_name,
+  
+          -- seized_items
+          si.id AS seized_item_id,
+          si.name AS seized_item_name
+  
+        FROM vehicle_seizure_records vsr
+        LEFT JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
+        LEFT JOIN offenders o ON ov.offender_id = o.id
+        LEFT JOIN vehicles v ON ov.vehicle_id = v.id
+        LEFT JOIN disciplinary_committed dc ON vsr.disciplinary_committed_id = dc.id
+        LEFT JOIN disciplinary_articles da ON dc.disciplinary_articles_id = da.id
+        LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
+        LEFT JOIN officers of ON vsr.officer_id = of.id
+        LEFT JOIN seized_items si ON vsr.seized_item = si.id
+  
+        WHERE ${dateFilter}
+        ORDER BY COALESCE(vsr.action_date, vsr.seized_date) DESC
+        `,
+            params
+        );
+
+        return results;
+    } catch (error: any) {
+        console.error('Error fetching case records:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+
+
 export async function importData(data: any[], vehicleCategoryId: number) {
     const db = await getDatabase();
 

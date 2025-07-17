@@ -5,21 +5,19 @@ import ExportModal from '@/components/ui/ExportModal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import NotFound from '@/components/ui/NotFound';
 import VehicleCategoriesFilter from '@/components/ui/VehicleCategoriesFilter';
-import vehicleCategoriesData from '@/constants/VehicleCategories';
-import { caseFilterWithDateData } from '@/database/offenderVehicles/offenderVehicles';
-import { saveExcelToDownloads } from '@/helpers/saveExcelToDownLoad';
+import { caseFilterWithDateData2 } from '@/database/offenderVehicles/offenderVehicles';
+import { exportSeizureDataToJson } from '@/helpers/exportJsonFile';
 import { useCaseFilterWithDate } from '@/hooks/useCase';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories';
 import { ExportTypeEnum } from '@/utils/enum/ExportType';
-import { format, subDays } from 'date-fns';
+import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 const Records = () => {
     const today = new Date();
-    const tenDaysAgo = subDays(today, 10);
     const { vehicleCategories } = useVehicleCategories() as any;
-    const [fromDate, setFromDate] = useState(format(tenDaysAgo, 'yyyy-MM-dd'));
+    const [fromDate, setFromDate] = useState(format(today, 'yyyy-MM-dd'));
     const [toDate, setToDate] = useState(format(today, 'yyyy-MM-dd'));
     const [vehicleCategoryId, setVehicleCategoryId] = useState("");
     const [exportType, setExportType] = useState(ExportTypeEnum.All);
@@ -39,11 +37,16 @@ const Records = () => {
     );
 
     const handleExport = async () => {
-        const data = await caseFilterWithDateData(fromDate, toDate, vehicleCategoryId, exportType) as any;
-        if (data?.length) {
-            const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
-            await saveExcelToDownloads(data, fileName)
+        const data = await caseFilterWithDateData2(fromDate, toDate, vehicleCategoryId, exportType) as any;
+
+        if (data.length) {
+            const jsonFile = await exportSeizureDataToJson(data);
+            console.log(jsonFile)
         }
+        // if (data?.length) {
+        //     const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
+        //     await saveExcelToDownloads(data, fileName)
+        // }
 
     }
     return (
