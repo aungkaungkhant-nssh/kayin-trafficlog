@@ -14,7 +14,6 @@ import { getDatabase } from "../db";
 
 export async function searchOffenderVehicles(data: SearchSchemaType) {
     const db = await getDatabase();
-
     let { name, fatherName, nrcState, nrcNumber, nrcTownShip, nrcType, vehicleNumber, vehicleLicense } = data;
     const nrcNumberMM = toBurmeseNumber(nrcNumber);
     const nationalIdNumber = `${getNrcStateMM(nrcState)}${nrcTownShip}(${nrcType})${nrcNumberMM}`;
@@ -199,6 +198,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
     const db = await getDatabase();
 
+
     try {
         await db.execAsync("PRAGMA foreign_keys = ON;");
 
@@ -229,6 +229,12 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         const seizedItemIdInt = parseInt(seizedItem_id, 10);
         const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
 
+        // id generate
+        const baseId = Date.now();
+        const newVehicleId = baseId + 1;
+        const newOffenderVehicleId = baseId + 2;
+        const newSeizureRecordId = baseId + 3;
+
         if (
             isNaN(committedIdInt) ||
             isNaN(seizedItemIdInt) ||
@@ -237,11 +243,13 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
             throw new Error("Invalid committed_id, seizedItem_id, or vehicle_categories_id. They must be valid numbers.");
         }
 
+
         const committedRow = await db.getFirstAsync(
             `SELECT id FROM disciplinary_committed WHERE id = ?`,
             [committedIdInt]
         );
         if (!committedRow) throw new Error(`committed_id ${committedIdInt} does not exist.`);
+
 
         const seizedItemRow = await db.getFirstAsync(
             `SELECT id FROM seized_items WHERE id = ?`,
@@ -261,10 +269,12 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         if (nrcState && nrcTownShip && nrcType && nrcNumberMM) {
             nationalIdNumber = `${getNrcStateMM(nrcState)}${sanitize(nrcTownShip)}(${sanitize(nrcType)})${nrcNumberMM}`;
         }
+
         // Insert offender
         await db.runAsync(
-            `INSERT INTO offenders (name, father_name, national_id_number, driver_license_number, address) VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address) VALUES (?,?, ?, ?, ?, ?)`,
             [
+                baseId,
                 sanitize(name),
                 sanitize(father_name),
                 sanitize(nationalIdNumber),
@@ -272,6 +282,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
                 sanitize(address),
             ]
         );
+
         const { id: offenderId } = (await db.getFirstAsync(
             `SELECT last_insert_rowid() as id`
         )) as any;
@@ -279,8 +290,10 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
         // Insert vehicle
         await db.runAsync(
-            `INSERT INTO vehicles (vehicle_number, vehicle_categories_id, vehicle_types, wheel_tax, vehicle_license_number) VALUES (?, ?, ?, ?, ?)`,
+            `INSERT INTO vehicles (id,vehicle_number, vehicle_categories_id, vehicle_types, wheel_tax, vehicle_license_number) 
+             VALUES (?, ?, ?, ?, ?, ?)`,
             [
+                newVehicleId,
                 sanitize(vehicle_number),
                 vehicleCategoriesInt,
                 sanitize(vehicle_types),
@@ -295,8 +308,8 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
         // Link offender and vehicle
         await db.runAsync(
-            `INSERT INTO offender_vehicles (offender_id, vehicle_id) VALUES (?, ?)`,
-            [offenderId, vehicleId]
+            `INSERT INTO offender_vehicles (id,offender_id, vehicle_id) VALUES (?, ?, ?)`,
+            [newOffenderVehicleId, offenderId, vehicleId]
         );
         const { id: offenderVehicleId } = (await db.getFirstAsync(
             `SELECT last_insert_rowid() as id`
@@ -306,10 +319,12 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         // Insert vehicle seizure record
         await db.runAsync(
             `INSERT INTO vehicle_seizure_records (
+                id,
                 offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
                 seizure_location, fine_paid, action_date, case_number, seized_item
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
+                newSeizureRecordId,
                 offenderVehicleId,
                 committedIdInt,
                 officerId,
@@ -355,6 +370,12 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
     const committedIdInt = parseInt(committed_id, 10);
     const seizedItemIdInt = parseInt(seizedItem_id, 10);
 
+    //id generate
+    const baseId = Date.now();
+    const newVehicleId = baseId + 1;
+    const newOffenderVehicleId = baseId + 2;
+    const newSeizureRecordId = baseId + 3;
+
     try {
         // 1. Check if offender_vehicle_id exists
         const checkResult = await db.getAllAsync(
@@ -377,9 +398,11 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
             data.vehicle_types &&
             vehicleCategoryId
         ) {
-            const insertResult = await db.runAsync(
+
+            await db.runAsync(
                 `
                 INSERT INTO vehicles (
+                    id,
                     vehicle_number,
                     vehicle_categories_id,
                     vehicle_types,
@@ -387,9 +410,10 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
                     vehicle_license_number,
                     created_at,
                     updated_at
-                ) VALUES (?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+                ) VALUES (?,?, ?, ?, ?, ?, datetime('now'), datetime('now'))
                 `,
                 [
+                    newVehicleId,
                     data.vehicle_number,
                     vehicleCategoryId,
                     data.vehicle_types,
@@ -398,26 +422,17 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
                 ]
             );
 
-            const newVehicleId = insertResult.lastInsertRowId;
             const offenderId = item.offender_id;
 
-
-            if (!offenderId || !newVehicleId) {
-                throw new Error('Missing offenderId or newVehicleId');
-            }
-
-            const offender_vehicle = await db.runAsync(
-                `
-                    INSERT INTO offender_vehicles (
-                        offender_id,
-                        vehicle_id,
-                        created_at,
-                        updated_at
-                    ) VALUES (?, ?, datetime('now'), datetime('now'))
-                `,
-                [offenderId, newVehicleId]
+            await db.runAsync(
+                `INSERT INTO offender_vehicles (id, offender_id, vehicle_id) VALUES (?, ?, ?)`,
+                [newOffenderVehicleId, offenderId, newVehicleId]
             );
-            offenderVehicleId = offender_vehicle.lastInsertRowId;
+
+            const { id } = (await db.getFirstAsync(
+                `SELECT last_insert_rowid() as id`
+            )) as any;
+            offenderVehicleId = id;
 
         }
 
@@ -425,6 +440,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
         // 2. Insert into vehicle_seizure_records
         await db.runAsync(
             `INSERT INTO vehicle_seizure_records (
+          id,
           offender_vehicles,
           disciplinary_committed_id,
           officer_id,
@@ -432,8 +448,9 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
           seizure_location,
           fine_paid,
           seized_item
-        ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
             [
+                newSeizureRecordId,
                 offenderVehicleId,
                 committedIdInt,
                 officerId,
