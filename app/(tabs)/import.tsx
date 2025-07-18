@@ -1,8 +1,8 @@
 import { AlertModal } from '@/components/ui/AlertModal';
-import { importData } from '@/database/offenderVehicles/offenderVehicles';
-import { pickAndParseExcelFiles } from '@/helpers/pickUpAndParseExcelFile';
+import { importJsonData } from '@/database/offenderVehicles/offenderVehicles';
+import { getJsonData } from '@/helpers/getJsonData';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories';
-import { MaterialIcons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
@@ -22,9 +22,14 @@ const Import = () => {
     const router = useRouter();
 
     const handlePickFile = async () => {
+        // const result = await DocumentPicker.getDocumentAsync({
+        //     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        //     copyToCacheDirectory: true,
+        // });
         const result = await DocumentPicker.getDocumentAsync({
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            type: 'application/json',
             copyToCacheDirectory: true,
+            multiple: false, // optional
         });
 
         if (!result.canceled && result.assets?.length) {
@@ -37,13 +42,10 @@ const Import = () => {
     };
 
     const handleImport = async () => {
-
         if (!selectedFiles.length || !selectedCategoryId) return;
-
-        const jsonData = await pickAndParseExcelFiles(selectedFiles);
-        if (!jsonData.length) return;
-
-        const res = await importData(jsonData, selectedCategoryId);
+        const jsonData = await getJsonData(selectedFiles);
+        if (!jsonData?.length) return;
+        const res = await importJsonData(jsonData);
         if (res?.success) setIsSuccess(true);
     };
 
@@ -62,57 +64,37 @@ const Import = () => {
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
             />
 
-            <Text style={styles.title}>ဒေတာအမျိုးအစား ရွေးချယ်ရန်</Text>
 
-            <View style={styles.buttonGroup}>
-                {vehicleCategories.map((category: any) => {
-                    const isSelected = selectedCategoryId === category.value;
+            <TouchableOpacity style={styles.uploadBox} onPress={handlePickFile}>
+                <View style={styles.iconCircle}>
+                    <Ionicons name="cloud-upload-outline" size={28} color="#fff" />
+                </View>
+                <Text style={styles.uploadText}>ဖိုင်ရွေးရန်</Text>
+            </TouchableOpacity>
 
-                    return (
+            <>
+                {selectedFiles.length > 0 && (
+                    <>
+                        <View style={styles.fileList}>
+                            {selectedFiles.map(file => (
+                                <View key={file.uri} style={styles.fileItem}>
+                                    <Text numberOfLines={1} style={styles.fileName}>{file.name}</Text>
+                                    <TouchableOpacity onPress={() => handleRemoveFile(file.uri)}>
+                                        <Text style={styles.removeText}>ဖျက်မည်</Text>
+                                    </TouchableOpacity>
+                                </View>
+                            ))}
+                        </View>
+
                         <TouchableOpacity
-                            key={category.value}
-                            style={[styles.button, isSelected && styles.selectedButton]}
-                            onPress={() => setSelectedCategoryId(category.value)}
-                            activeOpacity={0.85}
+                            style={[styles.confirmButton, { backgroundColor: '#000080' }]}
+                            onPress={handleImport}
                         >
-                            <Text style={[styles.buttonText, isSelected && styles.selectedText]}>
-                                {category.label}
-                            </Text>
+                            <Text style={[styles.confirmButtonText, { color: "#fff" }]}>📥 ဖိုင်ထည့်မည်</Text>
                         </TouchableOpacity>
-                    );
-                })}
-            </View>
-
-            {selectedCategoryId !== null && (
-                <>
-                    <TouchableOpacity style={styles.confirmButton} onPress={handlePickFile}>
-
-                        <Text style={styles.confirmButtonText}>📄 ဖိုင်ရွေးရန်</Text>
-                    </TouchableOpacity>
-
-                    {selectedFiles.length > 0 && (
-                        <>
-                            <View style={styles.fileList}>
-                                {selectedFiles.map(file => (
-                                    <View key={file.uri} style={styles.fileItem}>
-                                        <Text numberOfLines={1} style={styles.fileName}>{file.name}</Text>
-                                        <TouchableOpacity onPress={() => handleRemoveFile(file.uri)}>
-                                            <Text style={styles.removeText}>ဖျက်မည်</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                ))}
-                            </View>
-
-                            <TouchableOpacity
-                                style={[styles.confirmButton, { backgroundColor: '#000080' }]}
-                                onPress={handleImport}
-                            >
-                                <Text style={[styles.confirmButtonText, { color: "#fff" }]}>📥 ဖိုင်ထည့်မည်</Text>
-                            </TouchableOpacity>
-                        </>
-                    )}
-                </>
-            )}
+                    </>
+                )}
+            </>
         </ScrollView>
     );
 };
@@ -133,36 +115,28 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#222',
     },
-    buttonGroup: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'space-between',
-        gap: 12,
-    },
-    button: {
-        width: '48%',
-        paddingVertical: 14,
-        paddingHorizontal: 16,
-        borderRadius: 20,
-        backgroundColor: '#ffffff',
-        borderWidth: 1,
-        borderColor: '#ddd',
-        marginBottom: 12,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.08,
-        shadowRadius: 4,
-    },
-    selectedButton: {
-        backgroundColor: '#000080',
+    uploadBox: {
+        borderStyle: 'dashed',
         borderColor: '#000080',
-        shadowOpacity: 0.2,
+        borderWidth: 2,
+        borderRadius: 16,
+        paddingVertical: 30,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 20,
+        backgroundColor: '#fff',
     },
-    buttonText: {
-        fontSize: 15,
-        textAlign: 'center',
-        color: '#333',
+    iconCircle: {
+        backgroundColor: '#000080',
+        borderRadius: 50,
+        padding: 15,
+        marginBottom: 10,
+    },
+    uploadText: {
+        color: '#000080',
+        fontSize: 16,
+        fontWeight: '500',
     },
     selectedText: {
         color: '#fff',

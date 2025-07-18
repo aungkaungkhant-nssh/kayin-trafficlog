@@ -791,7 +791,7 @@ export async function caseFilterWithDateData2(
 
 
 
-export async function importData(data: any[], vehicleCategoryId: number) {
+export async function importExcelData(data: any[], vehicleCategoryId: number) {
     const db = await getDatabase();
 
     try {
@@ -980,6 +980,143 @@ export async function importData(data: any[], vehicleCategoryId: number) {
     }
 
 }
+
+export async function importJsonData(data: any[]) {
+    const db = await getDatabase();
+
+    try {
+        data.map(async (data) => {
+            const {
+                vehicle_id,
+                offender_vehicle_id,
+                vehicle_categories_id,
+                vehicle_number,
+                vehicle_types,
+                offender_id,
+                offender_name,
+                offender_father_name,
+                national_id_number,
+                driver_license_number,
+                offender_address,
+                seizure_id,
+                disciplinary_committed_id,
+                officer_id,
+                seized_date,
+                seizure_location,
+                action_date,
+                case_number,
+                seized_item_id
+            } = data;
+
+            const offenderVehicle = await db.getFirstAsync(
+                `SELECT * FROM offender_vehicles WHERE id = ?`,
+                [offender_vehicle_id]
+            ) as any;
+            let offenderVehicleId = offenderVehicle?.id || null;
+
+            // has offender Vehicle
+            if (!offenderVehicleId) {
+                const vehicle = await db.getFirstAsync("select * from vehicles where id =?", [vehicle_id]) as any;
+                let vehicleId = vehicle?.id || null;
+
+                //create new vehicle
+                if (!vehicleId) {
+                    await db.runAsync(
+                        `
+                        INSERT INTO vehicles (
+                            id,
+                            vehicle_number,
+                            vehicle_categories_id,
+                            vehicle_types,
+                            wheel_tax,
+                            vehicle_license_number,
+                            created_at,
+                            updated_at
+                        ) VALUES (?,?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+                        `,
+                        [
+                            vehicle_id,
+                            vehicle_number,
+                            vehicle_categories_id,
+                            vehicle_types,
+                            null, // assuming optional
+                            null
+                        ]
+                    );
+                    const { id } = (await db.getFirstAsync(
+                        `SELECT last_insert_rowid() as id`
+                    )) as any;
+
+                    vehicleId = id;
+
+                }
+
+
+                const offender = await db.getFirstAsync("select * from offenders where id =?", [offender_id]) as any;
+                let offenderId = offender?.id || null;
+
+                //create new offender
+                if (!offenderId) {
+                    await db.runAsync(
+                        `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address) VALUES (?,?, ?, ?, ?, ?)`,
+                        [
+                            offenderId,
+                            offender_name,
+                            offender_father_name,
+                            national_id_number,
+                            driver_license_number,
+                            offender_address
+                        ]
+                    );
+                    const { id } = (await db.getFirstAsync(
+                        `SELECT last_insert_rowid() as id`
+                    )) as any;
+
+                    offenderId = id;
+
+                }
+
+                // create offender vehicle
+                await db.runAsync(
+                    `INSERT INTO offender_vehicles (id, offender_id, vehicle_id) VALUES (?, ?, ?)`,
+                    [offender_vehicle_id, offenderId, vehicleId]
+                );
+
+                offenderVehicleId = offender_vehicle_id;
+            }
+
+            await db.runAsync(
+                `INSERT INTO vehicle_seizure_records (
+              id,
+              offender_vehicles,
+              disciplinary_committed_id,
+              officer_id,
+              seized_date,
+              seizure_location,
+              fine_paid,
+              seized_item
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    seizure_id,
+                    offenderVehicleId,
+                    disciplinary_committed_id,
+                    officer_id,
+                    seized_date,
+                    seizure_location,
+                    0,
+                    seized_item_id
+                ]
+            );
+
+        })
+
+        return { success: true }
+    } catch (err) {
+        return { success: false, error: err instanceof Error ? err.message : err }
+    }
+}
+
+
 
 
 export async function test() {
