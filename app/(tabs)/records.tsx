@@ -1,3 +1,4 @@
+import { AlertModal } from '@/components/ui/AlertModal';
 import CaseRecord from '@/components/ui/CaseRecords';
 import DateFilter from '@/components/ui/DateFilter';
 import ExportButton from '@/components/ui/ExportButton';
@@ -22,6 +23,7 @@ const Records = () => {
     const [vehicleCategoryId, setVehicleCategoryId] = useState("");
     const [exportType, setExportType] = useState(ExportTypeEnum.All);
     const [visible, setVisible] = useState(false);
+    const [isAlert, setIsAlert] = useState(false);
 
     useEffect(() => {
         if (vehicleCategories.length && !vehicleCategoryId) {
@@ -38,10 +40,12 @@ const Records = () => {
 
     const handleExport = async () => {
         const data = await caseFilterWithDateData2(fromDate, toDate, vehicleCategoryId, exportType) as any;
-
         if (data.length) {
-            const jsonFile = await exportSeizureDataToJson(data);
-            console.log(jsonFile)
+            const fileName = `${toDate}-${data[0].officer_name}.json`
+            await exportSeizureDataToJson(data, fileName);
+        } else {
+            setIsAlert(true)
+            setVisible(false)
         }
         // if (data?.length) {
         //     const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
@@ -51,6 +55,13 @@ const Records = () => {
     }
     return (
         <View style={styles.container}>
+            <AlertModal
+                visible={isAlert}
+                message="ဒေတာမရှိပါ။"
+                onConfirm={() => setIsAlert(false)}
+                onCancel={() => setIsAlert(false)}
+                confirmText="ပိတ်မည်။"
+            />
             <ExportModal
                 exportType={exportType}
                 setExportType={setExportType}

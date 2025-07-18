@@ -2,7 +2,8 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 
 export async function exportSeizureDataToJson(
-    data: any
+    data: any,
+    fileName: string,
 ) {
     try {
         // Get data from your existing function
@@ -11,7 +12,6 @@ export async function exportSeizureDataToJson(
         const jsonString = JSON.stringify(data, null, 2);
 
         // Create a path for the file
-        const fileName = `seizure_data_${Date.now()}.json`;
         const fileUri = FileSystem.documentDirectory + fileName;
 
         // Write JSON string to file
