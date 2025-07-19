@@ -52,9 +52,8 @@ const Import = () => {
 
         try {
             const jsonData = await getJsonData(state.selectedFiles);
-
+            console.log(jsonData)
             if (!jsonData?.length) return;
-
             const res = await importJsonData(jsonData);
 
             if (res?.success) {
