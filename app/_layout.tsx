@@ -44,7 +44,6 @@ function AppContent() {
       </View>
     );
   }
-
   return (
     <PaperProvider theme={customTheme}>
       <Stack

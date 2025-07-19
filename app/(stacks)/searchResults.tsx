@@ -19,6 +19,7 @@ const SearchResults = () => {
 
     const handleAddPunishment = useCallback(async () => {
         setModalState(true);
+        setSearchData([])
         const freshResults = await searchOffenderVehicles(searchFormData);
         setSearchData(freshResults);
     }, []);

@@ -3,6 +3,7 @@ import SecondInfo from '@/components/info/SecondInfo';
 import ThirdInfo from '@/components/info/ThirdInfo';
 import { AlertModal } from '@/components/ui/AlertModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 import Header from '@/components/ui/Header';
 import { useSession } from '@/context/SessionContext';
 import { storePunishment } from '@/database/offenderVehicles/offenderVehicles';
@@ -19,6 +20,8 @@ const AddPunishment = () => {
     const [currentInfo, setCurrentInfo] = useState<Step>(Step.First);
     const [isSuccess, setIsSuccess] = useState<boolean>(false);
     const [isConfirm, setIsConfirm] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
     const { officer } = useSession();
     const router = useRouter()
     const {
@@ -64,9 +67,17 @@ const AddPunishment = () => {
         setIsConfirm(false);
 
         const res = await storePunishment(data, officer.id);
-        if (res.success) {
+
+
+        if (res?.success) {
             setIsSuccess(true)
+        } else {
+            setError("အမှားတစ်ခုဖြစ်ပွားခဲ့သည်။ ကျေးဇူးပြု၍ ပြန်လည်ကြိုးစားပါ။");
         }
+    }
+
+    if (error) {
+        return <ErrorMessage message={error} onDismiss={() => setError(null)} />;
     }
 
     return (

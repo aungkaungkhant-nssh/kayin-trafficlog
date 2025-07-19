@@ -1,5 +1,6 @@
 import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
+import ErrorMessage from '@/components/ui/ErrorMessage';
 import { importJsonData } from '@/database/offenderVehicles/offenderVehicles';
 import { getJsonData } from '@/helpers/getJsonData';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
@@ -20,7 +21,7 @@ const Import = () => {
         isSuccess: false,
         selectedFiles: [] as any[],
     });
-
+    const [error, setError] = useState<string | null>(null);
     const router = useRouter();
 
     const handlePickFile = async () => {
@@ -49,28 +50,27 @@ const Import = () => {
         if (!state.selectedFiles.length) return;
 
         setState(prev => ({ ...prev, isLoading: true }));
+        const jsonData = await getJsonData(state.selectedFiles);
+        if (!jsonData?.length) return;
+        const res = await importJsonData(jsonData);
 
-        try {
-            const jsonData = await getJsonData(state.selectedFiles);
-            console.log(jsonData)
-            if (!jsonData?.length) return;
-            const res = await importJsonData(jsonData);
-
-            if (res?.success) {
-                setState(prev => ({
-                    ...prev,
-                    isLoading: false,
-                    isSuccess: true,
-                    selectedFiles: [],
-                }));
-            } else {
-                setState(prev => ({ ...prev, isLoading: false }));
-            }
-        } catch (error) {
-            console.error(error);
+        if (res?.success) {
+            setState(prev => ({
+                ...prev,
+                isLoading: false,
+                isSuccess: true,
+                selectedFiles: [],
+            }));
+        } else {
             setState(prev => ({ ...prev, isLoading: false }));
+            setError("အမှားတစ်ခုဖြစ်ပွားခဲ့သည်။ ကျေးဇူးပြု၍ ပြန်လည်ကြိုးစားပါ။");
         }
+
     };
+
+    if (error) {
+        return <ErrorMessage message={error} onDismiss={() => setError(null)} />;
+    }
 
     return (
         <ScrollView contentContainerStyle={styles.container}>

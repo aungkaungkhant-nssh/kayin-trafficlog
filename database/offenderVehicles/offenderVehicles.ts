@@ -198,161 +198,337 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
     const db = await getDatabase();
 
-
     try {
-        await db.execAsync("PRAGMA foreign_keys = ON;");
+        let result = null;
 
-        // Utility to remove all space characters from strings
-
-        const {
-            name,
-            father_name,
-            nrcState,
-            nrcTownShip,
-            nrcType,
-            nrcNumber,
-            driver_license_number,
-            address,
-            vehicle_number,
-            vehicle_categories_id,
-            vehicle_types,
-            wheel_tax,
-            vehicle_license_number,
-            committed_id,
-            seized_date,
-            seizure_location,
-            fine_amount,
-            seizedItem_id,
-        } = data;
-
-        const committedIdInt = parseInt(committed_id, 10);
-        const seizedItemIdInt = parseInt(seizedItem_id, 10);
-        const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
-
-        // id generate
-        const baseId = Date.now();
-        const newVehicleId = baseId + 1;
-        const newOffenderVehicleId = baseId + 2;
-        const newSeizureRecordId = baseId + 3;
-
-        if (
-            isNaN(committedIdInt) ||
-            isNaN(seizedItemIdInt) ||
-            isNaN(vehicleCategoriesInt)
-        ) {
-            throw new Error("Invalid committed_id, seizedItem_id, or vehicle_categories_id. They must be valid numbers.");
-        }
-
-
-        const committedRow = await db.getFirstAsync(
-            `SELECT id FROM disciplinary_committed WHERE id = ?`,
-            [committedIdInt]
-        );
-        if (!committedRow) throw new Error(`committed_id ${committedIdInt} does not exist.`);
-
-
-        const seizedItemRow = await db.getFirstAsync(
-            `SELECT id FROM seized_items WHERE id = ?`,
-            [seizedItemIdInt]
-        );
-        if (!seizedItemRow) throw new Error(`seizedItem_id ${seizedItemIdInt} does not exist.`);
-
-        const vehicleCategoryRow = await db.getFirstAsync(
-            `SELECT id FROM vehicle_categories WHERE id = ?`,
-            [vehicleCategoriesInt]
-        );
-        if (!vehicleCategoryRow) throw new Error(`vehicle_categories_id ${vehicleCategoriesInt} does not exist.`);
-
-        // Construct NRC Burmese formatted number
-        const nrcNumberMM = toBurmeseNumber(nrcNumber);
-        let nationalIdNumber = "";
-        if (nrcState && nrcTownShip && nrcType && nrcNumberMM) {
-            nationalIdNumber = `${getNrcStateMM(nrcState)}${sanitize(nrcTownShip)}(${sanitize(nrcType)})${nrcNumberMM}`;
-        }
-
-        // Insert offender
-        await db.runAsync(
-            `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address) VALUES (?,?, ?, ?, ?, ?)`,
-            [
-                baseId,
-                sanitize(name),
-                sanitize(father_name),
-                sanitize(nationalIdNumber),
-                sanitize(driver_license_number),
-                sanitize(address),
-            ]
-        );
-
-        const { id: offenderId } = (await db.getFirstAsync(
-            `SELECT last_insert_rowid() as id`
-        )) as any;
-        if (!offenderId) throw new Error("Failed to insert offender.");
-
-        // Insert vehicle
-        await db.runAsync(
-            `INSERT INTO vehicles (id,vehicle_number, vehicle_categories_id, vehicle_types, wheel_tax, vehicle_license_number) 
-             VALUES (?, ?, ?, ?, ?, ?)`,
-            [
-                newVehicleId,
-                sanitize(vehicle_number),
-                vehicleCategoriesInt,
-                sanitize(vehicle_types),
-                wheel_tax ?? null,
-                sanitize(vehicle_license_number),
-            ]
-        );
-        const { id: vehicleId } = (await db.getFirstAsync(
-            `SELECT last_insert_rowid() as id`
-        )) as any;
-        if (!vehicleId) throw new Error("Failed to insert vehicle.");
-
-        // Link offender and vehicle
-        await db.runAsync(
-            `INSERT INTO offender_vehicles (id,offender_id, vehicle_id) VALUES (?, ?, ?)`,
-            [newOffenderVehicleId, offenderId, vehicleId]
-        );
-        const { id: offenderVehicleId } = (await db.getFirstAsync(
-            `SELECT last_insert_rowid() as id`
-        )) as any;
-        if (!offenderVehicleId) throw new Error("Failed to insert offender_vehicle.");
-
-        // Insert vehicle seizure record
-        await db.runAsync(
-            `INSERT INTO vehicle_seizure_records (
-                id,
-                offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
-                seizure_location, fine_paid, action_date, case_number, seized_item
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                newSeizureRecordId,
-                offenderVehicleId,
-                committedIdInt,
-                officerId,
+        await db.withTransactionAsync(async () => {
+            const {
+                name,
+                father_name,
+                nrcState,
+                nrcTownShip,
+                nrcType,
+                nrcNumber,
+                driver_license_number,
+                address,
+                vehicle_number,
+                vehicle_categories_id,
+                vehicle_types,
+                wheel_tax,
+                vehicle_license_number,
+                committed_id,
                 seized_date,
-                sanitize(seizure_location),
-                fine_amount ? parseFloat(fine_amount.toString()) : 0,
-                null,
-                null,
-                seizedItemIdInt,
-            ]
-        );
-        const { id: seizureRecordId } = (await db.getFirstAsync(
-            `SELECT last_insert_rowid() as id`
-        )) as any;
-        if (!seizureRecordId) throw new Error("Failed to insert vehicle_seizure_record.");
+                seizure_location,
+                fine_amount,
+                seizedItem_id,
+            } = data;
 
-        return {
-            success: true,
-            offenderId,
-            vehicleId,
-            offenderVehicleId,
-            seizureRecordId,
-        };
+            const committedIdInt = parseInt(committed_id, 10);
+            const seizedItemIdInt = parseInt(seizedItem_id, 10);
+            const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
+
+            const baseId = Date.now();
+            const newVehicleId = baseId + 1;
+            const newOffenderVehicleId = baseId + 2;
+            const newSeizureRecordId = baseId + 3;
+
+            if (
+                isNaN(committedIdInt) ||
+                isNaN(seizedItemIdInt) ||
+                isNaN(vehicleCategoriesInt)
+            ) {
+                throw new Error(
+                    "Invalid committed_id, seizedItem_id, or vehicle_categories_id. They must be valid numbers."
+                );
+            }
+
+            const committedRow = await db.getFirstAsync(
+                `SELECT id FROM disciplinary_committed WHERE id = ?`,
+                [committedIdInt]
+            );
+            if (!committedRow)
+                throw new Error(`committed_id ${committedIdInt} does not exist.`);
+
+            const seizedItemRow = await db.getFirstAsync(
+                `SELECT id FROM seized_items WHERE id = ?`,
+                [seizedItemIdInt]
+            );
+            if (!seizedItemRow)
+                throw new Error(`seizedItem_id ${seizedItemIdInt} does not exist.`);
+
+            const vehicleCategoryRow = await db.getFirstAsync(
+                `SELECT id FROM vehicle_categories WHERE id = ?`,
+                [vehicleCategoriesInt]
+            );
+            if (!vehicleCategoryRow)
+                throw new Error(`vehicle_categories_id ${vehicleCategoriesInt} does not exist.`);
+
+            // Construct NRC Burmese formatted number
+            const nrcNumberMM = toBurmeseNumber(nrcNumber);
+            let nationalIdNumber = "";
+            if (nrcState && nrcTownShip && nrcType && nrcNumberMM) {
+                nationalIdNumber = `${getNrcStateMM(nrcState)}${sanitize(
+                    nrcTownShip
+                )}(${sanitize(nrcType)})${nrcNumberMM}`;
+            }
+
+            // Insert offender
+            await db.runAsync(
+                `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address) VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    baseId,
+                    sanitize(name),
+                    sanitize(father_name),
+                    sanitize(nationalIdNumber),
+                    sanitize(driver_license_number),
+                    sanitize(address),
+                ]
+            );
+
+            // offenderId = baseId (since you inserted with that id)
+            const offenderId = baseId;
+
+            // Insert vehicle
+            await db.runAsync(
+                `INSERT INTO vehicles (id, vehicle_number, vehicle_categories_id, vehicle_types, wheel_tax, vehicle_license_number) VALUES (?, ?, ?, ?, ?, ?)`,
+                [
+                    newVehicleId,
+                    sanitize(vehicle_number),
+                    vehicleCategoriesInt,
+                    sanitize(vehicle_types),
+                    wheel_tax ?? null,
+                    sanitize(vehicle_license_number),
+                ]
+            );
+            const vehicleId = newVehicleId;
+
+            // Link offender and vehicle
+            await db.runAsync(
+                `INSERT INTO offender_vehicles (id, offender_id, vehicle_id) VALUES (?, ?, ?)`,
+                [newOffenderVehicleId, offenderId, vehicleId]
+            );
+            const offenderVehicleId = newOffenderVehicleId;
+
+            // Insert vehicle seizure record
+            await db.runAsync(
+                `INSERT INTO vehicle_seizure_records (
+            id,
+            offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
+            seizure_location, fine_paid, action_date, case_number, seized_item
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                [
+                    newSeizureRecordId,
+                    offenderVehicleId,
+                    committedIdInt,
+                    officerId,
+                    seized_date,
+                    sanitize(seizure_location),
+                    fine_amount ? parseFloat(fine_amount.toString()) : 0,
+                    null,
+                    null,
+                    seizedItemIdInt,
+                ]
+            );
+            const seizureRecordId = newSeizureRecordId;
+
+            result = {
+                success: true,
+                offenderId,
+                vehicleId,
+                offenderVehicleId,
+                seizureRecordId,
+            };
+        });
+
+        return result;
     } catch (err) {
         console.error("Error in storePunishment:", err);
         return { success: false, error: err instanceof Error ? err.message : err };
     }
 }
+
+
+// export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
+//     const db = await getDatabase();
+
+
+//     try {
+//         await db.execAsync("PRAGMA foreign_keys = ON;");
+
+//         // Utility to remove all space characters from strings
+
+//         const {
+//             name,
+//             father_name,
+//             nrcState,
+//             nrcTownShip,
+//             nrcType,
+//             nrcNumber,
+//             driver_license_number,
+//             address,
+//             vehicle_number,
+//             vehicle_categories_id,
+//             vehicle_types,
+//             wheel_tax,
+//             vehicle_license_number,
+//             committed_id,
+//             seized_date,
+//             seizure_location,
+//             fine_amount,
+//             seizedItem_id,
+//         } = data;
+
+//         const committedIdInt = parseInt(committed_id, 10);
+//         const seizedItemIdInt = parseInt(seizedItem_id, 10);
+//         const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
+
+//         // id generate
+//         const baseId = Date.now();
+//         const newVehicleId = baseId + 1;
+//         const newOffenderVehicleId = baseId + 2;
+//         const newSeizureRecordId = baseId + 3;
+
+//         const oldDate = '2020-01-01 00:00:00';
+
+
+//         if (
+//             isNaN(committedIdInt) ||
+//             isNaN(seizedItemIdInt) ||
+//             isNaN(vehicleCategoriesInt)
+//         ) {
+//             throw new Error("Invalid committed_id, seizedItem_id, or vehicle_categories_id. They must be valid numbers.");
+//         }
+
+
+//         const committedRow = await db.getFirstAsync(
+//             `SELECT id FROM disciplinary_committed WHERE id = ?`,
+//             [committedIdInt]
+//         );
+//         if (!committedRow) throw new Error(`committed_id ${committedIdInt} does not exist.`);
+
+
+//         const seizedItemRow = await db.getFirstAsync(
+//             `SELECT id FROM seized_items WHERE id = ?`,
+//             [seizedItemIdInt]
+//         );
+//         if (!seizedItemRow) throw new Error(`seizedItem_id ${seizedItemIdInt} does not exist.`);
+
+//         const vehicleCategoryRow = await db.getFirstAsync(
+//             `SELECT id FROM vehicle_categories WHERE id = ?`,
+//             [vehicleCategoriesInt]
+//         );
+//         if (!vehicleCategoryRow) throw new Error(`vehicle_categories_id ${vehicleCategoriesInt} does not exist.`);
+
+//         // Construct NRC Burmese formatted number
+//         const nrcNumberMM = toBurmeseNumber(nrcNumber);
+//         let nationalIdNumber = "";
+//         if (nrcState && nrcTownShip && nrcType && nrcNumberMM) {
+//             nationalIdNumber = `${getNrcStateMM(nrcState)}${sanitize(nrcTownShip)}(${sanitize(nrcType)})${nrcNumberMM}`;
+//         }
+
+//         // Insert offender
+//         await db.runAsync(
+//             `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address, created_at, updated_at)
+//              VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+//             [
+//                 baseId,
+//                 sanitize(name),
+//                 sanitize(father_name),
+//                 sanitize(nationalIdNumber),
+//                 sanitize(driver_license_number),
+//                 sanitize(address),
+//                 '2020-01-01 00:00:00', // custom created_at
+//                 '2020-01-01 00:00:00'  // custom updated_at
+//             ]
+//         );
+
+//         const { id: offenderId } = (await db.getFirstAsync(
+//             `SELECT last_insert_rowid() as id`
+//         )) as any;
+//         if (!offenderId) throw new Error("Failed to insert offender.");
+
+//         // Insert vehicle
+//         await db.runAsync(
+//             `INSERT INTO vehicles (
+//                id, vehicle_number, vehicle_categories_id, vehicle_types,
+//                wheel_tax, vehicle_license_number, created_at, updated_at
+//              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+//             [
+//                 newVehicleId,
+//                 sanitize(vehicle_number),
+//                 vehicleCategoriesInt,
+//                 sanitize(vehicle_types),
+//                 wheel_tax ?? null,
+//                 sanitize(vehicle_license_number),
+//                 oldDate, // created_at
+//                 oldDate  // updated_at
+//             ]
+//         );
+
+//         const { id: vehicleId } = (await db.getFirstAsync(
+//             `SELECT last_insert_rowid() as id`
+//         )) as any;
+//         if (!vehicleId) throw new Error("Failed to insert vehicle.");
+
+//         // Link offender and vehicle
+//         await db.runAsync(
+//             `INSERT INTO offender_vehicles (
+//                id, offender_id, vehicle_id, created_at, updated_at
+//              ) VALUES (?, ?, ?, ?, ?)`,
+//             [
+//                 newOffenderVehicleId,
+//                 offenderId,
+//                 vehicleId,
+//                 oldDate,
+//                 oldDate
+//             ]
+//         );
+
+//         const { id: offenderVehicleId } = (await db.getFirstAsync(
+//             `SELECT last_insert_rowid() as id`
+//         )) as any;
+//         if (!offenderVehicleId) throw new Error("Failed to insert offender_vehicle.");
+
+//         // Insert vehicle seizure record
+//         await db.runAsync(
+//             `INSERT INTO vehicle_seizure_records (
+//                id, offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
+//                seizure_location, fine_paid, action_date, case_number, seized_item,
+//                created_at, updated_at
+//              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+//             [
+//                 newSeizureRecordId,
+//                 offenderVehicleId,
+//                 committedIdInt,
+//                 officerId,
+//                 oldDate, // seized_date
+//                 sanitize(seizure_location),
+//                 fine_amount ? parseFloat(fine_amount.toString()) : 0,
+//                 null,
+//                 null,
+//                 seizedItemIdInt,
+//                 oldDate,
+//                 oldDate
+//             ]
+//         );
+
+//         const { id: seizureRecordId } = (await db.getFirstAsync(
+//             `SELECT last_insert_rowid() as id`
+//         )) as any;
+//         if (!seizureRecordId) throw new Error("Failed to insert vehicle_seizure_record.");
+
+//         return {
+//             success: true,
+//             offenderId,
+//             vehicleId,
+//             offenderVehicleId,
+//             seizureRecordId,
+//         };
+//     } catch (err) {
+//         console.error("Error in storePunishment:", err);
+//         return { success: false, error: err instanceof Error ? err.message : err };
+//     }
+// }
 
 
 export async function addPunishment(data: AddPunishmentSchemaType, item: any, officerId: number) {
@@ -377,89 +553,92 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
     const newSeizureRecordId = baseId + 3;
 
     try {
-        // 1. Check if offender_vehicle_id exists
-        const checkResult = await db.getAllAsync(
-            'SELECT id FROM offender_vehicles WHERE id = ?',
-            [+offenderVehicleId]
-        );
+        await db.withTransactionAsync(async () => {
 
-        if (checkResult.length === 0) {
-            throw new Error('Invalid offender vehicle ID');
-        }
+            // 1. Check if offender_vehicle_id exists
+            const checkResult = await db.getAllAsync(
+                'SELECT id FROM offender_vehicles WHERE id = ?',
+                [+offenderVehicleId]
+            );
+
+            if (checkResult.length === 0) {
+                throw new Error('Invalid offender vehicle ID');
+            }
+
+            // check new vehicle or current vehicle
+            const vehicleCategoryId = Number(data.vehicle_categories_id);
+            if (
+                (item.vehicle_number !== data.vehicle_number ||
+                    item.vehicle_types !== data.vehicle_types ||
+                    item.vehicle_categories_id !== vehicleCategoryId) &&
+                data.vehicle_number &&
+                data.vehicle_types &&
+                vehicleCategoryId
+            ) {
+
+                await db.runAsync(
+                    `
+                    INSERT INTO vehicles (
+                        id,
+                        vehicle_number,
+                        vehicle_categories_id,
+                        vehicle_types,
+                        wheel_tax,
+                        vehicle_license_number,
+                        created_at,
+                        updated_at
+                    ) VALUES (?,?, ?, ?, ?, ?, datetime('now'), datetime('now'))
+                    `,
+                    [
+                        newVehicleId,
+                        data.vehicle_number,
+                        vehicleCategoryId,
+                        data.vehicle_types,
+                        null, // assuming optional
+                        null
+                    ]
+                );
+
+                const offenderId = item.offender_id;
+
+                await db.runAsync(
+                    `INSERT INTO offender_vehicles (id, offender_id, vehicle_id) VALUES (?, ?, ?)`,
+                    [newOffenderVehicleId, offenderId, newVehicleId]
+                );
+
+                const { id } = (await db.getFirstAsync(
+                    `SELECT last_insert_rowid() as id`
+                )) as any;
+                offenderVehicleId = id;
+
+            }
 
 
-        // check new vehicle or current vehicle
-        const vehicleCategoryId = Number(data.vehicle_categories_id);
-        if (
-            (item.vehicle_number !== data.vehicle_number ||
-                item.vehicle_types !== data.vehicle_types ||
-                item.vehicle_categories_id !== vehicleCategoryId) &&
-            data.vehicle_number &&
-            data.vehicle_types &&
-            vehicleCategoryId
-        ) {
-
+            // 2. Insert into vehicle_seizure_records
             await db.runAsync(
-                `
-                INSERT INTO vehicles (
+                `INSERT INTO vehicle_seizure_records (
                     id,
-                    vehicle_number,
-                    vehicle_categories_id,
-                    vehicle_types,
-                    wheel_tax,
-                    vehicle_license_number,
-                    created_at,
-                    updated_at
-                ) VALUES (?,?, ?, ?, ?, ?, datetime('now'), datetime('now'))
-                `,
+                    offender_vehicles,
+                    disciplinary_committed_id,
+                    officer_id,
+                    seized_date,
+                    seizure_location,
+                    fine_paid,
+                    seized_item
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    newVehicleId,
-                    data.vehicle_number,
-                    vehicleCategoryId,
-                    data.vehicle_types,
-                    null, // assuming optional
-                    null
+                    newSeizureRecordId,
+                    offenderVehicleId,
+                    committedIdInt,
+                    officerId,
+                    seized_date,
+                    seizure_location,
+                    fine_amount || 0,
+                    seizedItemIdInt
                 ]
             );
 
-            const offenderId = item.offender_id;
-
-            await db.runAsync(
-                `INSERT INTO offender_vehicles (id, offender_id, vehicle_id) VALUES (?, ?, ?)`,
-                [newOffenderVehicleId, offenderId, newVehicleId]
-            );
-
-            const { id } = (await db.getFirstAsync(
-                `SELECT last_insert_rowid() as id`
-            )) as any;
-            offenderVehicleId = id;
-
-        }
-
-
-        // 2. Insert into vehicle_seizure_records
-        await db.runAsync(
-            `INSERT INTO vehicle_seizure_records (
-          id,
-          offender_vehicles,
-          disciplinary_committed_id,
-          officer_id,
-          seized_date,
-          seizure_location,
-          fine_paid,
-          seized_item
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [
-                newSeizureRecordId,
-                offenderVehicleId,
-                committedIdInt,
-                officerId,
-                seized_date,
-                seizure_location,
-                fine_amount || 0,
-                seizedItemIdInt
-            ]
-        );
+        })
 
         return { success: true };
     } catch (error: any) {
@@ -985,116 +1164,118 @@ export async function importJsonData(data: any[]) {
     const db = await getDatabase();
 
     try {
-        await Promise.all(
-            data.map(async (data) => {
-                const {
-                    vehicle_id,
-                    offender_vehicle_id,
-                    vehicle_categories_id,
-                    vehicle_number,
-                    vehicle_types,
-                    offender_id,
-                    offender_name,
-                    offender_father_name,
-                    national_id_number,
-                    driver_license_number,
-                    offender_address,
-                    seizure_id,
-                    disciplinary_committed_id,
-                    officer_id,
-                    seized_date,
-                    seizure_location,
-                    action_date,
-                    case_number,
-                    seized_item_id
-                } = data;
+        await db.withTransactionAsync(async () => {
+            await Promise.all(
+                data.map(async (data) => {
+                    const {
+                        vehicle_id,
+                        offender_vehicle_id,
+                        vehicle_categories_id,
+                        vehicle_number,
+                        vehicle_types,
+                        offender_id,
+                        offender_name,
+                        offender_father_name,
+                        national_id_number,
+                        driver_license_number,
+                        offender_address,
+                        seizure_id,
+                        disciplinary_committed_id,
+                        officer_id,
+                        seized_date,
+                        seizure_location,
+                        action_date,
+                        case_number,
+                        seized_item_id
+                    } = data;
 
-                const offenderVehicle = await db.getFirstAsync(
-                    `SELECT * FROM offender_vehicles WHERE id = ?`,
-                    [offender_vehicle_id]
-                ) as any;
-                let offenderVehicleId = offenderVehicle?.id || null;
+                    const offenderVehicle = await db.getFirstAsync(
+                        `SELECT * FROM offender_vehicles WHERE id = ?`,
+                        [offender_vehicle_id]
+                    ) as any;
+                    let offenderVehicleId = offenderVehicle?.id || null;
 
-                if (!offenderVehicleId) {
-                    const vehicle = await db.getFirstAsync("SELECT * FROM vehicles WHERE id = ?", [vehicle_id]) as any;
-                    let vehicleId = vehicle?.id || null;
+                    if (!offenderVehicleId) {
+                        const vehicle = await db.getFirstAsync("SELECT * FROM vehicles WHERE id = ?", [vehicle_id]) as any;
+                        let vehicleId = vehicle?.id || null;
 
-                    if (!vehicleId) {
+                        if (!vehicleId) {
+                            await db.runAsync(
+                                `INSERT INTO vehicles (
+                                    id, vehicle_number, vehicle_categories_id, vehicle_types,
+                                    wheel_tax, vehicle_license_number, created_at, updated_at
+                                ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+                                [vehicle_id, vehicle_number, vehicle_categories_id, vehicle_types, null, null]
+                            );
+                            vehicleId = vehicle_id;
+                        }
+
+                        const offender = await db.getFirstAsync("SELECT * FROM offenders WHERE id = ?", [offender_id]) as any;
+                        let offenderId = offender?.id || null;
+
+                        if (!offenderId) {
+                            await db.runAsync(
+                                `INSERT INTO offenders (
+                                    id, name, father_name, national_id_number,
+                                    driver_license_number, address
+                                ) VALUES (?, ?, ?, ?, ?, ?)`,
+                                [
+                                    offender_id,
+                                    offender_name,
+                                    offender_father_name,
+                                    national_id_number,
+                                    driver_license_number,
+                                    offender_address
+                                ]
+                            );
+                            offenderId = offender_id;
+                        }
+
                         await db.runAsync(
-                            `INSERT INTO vehicles (
-                  id, vehicle_number, vehicle_categories_id, vehicle_types,
-                  wheel_tax, vehicle_license_number, created_at, updated_at
-                ) VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
-                            [vehicle_id, vehicle_number, vehicle_categories_id, vehicle_types, null, null]
+                            `INSERT INTO offender_vehicles (id, offender_id, vehicle_id)
+                            VALUES (?, ?, ?)`,
+                            [offender_vehicle_id, offender_id, vehicle_id]
                         );
-                        vehicleId = vehicle_id;
+
+                        offenderVehicleId = offender_vehicle_id;
                     }
 
-                    const offender = await db.getFirstAsync("SELECT * FROM offenders WHERE id = ?", [offender_id]) as any;
-                    let offenderId = offender?.id || null;
+                    const seizureRecords = await db.getFirstAsync(
+                        `SELECT * FROM vehicle_seizure_records WHERE id = ?`,
+                        [seizure_id]
+                    ) as any;
 
-                    if (!offenderId) {
+                    if (seizureRecords) {
                         await db.runAsync(
-                            `INSERT INTO offenders (
-                  id, name, father_name, national_id_number,
-                  driver_license_number, address
-                ) VALUES (?, ?, ?, ?, ?, ?)`,
+                            `UPDATE vehicle_seizure_records
+                            SET case_number = ?, action_date = ?
+                            WHERE id = ?`,
+                            [case_number, action_date, seizure_id]
+                        );
+                    } else {
+                        await db.runAsync(
+                            `INSERT INTO vehicle_seizure_records (
+                                id, offender_vehicles, disciplinary_committed_id,
+                                officer_id, seized_date, seizure_location,
+                                fine_paid, seized_item, case_number, action_date
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                             [
-                                offender_id,
-                                offender_name,
-                                offender_father_name,
-                                national_id_number,
-                                driver_license_number,
-                                offender_address
+                                seizure_id,
+                                offenderVehicleId,
+                                disciplinary_committed_id,
+                                officer_id,
+                                seized_date,
+                                seizure_location,
+                                0,
+                                seized_item_id,
+                                case_number,
+                                action_date
                             ]
                         );
-                        offenderId = offender_id;
                     }
-
-                    await db.runAsync(
-                        `INSERT INTO offender_vehicles (id, offender_id, vehicle_id)
-               VALUES (?, ?, ?)`,
-                        [offender_vehicle_id, offender_id, vehicle_id]
-                    );
-
-                    offenderVehicleId = offender_vehicle_id;
-                }
-
-                const seizureRecords = await db.getFirstAsync(
-                    `SELECT * FROM vehicle_seizure_records WHERE id = ?`,
-                    [seizure_id]
-                ) as any;
-
-                if (seizureRecords) {
-                    await db.runAsync(
-                        `UPDATE vehicle_seizure_records
-               SET case_number = ?, action_date = ?
-               WHERE id = ?`,
-                        [case_number, action_date, seizure_id]
-                    );
-                } else {
-                    await db.runAsync(
-                        `INSERT INTO vehicle_seizure_records (
-                id, offender_vehicles, disciplinary_committed_id,
-                officer_id, seized_date, seizure_location,
-                fine_paid, seized_item, case_number, action_date
-              ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                        [
-                            seizure_id,
-                            offenderVehicleId,
-                            disciplinary_committed_id,
-                            officer_id,
-                            seized_date,
-                            seizure_location,
-                            0,
-                            seized_item_id,
-                            case_number,
-                            action_date
-                        ]
-                    );
-                }
-            })
-        );
+                })
+            );
+        });
 
         return { success: true };
     } catch (err) {
@@ -1103,6 +1284,51 @@ export async function importJsonData(data: any[]) {
 }
 
 
+
+export async function deleteOldData() {
+    const db = await getDatabase();
+    try {
+
+        await db.withTransactionAsync(async () => {
+            await db.execAsync("PRAGMA foreign_keys = ON;");
+            // Delete seizure records older than 3 years
+            await db.runAsync(`
+                DELETE FROM vehicle_seizure_records 
+                WHERE id IN (
+                SELECT vsr.id
+                FROM vehicle_seizure_records vsr
+                JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
+                WHERE date(vsr.seized_date) < date('now', '-3 years')
+                )
+            `);
+
+            // Delete offender_vehicles related to old offenders or vehicles
+            await db.runAsync(`
+                DELETE FROM offender_vehicles 
+                WHERE offender_id IN (
+                SELECT id FROM offenders WHERE date(created_at) < date('now', '-3 years')
+                )
+                OR vehicle_id IN (
+                SELECT id FROM vehicles WHERE date(created_at) < date('now', '-3 years')
+                )
+            `);
+
+            // Delete old offenders
+            await db.runAsync(`
+                DELETE FROM offenders 
+                WHERE date(created_at) < date('now', '-3 years')
+            `);
+
+            // Delete old vehicles
+            await db.runAsync(`
+                DELETE FROM vehicles 
+                WHERE date(created_at) < date('now', '-3 years')
+            `);
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}
 
 
 

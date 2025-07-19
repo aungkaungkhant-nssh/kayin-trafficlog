@@ -1,3 +1,4 @@
+import { deleteOldData } from '@/database/offenderVehicles/offenderVehicles';
 import * as SecureStore from 'expo-secure-store';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
@@ -16,6 +17,7 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
     useEffect(() => {
         (async () => {
             try {
+                await deleteOldData();
                 const session = await SecureStore.getItemAsync('officerSession');
                 if (session) {
                     setOfficer(JSON.parse(session));
