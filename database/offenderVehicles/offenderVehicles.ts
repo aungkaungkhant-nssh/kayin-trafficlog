@@ -1085,28 +1085,48 @@ export async function importJsonData(data: any[]) {
                 offenderVehicleId = offender_vehicle_id;
             }
 
-            await db.runAsync(
-                `INSERT INTO vehicle_seizure_records (
-              id,
-              offender_vehicles,
-              disciplinary_committed_id,
-              officer_id,
-              seized_date,
-              seizure_location,
-              fine_paid,
-              seized_item
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                [
-                    seizure_id,
-                    offenderVehicleId,
-                    disciplinary_committed_id,
-                    officer_id,
-                    seized_date,
-                    seizure_location,
-                    0,
-                    seized_item_id
-                ]
-            );
+            const seizureRecords = await db.getFirstAsync(
+                `SELECT * FROM vehicle_seizure_records WHERE id = ?`,
+                [seizure_id]
+            ) as any;
+
+            if (seizureRecords) {
+                await db.runAsync(
+                    `UPDATE vehicle_seizure_records
+                     SET case_number = ?, action_date = ?
+                     WHERE id = ?`,
+                    [case_number, action_date, seizure_id]
+                );
+            } else {
+                await db.runAsync(
+                    `INSERT INTO vehicle_seizure_records (
+                  id,
+                  offender_vehicles,
+                  disciplinary_committed_id,
+                  officer_id,
+                  seized_date,
+                  seizure_location,
+                  fine_paid,
+                  seized_item,
+                  case_number,
+                  action_date
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?,?)`,
+                    [
+                        seizure_id,
+                        offenderVehicleId,
+                        disciplinary_committed_id,
+                        officer_id,
+                        seized_date,
+                        seizure_location,
+                        0,
+                        seized_item_id,
+                        case_number,
+                        action_date
+                    ]
+                );
+            }
+
+
 
         })
 
