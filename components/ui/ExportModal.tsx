@@ -44,21 +44,21 @@ const ExportModal = (
                         value={exportType}
                     >
                         <RadioButton.Item
-                            label="အားလုံးသော မှတ်တမ်းများ"
+                            label="နေ့စဉ်မှတ်တမ်းများ"
                             value={ExportTypeEnum.All}
                         />
                         <RadioButton.Item
                             label="တရားစွဲထားသော မှတ်တမ်းများ"
                             value={ExportTypeEnum.Filed}
                         />
-                        <RadioButton.Item
+                        {/* <RadioButton.Item
                             label="တရားမစွဲသေးသော မှတ်တမ်းများ"
                             value={ExportTypeEnum.UnFiled}
-                        />
+                        /> */}
 
                     </RadioButton.Group>
                     <AppButton
-                        label='File-ထုတ်မည်'
+                        label='📤 File-ထုတ်မည်'
                         onPress={onConfirm}
                     />
                 </View>

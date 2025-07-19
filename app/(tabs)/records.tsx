@@ -6,8 +6,10 @@ import ExportModal from '@/components/ui/ExportModal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import NotFound from '@/components/ui/NotFound';
 import VehicleCategoriesFilter from '@/components/ui/VehicleCategoriesFilter';
+import vehicleCategoriesData from '@/constants/VehicleCategories';
 import { caseFilterWithDateData2 } from '@/database/offenderVehicles/offenderVehicles';
 import { exportSeizureDataToJson } from '@/helpers/exportJsonFile';
+import { saveExcelToDownloads } from '@/helpers/saveExcelToDownLoad';
 import { useCaseFilterWithDate } from '@/hooks/useCase';
 import { useVehicleCategories } from '@/hooks/useVehicleCategories';
 import { ExportTypeEnum } from '@/utils/enum/ExportType';
@@ -41,8 +43,14 @@ const Records = () => {
     const handleExport = async () => {
         const data = await caseFilterWithDateData2(fromDate, toDate, vehicleCategoryId, exportType) as any;
         if (data.length) {
-            const fileName = `${toDate}-${data[0].officer_name}.json`
-            await exportSeizureDataToJson(data, fileName);
+            if (exportType === ExportTypeEnum.All) {
+                const fileName = `${toDate}-${data[0].officer_name}.json`
+                await exportSeizureDataToJson(data, fileName);
+            }
+            if (exportType === ExportTypeEnum.Filed) {
+                const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
+                await saveExcelToDownloads(data, fileName)
+            }
         } else {
             setIsAlert(true)
             setVisible(false)
