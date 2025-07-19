@@ -1,25 +1,34 @@
+import users from "@/constants/users";
 import { getDatabase } from "../db";
 
 
 export async function seedUser() {
-    const name = process.env.EXPO_PUBLIC_SEED_NAME;
-    const user_name = process.env.EXPO_PUBLIC_SEED_USER_NAME;
-    const password = process.env.EXPO_PUBLIC_SEED_PASSWORD;
     try {
         const database = await getDatabase();
-        await database.execAsync(`
-            PRAGMA journal_mode = WAL;
-            CREATE TABLE IF NOT EXISTS 
-            officers (
-                        id INTEGER PRIMARY KEY NOT NULL,  
-                        name TEXT NOT NULL,
-                        user_name TEXT NOT NULL,
-                        password TEXT NOT NULL,
-                        created_at TEXT,
-                        updated_at TEXT
-                    );
-            INSERT INTO officers (name,user_name, password) VALUES ('${name}','${user_name}','${password}');
-            `);
+
+        const officers = await database.getAllAsync("select * from officers");
+
+        if (officers.length > 0) return;
+
+        await Promise.all(
+            users.map(async (user) => {
+                await database.execAsync(`
+                    PRAGMA journal_mode = WAL;
+                    CREATE TABLE IF NOT EXISTS 
+                    officers (
+                                id INTEGER PRIMARY KEY NOT NULL,  
+                                name TEXT NOT NULL,
+                                user_name TEXT NOT NULL,
+                                password TEXT NOT NULL,
+                                created_at TEXT,
+                                updated_at TEXT
+                            );
+                    INSERT INTO officers (name,user_name, password) VALUES ('${user.name}','${user.user_name}','${user.password}');
+                    `);
+            })
+        )
+
+
         console.log("Ok")
     } catch (err) {
         console.log(err)
