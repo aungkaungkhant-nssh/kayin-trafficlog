@@ -1,4 +1,5 @@
 import { SessionProvider, useSession } from '@/context/SessionContext'; // Adjust path as needed
+import useData from '@/hooks/useData';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
@@ -27,7 +28,9 @@ export default function RootLayout() {
 }
 
 function AppContent() {
+  useData()
   const { officer, loading } = useSession();
+
 
   const customTheme = {
     ...DefaultTheme,
@@ -36,7 +39,6 @@ function AppContent() {
       primary: '#000080',
     },
   };
-
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>

@@ -342,7 +342,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
         return result;
     } catch (err) {
-        console.error("Error in storePunishment:", err);
+        console.log("Error in storePunishment:", err);
         return { success: false, error: err instanceof Error ? err.message : err };
     }
 }
@@ -698,7 +698,8 @@ export async function caseFilterWithDatePaginateData(
 
     try {
         const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
-
+        const r = await db.getAllAsync("select * from vehicle_seizure_records");
+        console.log(r)
         const results = await db.getAllAsync(
             `
         SELECT DISTINCT vsr.id,
@@ -725,10 +726,10 @@ export async function caseFilterWithDatePaginateData(
         LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
         LEFT JOIN officers of ON vsr.officer_id = of.id
         LEFT JOIN seized_items si ON vsr.seized_item = si.id
-        WHERE (
-          (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
-          OR
-          (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
+       WHERE (
+            (vsr.action_date IS NOT NULL AND vsr.action_date <> '' AND vsr.action_date BETWEEN ? AND ?)
+            OR
+            ((vsr.action_date IS NULL OR vsr.action_date = '') AND vsr.seized_date BETWEEN ? AND ?)
         )
           AND (? = '' OR v.vehicle_categories_id = ?)
         ORDER BY COALESCE(vsr.action_date, vsr.seized_date) DESC
@@ -745,7 +746,7 @@ export async function caseFilterWithDatePaginateData(
                 offset,
             ]
         );
-
+        console.log(results)
         return results;
     } catch (error: any) {
         console.error('Error fetching case records:', error);
@@ -770,27 +771,36 @@ export async function caseFilterWithDateData(
 
         switch (exportType) {
             case ExportTypeEnum.Filed:
-                dateFilter = `vsr.action_date IS NOT NULL AND vsr.case_number IS NOT NULL AND vsr.action_date BETWEEN ? AND ?`;
+                dateFilter = `
+                    vsr.action_date IS NOT NULL AND vsr.action_date <> '' 
+                    AND vsr.case_number IS NOT NULL 
+                    AND vsr.action_date BETWEEN ? AND ?
+                `;
                 params.push(startDate, endDate);
                 break;
 
             case ExportTypeEnum.UnFiled:
-                dateFilter = `vsr.action_date IS NULL AND vsr.case_number IS NULL AND vsr.seized_date BETWEEN ? AND ?`;
+                dateFilter = `
+                    (vsr.action_date IS NULL OR vsr.action_date = '') 
+                    AND vsr.case_number IS NULL 
+                    AND vsr.seized_date BETWEEN ? AND ?
+                `;
                 params.push(startDate, endDate);
                 break;
 
             case ExportTypeEnum.All:
             default:
                 dateFilter = `
-            (
-              (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
-              OR
-              (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
-            )
-          `;
+                    (
+                      (vsr.action_date IS NOT NULL AND vsr.action_date <> '' AND vsr.action_date BETWEEN ? AND ?)
+                      OR
+                      ((vsr.action_date IS NULL OR vsr.action_date = '') AND vsr.seized_date BETWEEN ? AND ?)
+                    )
+                `;
                 params.push(startDate, endDate, startDate, endDate);
                 break;
         }
+
 
         params.push(vehicleCategoryId, vehicleCategoryId);
 
@@ -852,34 +862,35 @@ export async function caseFilterWithDateData2(
         switch (exportType) {
             case ExportTypeEnum.Filed:
                 dateFilter = `
-            vsr.action_date IS NOT NULL
-            AND vsr.case_number IS NOT NULL
-            AND vsr.action_date BETWEEN ? AND ?
-          `;
+                    vsr.action_date IS NOT NULL AND vsr.action_date <> '' 
+                    AND vsr.case_number IS NOT NULL 
+                    AND vsr.action_date BETWEEN ? AND ?
+                `;
                 params.push(startDate, endDate);
                 break;
 
             case ExportTypeEnum.UnFiled:
                 dateFilter = `
-            vsr.action_date IS NULL
-            AND vsr.case_number IS NULL
-            AND vsr.seized_date BETWEEN ? AND ?
-          `;
+                    (vsr.action_date IS NULL OR vsr.action_date = '') 
+                    AND vsr.case_number IS NULL 
+                    AND vsr.seized_date BETWEEN ? AND ?
+                `;
                 params.push(startDate, endDate);
                 break;
 
             case ExportTypeEnum.All:
             default:
                 dateFilter = `
-            (
-              (vsr.action_date IS NOT NULL AND vsr.action_date BETWEEN ? AND ?)
-              OR
-              (vsr.action_date IS NULL AND vsr.seized_date BETWEEN ? AND ?)
-            )
-          `;
+                    (
+                      (vsr.action_date IS NOT NULL AND vsr.action_date <> '' AND vsr.action_date BETWEEN ? AND ?)
+                      OR
+                      ((vsr.action_date IS NULL OR vsr.action_date = '') AND vsr.seized_date BETWEEN ? AND ?)
+                    )
+                `;
                 params.push(startDate, endDate, startDate, endDate);
                 break;
         }
+
 
         if (vehicleCategoryId !== null) {
             dateFilter += ` AND v.vehicle_categories_id = ?`;

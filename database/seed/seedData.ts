@@ -77,10 +77,6 @@ export async function seedData() {
       }
     }
 
-
-
-    console.log("✅ Data seeded successfully.");
-
   } catch (err) {
     console.log(err)
   }

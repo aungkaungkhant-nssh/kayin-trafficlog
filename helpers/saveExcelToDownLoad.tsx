@@ -13,7 +13,7 @@ export async function saveExcelToDownloads(data: any[], fileName = 'cases.xlsx')
             "အမည်": d.offender_name,
             "မှတ်ပုံတင်": d?.national_id_number || "မရှိ",
             "အဘအမည်": d.offender_father_name,
-            "နေရပ်လိပ်စာ": d.address,
+            "နေရပ်လိပ်စာ": d.offender_address,
             "အရေးယူပုဒ်မ": `${d.article_number}(${d.offense_name})`,
             "အရေးယူအရာရှိ": d.officer_name,
             "အရေးယူရက်စွဲ": d?.action_date || "",

@@ -4,6 +4,20 @@ export async function seedTable() {
   try {
     const database = await getDatabase();
 
+    // await database.execAsync(`
+    //   PRAGMA journal_mode = WAL;
+    //   CREATE TABLE IF NOT EXISTS officers (
+    //         id INTEGER PRIMARY KEY NOT NULL,  
+    //         name TEXT NOT NULL,
+    //         user_name TEXT NOT NULL,
+    //         password TEXT NOT NULL,
+    //         created_at TEXT,
+    //         updated_at TEXT
+    //   );
+    // `);
+
+
+
     // 1. disciplinary_articles
     // await database.execAsync(`
     //   PRAGMA journal_mode = WAL;
@@ -150,6 +164,7 @@ export async function deleteTable() {
     //     DROP TABLE IF EXISTS vehicle_seizure_records;
     // ` );
     await db.execAsync(`PRAGMA foreign_keys = OFF;`);
+    // await db.execAsync("DROP TABLE IF EXISTS officers;");
     await db.execAsync(`DROP TABLE IF EXISTS offender_vehicles;`);
     await db.execAsync(`DROP TABLE IF EXISTS vehicles;`);
     // await db.execAsync(`DROP TABLE IF EXISTS vehicle_categories;`);

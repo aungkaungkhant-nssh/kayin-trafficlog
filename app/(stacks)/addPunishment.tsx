@@ -64,10 +64,10 @@ const AddPunishment = () => {
     });
 
     const onSubmit = async (data: AddPunishmentInfoSchemaType) => {
+
         setIsConfirm(false);
 
         const res = await storePunishment(data, officer.id);
-
 
         if (res?.success) {
             setIsSuccess(true)
