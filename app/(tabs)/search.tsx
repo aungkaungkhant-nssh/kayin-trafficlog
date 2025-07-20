@@ -3,6 +3,7 @@ import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
+import { seedTable } from '@/database/seed/seedTable';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import globalStyles from '@/styles/globalStyles';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -39,6 +40,7 @@ const Search = () => {
 
 
     const onSubmit = async (data: SearchSchemaType) => {
+    
         const res = await searchOffenderVehicles(data);
         if (!res.length) {
             setModalVisible(true);

@@ -4,16 +4,20 @@ import { getDatabase } from "../db";
 
 export async function seedUser() {
     try {
+
         const database = await getDatabase();
         const officers = await database.getAllAsync("select * from officers");
+
         if (officers.length > 0) return;
-        await Promise.all(
-            users.map(async (user) => {
-                await database.execAsync(`
-                    INSERT INTO officers (name,user_name, password) VALUES ('${user.name}','${user.user_name}','${user.password}');
-                    `);
-            })
-        )
+        await Promise.all(users.map(async (user) => {
+            await database.runAsync(`
+                INSERT INTO officers (name,user_name, password) VALUES (?,?,?)
+                `,
+                [user.name, user.user_name, user.password]
+            );
+        }))
+
+
     } catch (err) {
         console.log(err)
     }

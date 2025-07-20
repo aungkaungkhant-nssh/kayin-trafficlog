@@ -1,6 +1,7 @@
 import AppButton from "@/components/ui/AppButton";
 import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/officer/auth";
+import { seedTable } from "@/database/seed/seedTable";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import globalStyles from "@/styles/globalStyles";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +27,7 @@ const Login = () => {
     });
 
     const onSubmit = async (data: LoginSchemaType) => {
+       
         const trimmedData = {
             user_name: data.name.trim(),
             password: data.password.trim(),

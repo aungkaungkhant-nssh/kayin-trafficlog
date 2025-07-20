@@ -31,6 +31,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
     const conditions: string[] = [];
     const params: any[] = [];
 
+
     // const r = await db.runAsync("DELETE FROM offenders WHERE id=5");
     // await db.execAsync("PRAGMA foreign_keys = ON;");
 
@@ -188,7 +189,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
         return formatted;
 
     } catch (err) {
-        console.error("Error in searchOffenderVehicles:", err);
+        console.log("Error in searchOffenderVehicles:", err);
         return [];
     }
 }
@@ -698,8 +699,6 @@ export async function caseFilterWithDatePaginateData(
 
     try {
         const vehicleCategoryId = vehicleCategoryIdStr ? Number(vehicleCategoryIdStr) : '';
-        const r = await db.getAllAsync("select * from vehicle_seizure_records");
-        console.log(r)
         const results = await db.getAllAsync(
             `
         SELECT DISTINCT vsr.id,

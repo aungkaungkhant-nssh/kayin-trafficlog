@@ -1,83 +1,76 @@
 import DisciplinaryCommitted from "@/constants/DiscplinaryCommitteds";
+import seizedItems from "@/constants/SeizedItems";
+import vehicleCategoriesData from "@/constants/VehicleCategories";
 import { getDatabase } from "../db";
 
-export async function seedData() {
+function escapeSqlString(str: string): string {
+  return str.replace(/'/g, "''");
+}
 
+export async function seedData() {
   try {
     const database = await getDatabase();
 
+    // 1) vehicle_categories
     const vehicleCategories = await database.getAllAsync("select * from vehicle_categories");
-    // seed vehicleCategories data
-    if (!vehicleCategories.length) {
-      await Promise.all(
-        vehicleCategories.map(async (category) => {
-          await database.execAsync(`
-                      INSERT INTO vehicle_categories (name) VALUES ('${category}');
-                  `);
-        })
-      )
+    if (vehicleCategories.length === 0) {
+      for (const category of vehicleCategoriesData) {
+        await database.execAsync(`
+          INSERT INTO vehicle_categories (name) VALUES ('${escapeSqlString(category)}');
+        `);
+      }
     }
 
-
-
-    const seizedItems = await database.getAllAsync("select * from seized_items");
-    // seed seizedItems data
-    if (!seizedItems.length) {
-      await Promise.all(
-        seizedItems.map(async (item) => {
-          await database.execAsync(`
-                      INSERT INTO seized_items (name) VALUES ('${item}');
-                  `);
-        })
-      )
+    // 2) seized_items
+    const seizedItemsData = await database.getAllAsync("select * from seized_items");
+    if (seizedItemsData.length === 0) {
+      for (const item of seizedItems) {
+        await database.execAsync(`
+          INSERT INTO seized_items (name) VALUES ('${escapeSqlString(item)}');
+        `);
+      }
     }
 
-
+    // 3) disciplinary data
     const disciplinaryArticles = await database.getAllAsync("select * from disciplinary_articles");
     const committedOffenses = await database.getAllAsync("select * from committed_offenses");
     const disciplinaryCommitted = await database.getAllAsync("select * from disciplinary_committed");
 
-    if (!disciplinaryArticles.length && !committedOffenses.length && !disciplinaryCommitted.length) {
-      // seed discplinary committed data
+    if (disciplinaryArticles.length === 0 && committedOffenses.length === 0 && disciplinaryCommitted.length === 0) {
       for (const d of DisciplinaryCommitted) {
-        // Insert into disciplinary_articles
         await database.execAsync(`
-            INSERT OR IGNORE INTO disciplinary_articles (number)
-            VALUES ('${d.article}');
-          `);
+          INSERT OR IGNORE INTO disciplinary_articles (number) VALUES ('${escapeSqlString(d.article)}');
+        `);
 
-        // Get the inserted article's id
         const articleRow = await database.getFirstAsync(`
-            SELECT id FROM disciplinary_articles WHERE number = '${d.article}';
-          `) as any;
+          SELECT id FROM disciplinary_articles WHERE number = '${escapeSqlString(d.article)}';
+        `) as any;
         const articleId = articleRow?.id;
 
         for (const c of d.committed) {
-          // Insert into committed_offenses
           await database.execAsync(`
-              INSERT OR IGNORE INTO committed_offenses (name)
-              VALUES ('${c.title}');
-            `);
+            INSERT OR IGNORE INTO committed_offenses (name) VALUES ('${escapeSqlString(c.title)}');
+          `);
 
-          // Get the offense id
           const offenseRow = await database.getFirstAsync(`
-              SELECT id FROM committed_offenses WHERE name = '${c.title}';
-            `) as any;
+            SELECT id FROM committed_offenses WHERE name = '${escapeSqlString(c.title)}';
+          `) as any;
           const offenseId = offenseRow?.id;
 
-          // Insert into disciplinary_committed
-          await database.execAsync(`
+          if (articleId && offenseId) {
+            await database.execAsync(`
               INSERT INTO disciplinary_committed (
                 disciplinary_articles_id,
                 committed_offenses_id,
                 fine_amount
-              ) VALUES (${articleId}, ${offenseId}, '${c.fineAmount}');
+              ) VALUES (${articleId}, ${offenseId}, '${escapeSqlString(String(c.fineAmount))}');
             `);
+          }
         }
       }
     }
 
   } catch (err) {
-    console.log(err)
+    console.log(err);
   }
 }
