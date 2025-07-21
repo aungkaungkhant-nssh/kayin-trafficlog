@@ -7,7 +7,7 @@ const users = [
     {
         user_name: "aungkaungkhant",
         password: "12345678",
-        name: "ဒုရဲမှူးမျိုးကျော်ညွန့်"
+        name: "အောင်ကောင်းခန့်"
     },
 ]
 
