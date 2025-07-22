@@ -8,7 +8,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Platform, View } from 'react-native';
+import { Image, View } from 'react-native';
 import { PaperProvider, useTheme } from 'react-native-paper';
 
 
@@ -31,8 +31,9 @@ export default function TabLayout() {
         onCancel={() => setLogoutVisible(false)}
         onConfirm={handleLogout}
       />
+
       <Tabs
-        screenOptions={{
+        screenOptions={({ route }) => ({
           headerStyle: {
             backgroundColor: theme.colors.primary,
           },
@@ -40,33 +41,55 @@ export default function TabLayout() {
           headerTitleStyle: {
             fontSize: 17,
           },
+          tabBarLabelStyle: {
+            fontSize: 13,
+            fontFamily: 'Myanmar-Bold',
+          },
           tabBarActiveTintColor: theme.colors.primary,
           headerShown: true,
           tabBarButton: HapticTab,
           tabBarBackground: TabBarBackground,
-          tabBarStyle: Platform.select({
-            ios: {
-              position: 'absolute',
+          tabBarStyle: [
+            {
+              height: 70,
+              paddingBottom: 10,
+              paddingTop: 10,
             },
-            default: {},
-          }),
-        }}>
+            route.name === 'index' && { display: 'none' }, // 👈 Hide tab bar on index
+          ],
+        })}
+      >
+        887563690
+        776224007
         <Tabs.Screen
           name="index"
           options={{
-            title: 'ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)',
-            tabBarLabel: 'ပင်မစာမျက်နှာ',
-            tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+            headerTitle: () => (
+              <View style={{ alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+                <Image
+                  source={require('../../assets/images/police.png')}
+                  style={{ width: 40, height: 40, resizeMode: 'contain' }}
+                />
+              </View>
+            ),
+            title: '',
+            tabBarLabel: 'မူလ',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={22} name="house.fill" color={color} />
+            ),
           }}
         />
 
         <Tabs.Screen
           name="records"
           options={{
-            title: 'မှတ်တမ်းများ',
-            tabBarLabel: 'မှတ်တမ်းများ',
+            title: 'ဖိုင်ထုတ်',
+            tabBarLabel: 'ဖိုင်ထုတ်',
             headerLeft: () => <LeftHeader />,
-            tabBarIcon: ({ color }) => <AntDesign name="filetext1" size={24} color={color} />,
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="filetext1" size={22} color={color} />
+            ),
           }}
         />
 
@@ -80,36 +103,39 @@ export default function TabLayout() {
               <View
                 style={{
                   backgroundColor: theme.colors.primary,
-                  position: "absolute",
-                  bottom: "10%",
+                  position: 'absolute',
+                  bottom: '10%',
                   width: 60,
                   height: 60,
-                  borderRadius: "50%",
+                  borderRadius: 30,
                   justifyContent: 'center',
                   alignItems: 'center',
                 }}
               >
-                <AntDesign name="search1" size={24} color="#fff" />
+                <AntDesign name="search1" size={22} color="#fff" />
               </View>
-            )
+            ),
           }}
         />
 
         <Tabs.Screen
           name="import"
           options={{
-            title: 'ဒေတာဖိုင်ထည့်ပါ', // Top header title
-            tabBarLabel: 'ထည့်သွင်းမှု',
+            title: 'ဒေတာဖိုင်ထည့်ပါ',
+            tabBarLabel: 'ဖိုင်ထည့်',
             headerLeft: () => <LeftHeader />,
-            tabBarIcon: ({ color }) => <AntDesign name="filetext1" size={24} color={color} />,
+            tabBarIcon: ({ color }) => (
+              <AntDesign name="filetext1" size={22} color={color} />
+            ),
           }}
         />
+
         <Tabs.Screen
           name="logout"
           options={{
-            title: 'Logout',
+            title: 'ထွက်ရန်',
             tabBarIcon: ({ color }) => (
-              <MaterialIcons name="logout" size={28} color={color} />
+              <MaterialIcons name="logout" size={22} color={color} />
             ),
           }}
           listeners={{
@@ -121,6 +147,7 @@ export default function TabLayout() {
         />
       </Tabs>
     </PaperProvider>
+
 
   );
 }

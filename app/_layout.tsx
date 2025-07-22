@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { ActivityIndicator, View } from 'react-native';
 import { DefaultTheme, PaperProvider } from 'react-native-paper';
 
+
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -30,7 +31,6 @@ function AppContent() {
 
   const { officer, loading } = useSession();
 
-
   const customTheme = {
     ...DefaultTheme,
     colors: {
@@ -49,19 +49,34 @@ function AppContent() {
     <PaperProvider theme={customTheme}>
       <Stack
         screenOptions={{
-          headerShown: false,
           headerShadowVisible: false,
           headerStyle: {
             backgroundColor: '#000080',
           },
+          headerShown: false,  // default: hide header for all screens
         }}
       >
         {!officer ? (
-          <Stack.Screen name="(auth)" />
+          <Stack.Screen
+            name="(auth)"
+          // options={{
+          //   headerShown: true,
+          //   title: '',
+          //   headerLeft: () => (
+          //     <TouchableOpacity onPress={() => setOpen(true)} >
+          //       <Entypo name="menu" size={24} color="#fff" />
+          //     </TouchableOpacity>
+          //   )
+          // }}
+
+          />
         ) : (
           <Stack.Screen name="(tabs)" />
         )}
       </Stack>
+
+
     </PaperProvider>
+
   );
 }

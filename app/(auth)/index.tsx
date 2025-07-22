@@ -1,16 +1,18 @@
 import AppButton from "@/components/ui/AppButton";
 import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/officer/auth";
-import { seedTable } from "@/database/seed/seedTable";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import globalStyles from "@/styles/globalStyles";
+import Entypo from '@expo/vector-icons/Entypo';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { useRouter } from 'expo-router';
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Drawer } from "react-native-paper";
 const Login = () => {
+    const [open, setOpen] = useState(false)
     const router = useRouter();
     const {
         control,
@@ -27,7 +29,7 @@ const Login = () => {
     });
 
     const onSubmit = async (data: LoginSchemaType) => {
-       
+
         const trimmedData = {
             user_name: data.name.trim(),
             password: data.password.trim(),
@@ -51,6 +53,34 @@ const Login = () => {
             behavior={Platform.OS === "ios" ? "padding" : "height"}
             style={{ flex: 1 }}
         >
+            {open && (
+                <>
+                    <Pressable
+                        style={styles.overlay}
+                        onPress={() => setOpen(false)}
+                    />
+                    <Drawer.Section title="" style={styles.drawerContainer}>
+                        <View style={styles.btnContainer}>
+                            <TouchableOpacity onPress={() => router.push("/(drawer)/about")} style={styles.drawerItem} activeOpacity={0.7}>
+                                <Entypo name="text-document" size={20} color="#000080" />
+                                <Text style={styles.drawerLabel}>အကြောင်းအရာ</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity onPress={() => router.push("/(drawer)/contact")} style={styles.drawerItem} activeOpacity={0.7}>
+                                <Entypo name="phone" size={20} color="#000080" />
+                                <Text style={styles.drawerLabel}>ဆက်သွယ်ရန်</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Drawer.Section>
+                </>
+            )}
+
+            <View style={styles.loginHeader}>
+                <TouchableOpacity style={{ marginTop: 20 }} onPress={() => setOpen(true)}>
+                    <Entypo name="menu" size={24} color="#fff" />
+                </TouchableOpacity>
+
+            </View>
             <View style={styles.container}>
                 <View style={styles.innerContainer}>
                     <Image
@@ -109,17 +139,77 @@ const Login = () => {
                     </View>
                 </View>
             </View>
+
+
         </KeyboardAvoidingView>
 
     )
 }
 
 const styles = StyleSheet.create({
+    rowItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingVertical: 10,
+        paddingHorizontal: 16,
+    },
+    labelText: {
+        fontSize: 16,
+        color: '#000080',
+        marginLeft: 8, // space between icon and text
+    },
+    overlay: {
+        position: 'absolute',
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+        zIndex: 999,
+    },
+    drawerContainer: {
+        position: 'absolute',
+        backgroundColor: 'white',
+        zIndex: 1000,
+        top: 0,
+        bottom: -100,
+        left: 0,
+        width: 250,
+        shadowColor: '#000',
+        shadowOffset: { width: 2, height: 0 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 6,
+        paddingHorizontal: 10,
+        paddingTop: 30,
+    },
+    btnContainer: {
+        gap: 12,
+        marginVertical: 25
+    },
+    drawerItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#f4f6ff',
+        borderRadius: 10,
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+    },
+    drawerLabel: {
+        fontSize: 16,
+        marginLeft: 12,
+        color: '#000080',
+        fontWeight: '500',
+    },
     container: {
         flex: 1,
         justifyContent: "space-around",  // vertical center
         alignItems: 'center',      // horizontal center
         padding: 20,
+    },
+    loginHeader: {
+        backgroundColor: "#000080",
+        padding: 23
     },
     innerContainer: {
         width: '100%',
