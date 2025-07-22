@@ -100,7 +100,7 @@ const AddPunishment = () => {
                     router.push("/(tabs)/search");
                     setIsSuccess(false)
                 }}
-                message="ပြစ်မှု ထည့်ခြင်း အောင်မြင်ပါသည်။"
+                message="မှတ်တမ်း ထည့်ခြင်း အောင်မြင်ပါသည်။"
                 confirmText='ဆက်လက် ရှာဖွေမည်'
                 cancelText='မူလ စာမျက်နှာ'
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}

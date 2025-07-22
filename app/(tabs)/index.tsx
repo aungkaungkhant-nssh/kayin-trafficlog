@@ -55,6 +55,14 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>ထည့်သွင်းခြင်း</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => router.push("/(addition)/changepassword")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/import.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>password ပြောင်းခြင်း</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity onPress={() => setLogoutVisible(true)} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
           <Image
             source={require('../../assets/images/logout.png')}

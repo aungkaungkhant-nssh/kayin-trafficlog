@@ -1,7 +1,7 @@
 import { ExportTypeEnum } from '@/utils/enum/ExportType';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { Modal, Portal, RadioButton } from 'react-native-paper';
+import { Divider, Modal, Portal, RadioButton } from 'react-native-paper';
 import AppButton from './AppButton';
 
 interface PropsTypes {
@@ -9,6 +9,7 @@ interface PropsTypes {
     exportType: ExportTypeEnum,
     onConfirm: () => void;
     onCancel: () => void;
+    onShare: () => void;
     setExportType: (value: ExportTypeEnum) => void;
 }
 
@@ -18,6 +19,7 @@ const ExportModal = (
         visible,
         onCancel,
         onConfirm,
+        onShare,
         exportType,
         setExportType
     }: PropsTypes
@@ -57,10 +59,21 @@ const ExportModal = (
                         /> */}
 
                     </RadioButton.Group>
-                    <AppButton
-                        label='📤 File-ထုတ်မည်'
-                        onPress={onConfirm}
-                    />
+                    <Divider />
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 10 }}>
+                        <AppButton
+                            mode='outlined'
+                            label='share'
+                            onPress={onShare}
+                            icon="share"
+                        />
+                        <AppButton
+                            label='Download'
+                            onPress={onConfirm}
+                            icon="download"
+                        />
+                    </View>
+
                 </View>
 
             </Modal>

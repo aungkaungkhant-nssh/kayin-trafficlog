@@ -40,16 +40,16 @@ const Records = () => {
         vehicleCategoryId
     );
 
-    const handleExport = async () => {
+    const handleExport = async (isShare = false) => {
         const data = await caseFilterWithDateData2(fromDate, toDate, vehicleCategoryId, exportType) as any;
         if (data.length) {
             if (exportType === ExportTypeEnum.All) {
                 const fileName = `${toDate}-${data[0].officer_name}.json`
-                await exportSeizureDataToJson(data, fileName);
+                await exportSeizureDataToJson(data, fileName, isShare);
             }
             if (exportType === ExportTypeEnum.Filed) {
                 const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
-                await saveExcelToDownloads(data, fileName)
+                await saveExcelToDownloads(data, fileName,)
             }
         } else {
             setIsAlert(true)
@@ -76,6 +76,7 @@ const Records = () => {
                 visible={visible}
                 onCancel={() => setVisible(false)}
                 onConfirm={() => handleExport()}
+                onShare={() => handleExport(true)}
             />
             <DateFilter
                 fromDate={fromDate}

@@ -3,7 +3,6 @@ import { AlertModal } from '@/components/ui/AlertModal';
 import AppButton from '@/components/ui/AppButton';
 import AppTextInput from '@/components/ui/AppTextInput';
 import { searchOffenderVehicles } from '@/database/offenderVehicles/offenderVehicles';
-import { seedTable } from '@/database/seed/seedTable';
 import { searchSchema, SearchSchemaType } from '@/schema/search.schema';
 import globalStyles from '@/styles/globalStyles';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -40,7 +39,7 @@ const Search = () => {
 
 
     const onSubmit = async (data: SearchSchemaType) => {
-    
+
         const res = await searchOffenderVehicles(data);
         if (!res.length) {
             setModalVisible(true);
@@ -74,7 +73,7 @@ const Search = () => {
 
                 }}
                 onConfirm={() => setModalVisible(false)}
-                message="ပြစ်မှုကြူးလွန်ထားခြင်းမရှိပါ။"
+                message="ပြစ်မှုမှတ်တမ်းတွင်မရှိပါ။"
                 confirmText='ပြစ်မှုထည့်မည်'
                 icon={<Ionicons name="shield-checkmark" size={70} color="#4CAF50" />}
             />

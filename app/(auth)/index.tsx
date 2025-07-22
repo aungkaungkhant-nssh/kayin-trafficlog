@@ -61,12 +61,12 @@ const Login = () => {
                     />
                     <Drawer.Section title="" style={styles.drawerContainer}>
                         <View style={styles.btnContainer}>
-                            <TouchableOpacity onPress={() => router.push("/(drawer)/about")} style={styles.drawerItem} activeOpacity={0.7}>
+                            <TouchableOpacity onPress={() => router.push("/(addition)/about")} style={styles.drawerItem} activeOpacity={0.7}>
                                 <Entypo name="text-document" size={20} color="#000080" />
                                 <Text style={styles.drawerLabel}>အကြောင်းအရာ</Text>
                             </TouchableOpacity>
 
-                            <TouchableOpacity onPress={() => router.push("/(drawer)/contact")} style={styles.drawerItem} activeOpacity={0.7}>
+                            <TouchableOpacity onPress={() => router.push("/(addition)/contact")} style={styles.drawerItem} activeOpacity={0.7}>
                                 <Entypo name="phone" size={20} color="#000080" />
                                 <Text style={styles.drawerLabel}>ဆက်သွယ်ရန်</Text>
                             </TouchableOpacity>

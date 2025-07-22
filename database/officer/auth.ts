@@ -1,9 +1,9 @@
+import DisciplinaryCommitted from '@/constants/DiscplinaryCommitteds';
+import seizedItems from '@/constants/SeizedItems';
 import users from '@/constants/users';
+import vehicleCategoriesData from '@/constants/VehicleCategories';
 import * as SecureStore from 'expo-secure-store';
 import { getDatabase } from "../db";
-import vehicleCategoriesData from '@/constants/VehicleCategories';
-import seizedItems from '@/constants/SeizedItems';
-import DisciplinaryCommitted from '@/constants/DiscplinaryCommitteds';
 function escapeSqlString(str: string): string {
     return str.replace(/'/g, "''");
 }
@@ -92,6 +92,36 @@ export async function loginOfficer({ user_name, password }: { user_name: string,
         delete result.password;
         await SecureStore.setItemAsync('officerSession', JSON.stringify(result));
         return { success: true, user: result };
+    } catch (err: any) {
+        console.log(err);
+        return { success: false, error: err.message };
+    }
+}
+
+export async function changePassword({ oldPassword, newPassword, officerId }: { oldPassword: string, newPassword: string, officerId: number }) {
+    try {
+        const db = await getDatabase();
+
+        const existingOfficer = await db.getFirstAsync<{ password: string }>(
+            `SELECT password FROM officers WHERE id = ?`,
+            [officerId]
+        );
+
+        if (!existingOfficer || existingOfficer.password !== oldPassword) {
+            return { success: false, error: "စကားဝှက်ဟောင်းမှားနေသည်" };
+        }
+
+        // 2. Update password
+        await db.runAsync(
+            `
+            UPDATE officers
+            SET password = ?, updated_at = datetime('now')
+            WHERE id = ?
+            `,
+            [newPassword, officerId]
+        );
+
+        return true;
     } catch (err: any) {
         console.log(err);
         return { success: false, error: err.message };

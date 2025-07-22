@@ -1,3 +1,4 @@
+import { Entypo } from '@expo/vector-icons';
 import React from 'react';
 import { ActivityIndicator, GestureResponderEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
@@ -45,9 +46,9 @@ const AppButton: React.FC<AppButtonProps> = ({
         <ActivityIndicator color={textColor} />
       ) : (
         <View style={styles.content}>
-          {/* {icon && typeof icon === 'string' && (
-            <Entypo name={icon} size={18} color={textColor} style={{ marginRight: 8 }} />
-          )} */}
+          {icon && typeof icon === 'string' && (
+            <Entypo name={icon as any} size={18} color={textColor} style={{ marginRight: 8 }} />
+          )}
           {icon && typeof icon === 'function' && icon({
             size: 18, color: textColor,
             name: undefined,
