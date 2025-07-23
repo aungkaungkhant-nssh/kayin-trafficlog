@@ -1,14 +1,14 @@
 import { HapticTab } from '@/components/HapticTab';
 import LeftHeader from '@/components/header/leftHeader';
-import { AlertModal } from '@/components/ui/AlertModal';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { LogoutModal } from '@/components/ui/LogoutModal';
 import TabBarBackground from '@/components/ui/TabBarBackground';
 import { logoutOfficer } from '@/database/officer/auth';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, View } from 'react-native';
+import { BackHandler, Image, Platform, View } from 'react-native';
 import { PaperProvider, useTheme } from 'react-native-paper';
 
 
@@ -17,19 +17,28 @@ export default function TabLayout() {
   const [logoutVisible, setLogoutVisible] = useState(false);
   const router = useRouter();
 
-  const handleLogout = async () => {
+  const handleLogout = async (exit = false) => {
     setLogoutVisible(false);
     const res = await logoutOfficer();
     if (res.success) {
+      if (exit) {
+        if (Platform.OS === 'android') {
+          BackHandler.exitApp();
+
+        }
+      }
+
       router.replace("/(auth)");
+
     }
   };
   return (
     <PaperProvider theme={theme}>
-      <AlertModal
+      <LogoutModal
         visible={logoutVisible}
         onCancel={() => setLogoutVisible(false)}
-        onConfirm={handleLogout}
+        onConfirm={() => handleLogout(true)}
+        onLogin={() => handleLogout(false)}
       />
 
       <Tabs
@@ -59,8 +68,6 @@ export default function TabLayout() {
           ],
         })}
       >
-        887563690
-        776224007
         <Tabs.Screen
           name="index"
           options={{

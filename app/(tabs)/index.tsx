@@ -1,8 +1,8 @@
-import { AlertModal } from '@/components/ui/AlertModal';
+import { LogoutModal } from '@/components/ui/LogoutModal';
 import { logoutOfficer } from '@/database/officer/auth';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { BackHandler, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
@@ -10,20 +10,26 @@ export default function HomeScreen() {
   const router = useRouter();
   const [logoutVisible, setLogoutVisible] = useState(false);
 
-  const handleLogout = async () => {
+  const handleLogout = async (exit = false) => {
     setLogoutVisible(false);
     const res = await logoutOfficer();
     if (res.success) {
+      if (exit) {
+        if (Platform.OS === 'android') {
+          BackHandler.exitApp();
+
+        }
+      }
       router.replace("/(auth)");
     }
   };
-
   return (
     <View style={styles.container}>
-      <AlertModal
+      <LogoutModal
         visible={logoutVisible}
         onCancel={() => setLogoutVisible(false)}
-        onConfirm={handleLogout}
+        onConfirm={() => handleLogout(true)}
+        onLogin={() => handleLogout(false)}
       />
       <View style={styles.titleContainer}>
         <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း</Text>
