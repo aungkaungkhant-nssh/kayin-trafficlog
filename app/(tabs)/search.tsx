@@ -75,6 +75,7 @@ const Search = () => {
                 onConfirm={() => setModalVisible(false)}
                 message="ပြစ်မှုမှတ်တမ်းတွင်မရှိပါ။"
                 confirmText='ပြစ်မှုထည့်မည်'
+                cancelText='ဆက်လက်ရှာဖွေမည်။'
                 icon={<Ionicons name="shield-checkmark" size={70} color="#4CAF50" />}
             />
             <View style={globalStyles.card}>
