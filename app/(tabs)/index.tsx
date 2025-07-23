@@ -63,7 +63,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity onPress={() => router.push("/(addition)/changepassword")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
           <Image
-            source={require('../../assets/images/import.png')}
+            source={require('../../assets/images/changepassword.png')}
             style={styles.image}
           />
           <Text style={styles.buttonText}>password ပြောင်းခြင်း</Text>

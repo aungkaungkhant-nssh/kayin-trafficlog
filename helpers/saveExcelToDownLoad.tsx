@@ -35,9 +35,15 @@ export async function saveExcelToDownloads(data: any[], fileName = 'cases.xlsx',
 
     // Define the file URI (where to save the file)
     const uri = FileSystem.documentDirectory + fileName;
+
+    await FileSystem.writeAsStringAsync(uri, wbout, {
+        encoding: FileSystem.EncodingType.Base64,
+    });
+
     if (!isShare) {
         if (Platform.OS === "android") {
             const permissions = await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+            console.log(permissions)
             if (permissions.granted) {
                 const base64 = await FileSystem.readAsStringAsync(uri, { encoding: FileSystem.EncodingType.Base64 });
                 await FileSystem.StorageAccessFramework.createFileAsync(permissions.directoryUri, fileName, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')

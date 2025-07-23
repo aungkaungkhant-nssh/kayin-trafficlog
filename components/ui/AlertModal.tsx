@@ -18,8 +18,8 @@ export function AlertModal({
     onConfirm,
     onCancel,
     message = 'ထွက်ရန်သေချာပါသလား',
-    confirmText = 'အတည်ပြုမည်',
-    cancelText = 'မပြုလုပ်တော့ပါ',
+    confirmText = 'အတည်ပြုမည်။',
+    cancelText = 'ပယ်ဖျတ်မည်။',
     icon,
 }: AlertModalProps) {
     const theme = useTheme();

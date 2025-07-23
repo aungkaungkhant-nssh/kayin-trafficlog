@@ -18,7 +18,7 @@ const Contact = () => {
                         </View>
                         <View style={styles.textContainer}>
                             <Text style={styles.label}>ခေါ်ဆိုရန်</Text>
-                            <Text style={styles.phoneNumber}>0998888888</Text>
+                            <Text style={styles.phoneNumber}>09887563691</Text>
                         </View>
                     </View>
                 </View>

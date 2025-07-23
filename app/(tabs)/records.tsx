@@ -49,7 +49,7 @@ const Records = () => {
             }
             if (exportType === ExportTypeEnum.Filed) {
                 const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
-                await saveExcelToDownloads(data, fileName,)
+                await saveExcelToDownloads(data, fileName, isShare)
             }
         } else {
             setIsAlert(true)
