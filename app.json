@@ -23,7 +23,8 @@
       },
       "edgeToEdgeEnabled": true,
       "enableFTS": false,
-      "useSQLCipher": false
+      "useSQLCipher": false,
+      "package": "com.aungkaungkhantnssh.kayintrafficlog"
     },
     "web": {
       "bundler": "metro",
@@ -46,6 +47,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "4449ef07-37f6-464c-b59c-4b2a2179a5f8"
+      }
     }
   }
 }

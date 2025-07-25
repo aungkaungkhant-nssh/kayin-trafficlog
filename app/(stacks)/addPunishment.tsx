@@ -64,11 +64,8 @@ const AddPunishment = () => {
     });
 
     const onSubmit = async (data: AddPunishmentInfoSchemaType) => {
-
         setIsConfirm(false);
-
         const res = await storePunishment(data, officer.id);
-
         if (res?.success) {
             setIsSuccess(true)
         } else {
@@ -117,6 +114,7 @@ const AddPunishment = () => {
 
                 }}
                 message="အချက်အလက်များ သေချာပါသလား။"
+                cancelText='ပြင်ဆင်မည်။'
                 icon={<MaterialIcons name="help-outline" size={40} color="#000080" />}
                 data={getValues()}
             />

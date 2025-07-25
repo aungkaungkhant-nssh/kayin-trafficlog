@@ -1,3 +1,4 @@
+import AppButton from '@/components/ui/AppButton';
 import Header from '@/components/ui/Header';
 import PunishmentFormModal from '@/components/ui/PunishmentFormModal';
 import SearchResultCard from '@/components/ui/SearchResultCard';
@@ -46,6 +47,7 @@ const SearchResults = () => {
                 onCancel={() => setSelectedData(null)}
                 onConfirm={handleAddPunishment}
             />
+
             <FlatList
                 data={searchData}
                 renderItem={({ item }) => (
@@ -57,6 +59,12 @@ const SearchResults = () => {
                 ListHeaderComponent={<Header title="ရှာမည်" />}
                 stickyHeaderIndices={[0]}
             />
+            <View>
+                <AppButton
+                    label='အသစ်ထည့်မည်။'
+                    onPress={() => router.push("/(stacks)/addPunishment")}
+                />
+            </View>
         </>
 
     );

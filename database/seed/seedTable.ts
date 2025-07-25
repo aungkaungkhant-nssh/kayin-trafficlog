@@ -1,3 +1,4 @@
+import * as SecureStore from 'expo-secure-store';
 import { getDatabase } from "../db";
 
 export async function seedTable() {
@@ -154,6 +155,7 @@ export async function seedTable() {
 
 
 export async function deleteTable() {
+  await SecureStore.deleteItemAsync('DB_INITIALIZED');
   try {
     const db = await getDatabase();
     // await database.execAsync(`
@@ -165,11 +167,11 @@ export async function deleteTable() {
     // ` );
     await db.execAsync(`PRAGMA foreign_keys = OFF;`);
     await db.execAsync("DROP TABLE IF EXISTS officers");
-    // await db.execAsync(`DROP TABLE IF EXISTS offender_vehicles;`);
-    // await db.execAsync(`DROP TABLE IF EXISTS vehicles;`);
-    // await db.execAsync(`DROP TABLE IF EXISTS vehicle_categories;`);
-    // await db.execAsync(`DROP TABLE IF EXISTS offenders;`);
-    // await db.execAsync(`DROP TABLE IF EXISTS vehicle_seizure_records`);
+    await db.execAsync(`DROP TABLE IF EXISTS offender_vehicles;`);
+    await db.execAsync(`DROP TABLE IF EXISTS vehicles;`);
+    await db.execAsync(`DROP TABLE IF EXISTS vehicle_categories;`);
+    await db.execAsync(`DROP TABLE IF EXISTS offenders;`);
+    await db.execAsync(`DROP TABLE IF EXISTS vehicle_seizure_records`);
 
     // await db.execAsync(`
     //   DROP TABLE IF EXISTS disciplinary_committed;

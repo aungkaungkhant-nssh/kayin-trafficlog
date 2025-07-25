@@ -1,16 +1,18 @@
 import AppButton from "@/components/ui/AppButton";
 import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/officer/auth";
+import { setUpTable } from "@/database/seed/setUpTable";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import globalStyles from "@/styles/globalStyles";
 import Entypo from '@expo/vector-icons/Entypo';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { useRouter } from 'expo-router';
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Drawer } from "react-native-paper";
+
 const Login = () => {
     const [open, setOpen] = useState(false)
     const router = useRouter();
@@ -28,8 +30,14 @@ const Login = () => {
         }
     });
 
-    const onSubmit = async (data: LoginSchemaType) => {
+    useEffect(() => {
+        const init = async () => {
+            await setUpTable();
+        };
+        init();
+    }, [])
 
+    const onSubmit = async (data: LoginSchemaType) => {
         const trimmedData = {
             user_name: data.name.trim(),
             password: data.password.trim(),

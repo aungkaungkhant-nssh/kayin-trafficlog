@@ -9,6 +9,7 @@ import { AddPunishmentInfoSchemaType } from "@/schema/addPunishmentInfo.schema";
 import { SearchSchemaType } from "@/schema/search.schema";
 import { ExportTypeEnum } from "@/utils/enum/ExportType";
 import { ImportEnum } from "@/utils/enum/ImportEnum";
+import * as SecureStore from 'expo-secure-store';
 import { getDatabase } from "../db";
 
 
@@ -198,10 +199,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
 
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
     const db = await getDatabase();
-
     try {
-        let result = null;
-
         await db.withTransactionAsync(async () => {
             const {
                 name,
@@ -223,7 +221,6 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
                 fine_amount,
                 seizedItem_id,
             } = data;
-
             const committedIdInt = parseInt(committed_id, 10);
             const seizedItemIdInt = parseInt(seizedItem_id, 10);
             const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
@@ -265,7 +262,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
                 throw new Error(`vehicle_categories_id ${vehicleCategoriesInt} does not exist.`);
 
             // Construct NRC Burmese formatted number
-            const nrcNumberMM = toBurmeseNumber(nrcNumber);
+            const nrcNumberMM = nrcNumber ? toBurmeseNumber(nrcNumber) : null;
             let nationalIdNumber = "";
             if (nrcState && nrcTownShip && nrcType && nrcNumberMM) {
                 nationalIdNumber = `${getNrcStateMM(nrcState)}${sanitize(
@@ -330,18 +327,9 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
                     seizedItemIdInt,
                 ]
             );
-            const seizureRecordId = newSeizureRecordId;
-
-            result = {
-                success: true,
-                offenderId,
-                vehicleId,
-                offenderVehicleId,
-                seizureRecordId,
-            };
         });
 
-        return result;
+        return { success: true };
     } catch (err) {
         console.log("Error in storePunishment:", err);
         return { success: false, error: err instanceof Error ? err.message : err };
@@ -1295,6 +1283,10 @@ export async function importJsonData(data: any[]) {
 
 
 export async function deleteOldData() {
+    const isInitialized = await SecureStore.getItemAsync('DB_INITIALIZED');
+    if (!isInitialized) {
+        return;
+    }
     const db = await getDatabase();
     try {
 

@@ -21,6 +21,7 @@ const Search = () => {
         watch,
         control,
         handleSubmit,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm<SearchSchemaType>({
         resolver: zodResolver(searchSchema),
@@ -53,6 +54,8 @@ const Search = () => {
                 }
             });
         }
+
+        reset()
 
     }
 
