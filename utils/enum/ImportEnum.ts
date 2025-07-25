@@ -1,0 +1,16 @@
+export enum ImportEnum {
+    FatherName = 'အဘအမည်',
+    Name = 'အမည်',
+    NRC = 'မှတ်ပုံတင်',
+    Address = 'နေရပ်လိပ်စာ',
+    VehicleNumber = 'ယာဉ်အမှတ်',
+    VehicleTypeAndColor = 'အမျိုးအစား/အရောင်',
+    FineAmount = 'ဒဏ်ငွေ',
+    Location = 'နေရာ',
+    Date = 'ရက်စွဲ',
+    CaseNumber = 'ရာကြီးအမှတ်',
+    SeizedItems = 'သိမ်းဆည်းပစ္စည်း',
+    ActionTakenSection = 'အရေးယူပုဒ်မ',
+    ActionTakenDate = 'အရေးယူရက်စွဲ',
+    ActionOfficer = 'အရေးယူအရာရှိ',
+}

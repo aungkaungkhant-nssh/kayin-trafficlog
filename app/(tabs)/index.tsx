@@ -1,75 +1,138 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { LogoutModal } from '@/components/ui/LogoutModal';
+import { logoutOfficer } from '@/database/officer/auth';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { BackHandler, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
+  const theme = useTheme();
+  const router = useRouter();
+  const [logoutVisible, setLogoutVisible] = useState(false);
+
+  const handleLogout = async (exit = false) => {
+    setLogoutVisible(false);
+    const res = await logoutOfficer();
+    if (res.success) {
+      if (exit) {
+        if (Platform.OS === 'android') {
+          BackHandler.exitApp();
+
+        }
+      }
+      router.replace("/(auth)");
+    }
+  };
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <LogoutModal
+        visible={logoutVisible}
+        onCancel={() => setLogoutVisible(false)}
+        onConfirm={() => handleLogout(true)}
+        onLogin={() => handleLogout(false)}
+      />
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း</Text>
+        <Text style={styles.titleDescription}>(ကရင်ပြည်နယ်)</Text>
+      </View>
+
+      <View style={styles.routeContainer}>
+        <TouchableOpacity onPress={() => router.push("/(tabs)/search")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/search.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>ရှာဖွေခြင်း</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/(tabs)/records")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/export.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>ထုတ်ယူခြင်း</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/(tabs)/import")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/import.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>ထည့်သွင်းခြင်း</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => router.push("/(addition)/changepassword")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/changepassword.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>password ပြောင်းခြင်း</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => setLogoutVisible(true)} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/logout.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>ထွက်ရန်</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  image: {
+    width: 35,
+    height: 35
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
   titleContainer: {
+    // alignItems: 'center',
+    marginBottom: 30,
+  },
+  title: {
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Myanmar-Bold',
+  },
+  titleDescription: {
+    fontSize: 18,
+    textAlign: 'center',
+    fontFamily: 'Myanmar-Bold',
+  },
+  routeContainer: {
+    paddingHorizontal: 20,
+    width: '100%',          // full width container so buttons can fill it
+    gap: 16,
+  },
+  button: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginVertical: 6,
+    width: '100%',
+    backgroundColor: '#f5f5f5',
+    borderWidth: 1,
+    borderColor: '#000080',
+    justifyContent: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  buttonText: {
+    color: '#000080',
+    fontSize: 16,
+    fontFamily: 'Myanmar-Bold',
+    marginLeft: 12,
   },
 });

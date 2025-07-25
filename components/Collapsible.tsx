@@ -1,45 +1,96 @@
 import { PropsWithChildren, useState } from 'react';
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Animated, Easing, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { IconSymbol } from '@/components/ui/IconSymbol';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Divider, useTheme } from 'react-native-paper';
 
-export function Collapsible({ children, title }: PropsWithChildren & { title: string }) {
+export function Collapsible({
+  children,
+  title,
+}: PropsWithChildren & { title: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const theme = useColorScheme() ?? 'light';
+  const theme = useTheme();
+
+  const rotation = new Animated.Value(isOpen ? 1 : 0);
+
+  const toggle = () => {
+    setIsOpen((prev) => {
+      Animated.timing(rotation, {
+        toValue: prev ? 0 : 1,
+        duration: 200,
+        useNativeDriver: true,
+        easing: Easing.ease,
+      }).start();
+      return !prev;
+    });
+  };
+
+  const rotateInterpolate = rotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['90deg', '270deg'],
+  });
 
   return (
-    <ThemedView>
+    <ThemedView style={styles.container}>
       <TouchableOpacity
         style={styles.heading}
-        onPress={() => setIsOpen((value) => !value)}
-        activeOpacity={0.8}>
-        <IconSymbol
-          name="chevron.right"
-          size={18}
-          weight="medium"
-          color={theme === 'light' ? Colors.light.icon : Colors.dark.icon}
-          style={{ transform: [{ rotate: isOpen ? '90deg' : '0deg' }] }}
-        />
-
-        <ThemedText type="defaultSemiBold">{title}</ThemedText>
+        onPress={toggle}
+        activeOpacity={0.7}
+      >
+        <ThemedText type="defaultSemiBold" style={styles.title}>
+          {title}
+        </ThemedText>
+        <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
+          <IconSymbol
+            name="chevron.right"
+            size={24}
+            weight="medium"
+            color={theme.colors.primary}
+          />
+        </Animated.View>
       </TouchableOpacity>
-      {isOpen && <ThemedView style={styles.content}>{children}</ThemedView>}
+      {isOpen && (
+        <>
+          <Divider />
+          <ThemedView style={styles.content}>
+            {children}
+          </ThemedView>
+        </>
+
+      )}
     </ThemedView>
   );
 }
 
+
 const styles = StyleSheet.create({
+  container: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingVertical: 8,
+    borderRadius: 10,
+    backgroundColor: "#F5F5F5",
+    elevation: 3,
+  },
   heading: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'space-between',
+    paddingLeft: 12,
+    paddingRight: 8,
+    paddingVertical: 12,
+  },
+  title: {
+    flex: 1,
+    fontSize: 16,
+    fontFamily: 'Myanmar-Bold',
+    color: "#000"
   },
   content: {
-    marginTop: 6,
-    marginLeft: 24,
+    marginTop: 8,
+    paddingHorizontal: 12,
+    backgroundColor: "#F5F5F5"
   },
 });
