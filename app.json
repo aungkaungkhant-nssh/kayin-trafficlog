@@ -4,7 +4,7 @@
     "slug": "kayin-trafficlog",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/police.png",
     "scheme": "kayintrafficlog",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,

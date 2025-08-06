@@ -225,7 +225,8 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         const seizedItemIdInt = parseInt(seizedItem_id, 10);
         const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
 
-        const baseId = Date.now();
+        const baseId = Date.now() + Math.floor(Math.random() * 1000);
+        const newOffenderId = baseId;
         const newVehicleId = baseId + 1;
         const newOffenderVehicleId = baseId + 2;
         const newSeizureRecordId = baseId + 3;
@@ -274,7 +275,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         await db.runAsync(
             `INSERT INTO offenders (id, name, father_name, national_id_number, driver_license_number, address) VALUES (?, ?, ?, ?, ?, ?)`,
             [
-                baseId,
+                newOffenderId,
                 sanitize(name),
                 sanitize(father_name),
                 sanitize(nationalIdNumber),
@@ -284,7 +285,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         );
 
         // offenderId = baseId (since you inserted with that id)
-        const offenderId = baseId;
+        const offenderId = newOffenderId;
 
         // Insert vehicle
         await db.runAsync(
@@ -534,7 +535,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
     const seizedItemIdInt = parseInt(seizedItem_id, 10);
 
     //id generate
-    const baseId = Date.now();
+    const baseId = Date.now() + Math.floor(Math.random() * 1000);
     const newVehicleId = baseId + 1;
     const newOffenderVehicleId = baseId + 2;
     const newSeizureRecordId = baseId + 3;
