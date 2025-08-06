@@ -42,6 +42,7 @@ const Records = () => {
 
     const handleExport = async (isShare = false) => {
         const data = await caseFilterWithDateData2(fromDate, toDate, vehicleCategoryId, exportType) as any;
+
         if (data.length) {
             if (exportType === ExportTypeEnum.All) {
                 const fileName = `${toDate}-${data[0].officer_name}.json`
@@ -53,8 +54,8 @@ const Records = () => {
             }
         } else {
             setIsAlert(true)
-            setVisible(false)
         }
+        setVisible(false)
         // if (data?.length) {
         //     const fileName = `${toDate} ${vehicleCategoriesData[+vehicleCategoryId - 1]}ဖိုင်.xlsx`;
         //     await saveExcelToDownloads(data, fileName)
