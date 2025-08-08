@@ -149,6 +149,10 @@ export async function setUpTable() {
             FOREIGN KEY (seized_item) REFERENCES seized_items(id)
           );
         `);
+
+    await database.execAsync("PRAGMA journal_mode = WAL;");
+    await database.getFirstAsync("SELECT 1");
+
     await SecureStore.setItemAsync('DB_INITIALIZED', "true");
     console.log("✅ All tables created successfully.");
   } catch (err) {
