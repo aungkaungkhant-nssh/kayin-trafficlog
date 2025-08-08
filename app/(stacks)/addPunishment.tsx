@@ -111,7 +111,6 @@ const AddPunishment = () => {
                 }}
                 onConfirm={async () => {
                     await handleSubmit(onSubmit)()
-
                 }}
                 message="အချက်အလက်များ သေချာပါသလား။"
                 cancelText='ပြင်ဆင်မည်။'

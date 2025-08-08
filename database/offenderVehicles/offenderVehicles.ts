@@ -1330,8 +1330,6 @@ export async function deleteOldData() {
     }
 }
 
-
-
 export async function test() {
     const db = await getDatabase();
 
