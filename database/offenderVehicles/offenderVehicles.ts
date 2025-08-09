@@ -116,7 +116,7 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                     vehicle_seizure_records.offender_vehicles AS offender_vehicle_id,
                     vehicle_seizure_records.seized_date,
                     vehicle_seizure_records.seizure_location,
-                    vehicle_seizure_records.fine_paid,
+                    vehicle_seizure_records.fine_amount,
                     vehicle_seizure_records.case_number,
                     vehicle_seizure_records.action_date,
 
@@ -153,7 +153,6 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
                     seized_date: record.seized_date,
                     action_date: record.action_date,
                     seizure_location: record.seizure_location,
-                    fine_paid: record.fine_paid,
                     case_number: record.case_number,
                     seizedItem_label: record.seized_item_name,
                     disciplinary_committed_id: record.disciplinary_committed_id,
@@ -244,9 +243,18 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         const committedRow = await db.getFirstAsync(
             `SELECT id FROM disciplinary_committed WHERE id = ?`,
             [committedIdInt]
-        );
+        ) as any;
         if (!committedRow)
             throw new Error(`committed_id ${committedIdInt} does not exist.`);
+
+        if (committedRow?.fine_amount !== fine_amount) {
+            await db.runAsync(
+                `UPDATE disciplinary_committed 
+                 SET fine_amount = ? 
+                 WHERE id = ?`,
+                [fine_amount, committedIdInt]
+            );
+        }
 
         const seizedItemRow = await db.getFirstAsync(
             `SELECT id FROM seized_items WHERE id = ?`,
@@ -313,7 +321,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
             `INSERT INTO vehicle_seizure_records (
             id,
             offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
-            seizure_location, fine_paid, action_date, case_number, seized_item
+            seizure_location, fine_amount, action_date, case_number, seized_item
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 newSeizureRecordId,
@@ -322,7 +330,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
                 officerId,
                 seized_date,
                 sanitize(seizure_location),
-                fine_amount ? parseFloat(fine_amount.toString()) : 0,
+                fine_amount,
                 null,
                 null,
                 seizedItemIdInt,
@@ -601,6 +609,21 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
 
             }
 
+            const committedRow = await db.getFirstAsync(
+                `SELECT id FROM disciplinary_committed WHERE id = ?`,
+                [committedIdInt]
+            ) as any;
+            if (!committedRow)
+                throw new Error(`committed_id ${committedIdInt} does not exist.`);
+
+            if (committedRow?.fine_amount !== fine_amount) {
+                await db.runAsync(
+                    `UPDATE disciplinary_committed 
+                     SET fine_amount = ? 
+                     WHERE id = ?`,
+                    [fine_amount, committedIdInt]
+                );
+            }
 
             // 2. Insert into vehicle_seizure_records
             await db.runAsync(
@@ -611,7 +634,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
                     officer_id,
                     seized_date,
                     seizure_location,
-                    fine_paid,
+                    fine_amount,
                     seized_item
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
@@ -890,7 +913,7 @@ export async function caseFilterWithDateData2(
           vsr.action_date,
           vsr.case_number,
           vsr.seizure_location,
-          vsr.fine_paid,
+          vsr.fine_amount,
           vsr.created_at AS seizure_created_at,
           vsr.updated_at AS seizure_updated_at,
   
@@ -1182,8 +1205,25 @@ export async function importJsonData(data: any[]) {
                         seizure_location,
                         action_date,
                         case_number,
-                        seized_item_id
+                        seized_item_id,
+                        fine_amount
                     } = data;
+
+                    const committedRow = await db.getFirstAsync(
+                        `SELECT id FROM disciplinary_committed WHERE id = ?`,
+                        [disciplinary_committed_id]
+                    ) as any;
+                    if (!committedRow)
+                        throw new Error(`committed_id ${disciplinary_committed_id} does not exist.`);
+
+                    if (committedRow?.fine_amount !== fine_amount) {
+                        await db.runAsync(
+                            `UPDATE disciplinary_committed 
+                             SET fine_amount = ? 
+                             WHERE id = ?`,
+                            [fine_amount, disciplinary_committed_id]
+                        );
+                    }
 
                     const offenderVehicle = await db.getFirstAsync(
                         `SELECT * FROM offender_vehicles WHERE id = ?`,
@@ -1249,11 +1289,12 @@ export async function importJsonData(data: any[]) {
                             [case_number, action_date, seizure_id]
                         );
                     } else {
+
                         await db.runAsync(
                             `INSERT INTO vehicle_seizure_records (
                                 id, offender_vehicles, disciplinary_committed_id,
                                 officer_id, seized_date, seizure_location,
-                                fine_paid, seized_item, case_number, action_date
+                                fine_amount, seized_item, case_number, action_date
                             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                             [
                                 seizure_id,
@@ -1262,7 +1303,7 @@ export async function importJsonData(data: any[]) {
                                 officer_id,
                                 seized_date,
                                 seizure_location,
-                                0,
+                                fine_amount,
                                 seized_item_id,
                                 case_number,
                                 action_date

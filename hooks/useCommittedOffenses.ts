@@ -34,6 +34,6 @@ export const useFineAmount = (articleValue: number, committedValue: number) => {
         })();
     }, [articleValue, committedValue]);
 
-    return { fineAmount }
+    return { fineAmount, setFineAmount }
 };
 

@@ -137,7 +137,7 @@ export async function setUpTable() {
             officer_id INTEGER NOT NULL,
             seized_date TEXT NOT NULL,
             seizure_location TEXT NOT NULL,
-            fine_paid INTEGER DEFAULT 0,
+            fine_amount REAL NOT NULL,
             action_date TEXT,
             case_number INTEGER,
             seized_item INTEGER NOT NULL,

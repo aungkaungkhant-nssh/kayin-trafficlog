@@ -4,7 +4,7 @@ import useDisciplinaryArticles from '@/hooks/useDisciplinaryArticles';
 import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema';
 import globalStyles from '@/styles/globalStyles';
 import React, { useEffect } from 'react';
-import { Control, Controller, FieldErrors, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { Control, Controller, FieldErrors, UseFormGetValues, UseFormSetValue, UseFormWatch } from 'react-hook-form';
 import { StyleSheet, Text, View } from 'react-native';
 import AppDropdown from './ui/AppDropDown';
 import AppTextInput from './ui/AppTextInput';
@@ -14,10 +14,11 @@ export type ControlProps = {
     control: Control<any>;
     watch: UseFormWatch<any>;
     setValue: UseFormSetValue<any>;
+    getValues?: UseFormGetValues<any>;
     errors: FieldErrors<AddPunishmentInfoSchemaType>;
 };
 
-const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) => {
+const DisciplinaryInput = ({ control, watch, setValue, errors, getValues }: ControlProps) => {
     const { disciplinaryArticleOptions } = useDisciplinaryArticles();
 
     const articleValue = watch('article_id');
@@ -26,23 +27,38 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
     const { fineAmount } = useFineAmount(articleValue, committedValue);
 
     useEffect(() => {
-        if (fineAmount) {
-            setValue("fine_amount", String(fineAmount))
+        const currentValue = getValues?.("fine_amount");
+
+        // Only set fine amount if it's fetched and no value is currently entered
+        if (fineAmount && !currentValue) {
+            setValue("fine_amount", String(fineAmount));
         }
 
+        // Update article label if article selected
         const selectedArticle = disciplinaryArticleOptions.find(item => item.value === articleValue);
         if (selectedArticle) {
             setValue("article_label", selectedArticle.label);
         }
 
+        // Update committed label if committed offense selected
         const selectedCommitted = committedOptions.find(item => item.value === committedValue);
         if (selectedCommitted) {
             setValue("committed_label", selectedCommitted.label);
         }
-    }, [fineAmount, articleValue, committedValue, disciplinaryArticleOptions, committedOptions, setValue])
+    }, [
+        fineAmount,
+        articleValue,
+        committedValue,
+        disciplinaryArticleOptions,
+        committedOptions,
+        setValue,
+        getValues
+    ]);
+
     return (
         <View style={globalStyles.inputWrapper}>
             <View style={styles.dropDownContainer}>
+                {/* Article dropdown */}
                 <View>
                     <Controller
                         control={control}
@@ -52,8 +68,8 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                                 selectedValue={value}
                                 onValueChange={onChange}
                                 options={disciplinaryArticleOptions}
-                                placeholder='ပုဒ်မ'
-                                label='ပုဒ်မ'
+                                placeholder="ပုဒ်မ"
+                                label="ပုဒ်မ"
                             />
                         )}
                     />
@@ -62,6 +78,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                     )}
                 </View>
 
+                {/* Committed offense dropdown */}
                 <View>
                     <Controller
                         control={control}
@@ -71,7 +88,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                                 selectedValue={value}
                                 onValueChange={onChange}
                                 options={committedOptions}
-                                placeholder={"ကျူးလွန်ပြစ်မှု"}
+                                placeholder="ကျူးလွန်ပြစ်မှု"
                                 label="ကျူးလွန်ပြစ်မှု"
                             />
                         )}
@@ -81,6 +98,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                     )}
                 </View>
 
+                {/* Fine amount input */}
                 <View style={globalStyles.inputWrapper}>
                     <Controller
                         control={control}
@@ -88,18 +106,12 @@ const DisciplinaryInput = ({ control, watch, setValue, errors }: ControlProps) =
                         render={({ field: { onChange, value } }) => (
                             <AppTextInput
                                 label="ဒဏ်ငွေ"
-                                value={String(fineAmount)}
+                                value={value}
                                 onChangeText={onChange}
-                                disable={true}
-
                             />
                         )}
                     />
-                    {/* {errors.name && (
-                                    <Text style={styles.errorText}>{errors.name.message}</Text>
-                                )} */}
                 </View>
-
             </View>
         </View>
     );

@@ -155,6 +155,7 @@ const AddPunishment = () => {
                                 // onError={onError}
                                 setIsConfirm={setIsConfirm}
                                 setValue={setValue}
+                                getValues={getValues}
                                 trigger={trigger}
                                 errors={errors}
                             />

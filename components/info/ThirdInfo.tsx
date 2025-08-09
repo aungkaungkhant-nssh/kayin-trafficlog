@@ -1,7 +1,7 @@
 import { AddPunishmentInfoSchemaType } from '@/schema/addPunishmentInfo.schema'
 import globalStyles from '@/styles/globalStyles'
 import React from 'react'
-import { Controller, UseFormSetValue } from 'react-hook-form'
+import { Controller, UseFormGetValues, UseFormSetValue } from 'react-hook-form'
 import { StyleSheet, Text, View } from 'react-native'
 import DisciplinaryInput from '../DisciplinaryInput'
 import SeizedInput from '../SeizedInput'
@@ -12,10 +12,11 @@ import { InfoProps } from './FirstInfo'
 
 export type ThirdInfoProps = InfoProps & {
     setValue: UseFormSetValue<AddPunishmentInfoSchemaType>;
+    getValues?: UseFormGetValues<AddPunishmentInfoSchemaType>;
     setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConfirm, trigger }: ThirdInfoProps) => {
+const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConfirm, trigger, getValues }: ThirdInfoProps) => {
     return (
         <>
             <View style={globalStyles.inputWrapper}>
@@ -77,6 +78,7 @@ const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConf
                 control={control}
                 watch={watch}
                 setValue={setValue}
+                getValues={getValues}
                 errors={errors}
             />
 
