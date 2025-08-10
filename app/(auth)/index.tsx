@@ -1,31 +1,28 @@
 import AppButton from "@/components/ui/AppButton";
 import AppTextInput from "@/components/ui/AppTextInput";
 import { loginOfficer } from "@/database/officer/auth";
-import { setUpTable } from "@/database/seed/setUpTable";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import globalStyles from "@/styles/globalStyles";
 import Entypo from "@expo/vector-icons/Entypo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
-    ActivityIndicator,
     KeyboardAvoidingView,
     Platform,
     Pressable,
     StyleSheet,
     Text,
     TouchableOpacity,
-    View,
+    View
 } from "react-native";
 import { Drawer } from "react-native-paper";
 
 const Login = () => {
     const [open, setOpen] = useState(false);
-    const [dbReady, setDbReady] = useState(false);
-    const [dbError, setDbError] = useState<string | null>(null);
+
 
     const router = useRouter();
     const {
@@ -42,28 +39,9 @@ const Login = () => {
         },
     });
 
-    useEffect(() => {
-        const init = async () => {
-            try {
-                await setUpTable();
-                setDbReady(true);
-            } catch (err) {
-                console.error("Error setting up DB:", err);
-                setDbError("Database initialization failed. Please restart the app.");
-            }
-        };
-        init();
-    }, []);
+
 
     const onSubmit = async (data: LoginSchemaType) => {
-        if (!dbReady) {
-            setError("root", {
-                type: "manual",
-                message: "Database is still initializing. Please wait...",
-            });
-            return;
-        }
-
         const trimmedData = {
             user_name: data.name.trim(),
             password: data.password.trim(),
@@ -82,15 +60,6 @@ const Login = () => {
         router.replace("/(tabs)");
     };
 
-    if (!dbReady && !dbError) {
-        // Show loading screen until DB setup is done
-        return (
-            <View style={styles.loadingScreen}>
-                <ActivityIndicator size="large" color="#000080" />
-                <Text style={styles.loadingText}>Initializing database...</Text>
-            </View>
-        );
-    }
 
     return (
         <KeyboardAvoidingView
@@ -143,16 +112,7 @@ const Login = () => {
                         ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)
                     </Text>
 
-                    {errors.root && (
-                        <Text style={{ ...globalStyles.errorText, marginVertical: 10 }}>
-                            {errors.root.message}
-                        </Text>
-                    )}
-                    {dbError && (
-                        <Text style={{ ...globalStyles.errorText, marginVertical: 10 }}>
-                            {dbError}
-                        </Text>
-                    )}
+
 
                     {/* Name input */}
                     <View style={globalStyles.inputWrapper}>
@@ -164,7 +124,7 @@ const Login = () => {
                                     label="အမည်"
                                     value={value}
                                     onChangeText={onChange}
-                                    editable={dbReady}
+
                                 />
                             )}
                         />
@@ -184,7 +144,6 @@ const Login = () => {
                                     isPassword
                                     value={value}
                                     onChangeText={onChange}
-                                    editable={dbReady}
                                 />
                             )}
                         />
@@ -198,7 +157,6 @@ const Login = () => {
                             label="အကောင့်ဝင်ရန်"
                             onPress={handleSubmit(onSubmit)}
                             loading={isSubmitting}
-                            disabled={!dbReady}
                         />
                     </View>
                 </View>

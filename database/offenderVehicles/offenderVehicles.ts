@@ -67,106 +67,118 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
         const whereClause = conditions.length > 0 ? "WHERE " + conditions.join(" OR ") : "";
 
         const sql = `
-            SELECT
-                offenders.id AS offender_id,
-                offenders.name,
-                offenders.father_name,
-                offenders.national_id_number,
-                offenders.driver_license_number,
-                offenders.address,
+          SELECT
+            offenders.id AS offender_id,
+            offenders.name,
+            offenders.father_name,
+            offenders.national_id_number,
+            offenders.driver_license_number,
+            offenders.address,
 
-                vehicles.id AS vehicle_id,
-                vehicles.vehicle_number,
-                vehicles.vehicle_license_number,
-                vehicles.vehicle_types,
-                vehicle_categories.name AS vehicle_category_name,
-                vehicle_categories.id AS vehicle_category_id,
+            vehicles.id AS vehicle_id,
+            vehicles.vehicle_number,
+            vehicles.vehicle_license_number,
+            vehicles.vehicle_types,
+            vehicle_categories.name AS vehicle_category_name,
+            vehicle_categories.id AS vehicle_category_id,
 
-                (
-                    SELECT COUNT(*)
-                    FROM vehicle_seizure_records vsr
-                    JOIN offender_vehicles ov_sub ON ov_sub.id = vsr.offender_vehicles
-                    WHERE ov_sub.vehicle_id = vehicles.id
-                ) AS seizure_count,
+            COUNT(DISTINCT vsr.id) AS seizure_count,
 
-                offender_vehicles.id AS offender_vehicle_id
+            offender_vehicles.id AS offender_vehicle_id,
 
-            FROM offenders
-            LEFT JOIN offender_vehicles ON offender_vehicles.offender_id = offenders.id
-            LEFT JOIN vehicles ON vehicles.id = offender_vehicles.vehicle_id
-            LEFT JOIN vehicle_categories ON vehicle_categories.id = vehicles.vehicle_categories_id
-            ${whereClause}
+            (
+                SELECT o.name
+                FROM vehicle_seizure_records vsr2
+                JOIN officers o ON o.id = vsr2.officer_id
+                WHERE vsr2.offender_vehicles = offender_vehicles.id
+                ORDER BY vsr2.seized_date DESC
+                LIMIT 1
+            ) AS officer_name
+
+        FROM offenders
+        LEFT JOIN offender_vehicles 
+            ON offender_vehicles.offender_id = offenders.id
+        LEFT JOIN vehicles 
+            ON vehicles.id = offender_vehicles.vehicle_id
+        LEFT JOIN vehicle_categories 
+            ON vehicle_categories.id = vehicles.vehicle_categories_id
+        LEFT JOIN vehicle_seizure_records vsr
+            ON vsr.offender_vehicles = offender_vehicles.id
+        ${whereClause}
+        GROUP BY offender_vehicles.id;
+
         `;
 
         const offendersWithVehicles = await db.getAllAsync(sql, params);
+
         if (offendersWithVehicles.length === 0) return [];
 
-        const offenderVehicleIds = offendersWithVehicles
-            .map((o: any) => o.offender_vehicle_id)
-            .filter(Boolean);
+        // const offenderVehicleIds = offendersWithVehicles
+        //     .map((o: any) => o.offender_vehicle_id)
+        //     .filter(Boolean);
 
-        let seizureRecordsByVehicle: Record<number, any[]> = {};
+        // let seizureRecordsByVehicle: Record<number, any[]> = {};
 
-        if (offenderVehicleIds.length > 0) {
-            const placeholders = offenderVehicleIds.map(() => "?").join(",");
+        // if (offenderVehicleIds.length > 0) {
+        //     const placeholders = offenderVehicleIds.map(() => "?").join(",");
 
-            const seizureSql = `
-                SELECT
-                    vehicle_seizure_records.id AS seizure_id,
-                    vehicle_seizure_records.offender_vehicles AS offender_vehicle_id,
-                    vehicle_seizure_records.seized_date,
-                    vehicle_seizure_records.seizure_location,
-                    vehicle_seizure_records.fine_amount,
-                    vehicle_seizure_records.case_number,
-                    vehicle_seizure_records.action_date,
+        //     const seizureSql = `
+        //         SELECT
+        //             vehicle_seizure_records.id AS seizure_id,
+        //             vehicle_seizure_records.offender_vehicles AS offender_vehicle_id,
+        //             vehicle_seizure_records.seized_date,
+        //             vehicle_seizure_records.seizure_location,
+        //             vehicle_seizure_records.fine_amount,
+        //             vehicle_seizure_records.case_number,
+        //             vehicle_seizure_records.action_date,
 
-                    seized_items.name AS seized_item_name,
+        //             seized_items.name AS seized_item_name,
 
-                    disciplinary_committed.id AS disciplinary_committed_id,
-                    disciplinary_committed.fine_amount,
+        //             disciplinary_committed.id AS disciplinary_committed_id,
+        //             disciplinary_committed.fine_amount,
 
-                    disciplinary_articles.id AS article_id,
-                    disciplinary_articles.number AS article_number,
+        //             disciplinary_articles.id AS article_id,
+        //             disciplinary_articles.number AS article_number,
 
-                    committed_offenses.id AS offense_id,
-                    committed_offenses.name AS offense_name,
+        //             committed_offenses.id AS offense_id,
+        //             committed_offenses.name AS offense_name,
 
-                    officers.id AS officer_id,
-                    officers.name AS officer_name
+        //             officers.id AS officer_id,
+        //             officers.name AS officer_name
 
-                FROM vehicle_seizure_records
-                LEFT JOIN seized_items ON vehicle_seizure_records.seized_item = seized_items.id
-                LEFT JOIN disciplinary_committed ON vehicle_seizure_records.disciplinary_committed_id = disciplinary_committed.id
-                LEFT JOIN disciplinary_articles ON disciplinary_committed.disciplinary_articles_id = disciplinary_articles.id
-                LEFT JOIN committed_offenses ON disciplinary_committed.committed_offenses_id = committed_offenses.id
-                LEFT JOIN officers ON vehicle_seizure_records.officer_id = officers.id
-                WHERE vehicle_seizure_records.offender_vehicles IN (${placeholders})
-                ORDER BY vehicle_seizure_records.seized_date DESC
-            `;
+        //         FROM vehicle_seizure_records
+        //         LEFT JOIN seized_items ON vehicle_seizure_records.seized_item = seized_items.id
+        //         LEFT JOIN disciplinary_committed ON vehicle_seizure_records.disciplinary_committed_id = disciplinary_committed.id
+        //         LEFT JOIN disciplinary_articles ON disciplinary_committed.disciplinary_articles_id = disciplinary_articles.id
+        //         LEFT JOIN committed_offenses ON disciplinary_committed.committed_offenses_id = committed_offenses.id
+        //         LEFT JOIN officers ON vehicle_seizure_records.officer_id = officers.id
+        //         WHERE vehicle_seizure_records.offender_vehicles IN (${placeholders})
+        //         ORDER BY vehicle_seizure_records.seized_date DESC
+        //     `;
 
-            const seizureRecords = await db.getAllAsync(seizureSql, offenderVehicleIds);
+        //     const seizureRecords = await db.getAllAsync(seizureSql, offenderVehicleIds);
 
-            seizureRecordsByVehicle = seizureRecords.reduce((acc: Record<number, any[]>, record: any) => {
-                if (!acc[record.offender_vehicle_id]) acc[record.offender_vehicle_id] = [];
-                acc[record.offender_vehicle_id].push({
-                    seizure_id: record.seizure_id,
-                    seized_date: record.seized_date,
-                    action_date: record.action_date,
-                    seizure_location: record.seizure_location,
-                    case_number: record.case_number,
-                    seizedItem_label: record.seized_item_name,
-                    disciplinary_committed_id: record.disciplinary_committed_id,
-                    fine_amount: record.fine_amount,
-                    article_id: record.article_id,
-                    article_number: record.article_number,
-                    offense_id: record.offense_id,
-                    offense_name: record.offense_name,
-                    officer_id: record.officer_id,
-                    officer_name: record.officer_name,
-                });
-                return acc;
-            }, {});
-        }
+        //     seizureRecordsByVehicle = seizureRecords.reduce((acc: Record<number, any[]>, record: any) => {
+        //         if (!acc[record.offender_vehicle_id]) acc[record.offender_vehicle_id] = [];
+        //         acc[record.offender_vehicle_id].push({
+        //             seizure_id: record.seizure_id,
+        //             seized_date: record.seized_date,
+        //             action_date: record.action_date,
+        //             seizure_location: record.seizure_location,
+        //             case_number: record.case_number,
+        //             seizedItem_label: record.seized_item_name,
+        //             disciplinary_committed_id: record.disciplinary_committed_id,
+        //             fine_amount: record.fine_amount,
+        //             article_id: record.article_id,
+        //             article_number: record.article_number,
+        //             offense_id: record.offense_id,
+        //             offense_name: record.offense_name,
+        //             officer_id: record.officer_id,
+        //             officer_name: record.officer_name,
+        //         });
+        //         return acc;
+        //     }, {});
+        // }
 
         const formatted = offendersWithVehicles.map((o: any) => ({
             offender_id: o.offender_id,
@@ -183,7 +195,8 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
             vehicle_categories_id: o.vehicle_category_id,
             seizure_count: o.seizure_count || 0,
             offender_vehicle_id: o.offender_vehicle_id,
-            vehicle_seizure_records: seizureRecordsByVehicle[o.offender_vehicle_id] || []
+            officer_name: o.officer_name
+            // vehicle_seizure_records: seizureRecordsByVehicle[o.offender_vehicle_id] || []
         }));
 
         return formatted;
@@ -194,6 +207,73 @@ export async function searchOffenderVehicles(data: SearchSchemaType) {
     }
 }
 
+
+export async function getDetailOffender(offenderVehicleId: string) {
+    const db = await getDatabase();
+
+    const seizureSql = `
+            SELECT
+                vehicle_seizure_records.id AS seizure_id,
+                vehicle_seizure_records.offender_vehicles AS offender_vehicle_id,
+                vehicle_seizure_records.seized_date,
+                vehicle_seizure_records.seizure_location,
+                vehicle_seizure_records.fine_amount,
+                vehicle_seizure_records.case_number,
+                vehicle_seizure_records.action_date,
+
+                seized_items.name AS seized_item_name,
+
+                disciplinary_committed.id AS disciplinary_committed_id,
+                disciplinary_committed.fine_amount,
+
+                disciplinary_articles.id AS article_id,
+                disciplinary_articles.number AS article_number,
+
+                committed_offenses.id AS offense_id,
+                committed_offenses.name AS offense_name,
+
+                officers.id AS officer_id,
+                officers.name AS officer_name
+
+            FROM vehicle_seizure_records
+            LEFT JOIN seized_items 
+                ON vehicle_seizure_records.seized_item = seized_items.id
+            LEFT JOIN disciplinary_committed 
+                ON vehicle_seizure_records.disciplinary_committed_id = disciplinary_committed.id
+            LEFT JOIN disciplinary_articles 
+                ON disciplinary_committed.disciplinary_articles_id = disciplinary_articles.id
+            LEFT JOIN committed_offenses 
+                ON disciplinary_committed.committed_offenses_id = committed_offenses.id
+            LEFT JOIN officers 
+                ON vehicle_seizure_records.officer_id = officers.id
+            WHERE vehicle_seizure_records.offender_vehicles = ?
+            ORDER BY vehicle_seizure_records.seized_date DESC
+        `;
+
+    const seizureRecords = await db.getAllAsync(seizureSql, [+offenderVehicleId]);
+    const seizureRecordsByVehicle = seizureRecords.reduce((acc: Record<number, any[]>, record: any) => {
+        if (!acc[record.offender_vehicle_id]) acc[record.offender_vehicle_id] = [];
+        acc[record.offender_vehicle_id].push({
+            seizure_id: record.seizure_id,
+            seized_date: record.seized_date,
+            action_date: record.action_date,
+            seizure_location: record.seizure_location,
+            case_number: record.case_number,
+            seizedItem_label: record.seized_item_name,
+            disciplinary_committed_id: record.disciplinary_committed_id,
+            fine_amount: record.fine_amount,
+            article_id: record.article_id,
+            article_number: record.article_number,
+            offense_id: record.offense_id,
+            offense_name: record.offense_name,
+            officer_id: record.officer_id,
+            officer_name: record.officer_name,
+        });
+        return acc;
+    }, {});
+
+    return seizureRecordsByVehicle;
+}
 
 
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
@@ -543,7 +623,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
     const seizedItemIdInt = parseInt(seizedItem_id, 10);
 
     //id generate
-    const baseId = Date.now() + Math.floor(Math.random() * 1000);
+    const baseId = Date.now();
     const newVehicleId = baseId + 1;
     const newOffenderVehicleId = baseId + 2;
     const newSeizureRecordId = baseId + 3;
@@ -571,7 +651,6 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
                 data.vehicle_types &&
                 vehicleCategoryId
             ) {
-
                 await db.runAsync(
                     `
                     INSERT INTO vehicles (
@@ -608,6 +687,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
                 offenderVehicleId = id;
 
             }
+
 
             const committedRow = await db.getFirstAsync(
                 `SELECT id FROM disciplinary_committed WHERE id = ?`,
@@ -657,6 +737,7 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
         return { success: false, message: error.message };
     }
 }
+
 
 
 export async function addCase(data: AddCaseSchemaType, seizure_id: number) {

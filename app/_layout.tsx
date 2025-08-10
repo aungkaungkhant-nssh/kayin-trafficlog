@@ -1,7 +1,9 @@
 import { SessionProvider, useSession } from '@/context/SessionContext'; // Adjust path as needed
+import { setUpTable } from '@/database/seed/setUpTable';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { ActivityIndicator, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { DefaultTheme, PaperProvider } from 'react-native-paper';
 
 
@@ -11,6 +13,32 @@ export default function RootLayout() {
     'Myanmar-Regular': require('../assets/fonts/NotoSansMyanmar-Regular.ttf'),
     'Myanmar-Bold': require('../assets/fonts/NotoSansMyanmar-Bold.ttf'),
   });
+  const [dbReady, setDbReady] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await setUpTable();
+        setDbReady(true);
+      } catch (err) {
+        console.error("Error setting up DB:", err);
+        setDbError("Database initialization failed. Please restart the app.");
+      }
+    };
+    init();
+  }, []);
+
+  if (!dbReady && !dbError) {
+    // Show loading screen until DB setup is done
+    return (
+      <View style={styles.loadingScreen}>
+        <ActivityIndicator size="large" color="#000080" />
+        <Text style={styles.loadingText}>Initializing database...</Text>
+      </View>
+    );
+  }
+
 
   if (!fontsLoaded) {
     return (
@@ -20,12 +48,28 @@ export default function RootLayout() {
     );
   }
 
+
+
   return (
     <SessionProvider>
       <AppContent />
     </SessionProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingScreen: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#000080",
+  },
+});
 
 function AppContent() {
 

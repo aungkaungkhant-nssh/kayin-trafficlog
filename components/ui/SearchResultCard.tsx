@@ -51,7 +51,7 @@ const SearchResultCard = ({
                     <TouchableOpacity style={styles.starButton}>
                         <AntDesign name="staro" size={24} color="#fff" />
                         <Text style={{ color: '#fff', marginLeft: 10 }}>
-                            {item.vehicle_seizure_records?.[0]?.officer_name}
+                            {item.officer_name}
                         </Text>
                     </TouchableOpacity>
                 </View>
@@ -96,7 +96,7 @@ const SearchResultCard = ({
                             router.push({
                                 pathname: '/(stacks)/details',
                                 params: {
-                                    result: JSON.stringify(item),
+                                    offenderVehicleId: item.offender_vehicle_id,
                                     formData: JSON.stringify(formData)
                                 }
                             })

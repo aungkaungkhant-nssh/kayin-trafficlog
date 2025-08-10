@@ -1,20 +1,20 @@
-import { Collapsible } from '@/components/Collapsible';
-import OffenderVehicleDetails from '@/components/OffenderVehicleDetails';
 import AddCaseFormModal from '@/components/ui/AddCaseFormModal';
 import { AlertModal } from '@/components/ui/AlertModal';
-import AppButton from '@/components/ui/AppButton';
-import Divider from '@/components/ui/Divider';
 import Header from '@/components/ui/Header';
-import { LabelTypeEnum } from '@/utils/enum/LabelEnum';
+import { useOffenderDetail } from '@/hooks/useOffenderDetail';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 
 const Details = () => {
-  const { result } = useLocalSearchParams();
-  const searchData = JSON.parse(Array.isArray(result) ? result[0] : result);
+  const { offenderVehicleId } = useLocalSearchParams();
+  const searchId = JSON.parse(Array.isArray(offenderVehicleId) ? offenderVehicleId[0] : offenderVehicleId);
+
+  const { offenderDetails } = useOffenderDetail({ offenderVehicleId: searchId });
+  console.log(offenderDetails)
+  // const searchData = JSON.parse(Array.isArray(result) ? result[0] : result);
   const router = useRouter()
   const [modalState, setModalState] = useState<{
     open: boolean;
@@ -60,7 +60,7 @@ const Details = () => {
       />
 
 
-      <ScrollView style={styles.container}>
+      {/* <ScrollView style={styles.container}>
         <View style={styles.collapseItem}>
           <Collapsible title="👤 ယာဉ်မောင်းသူ အချက်အလက်">
             <OffenderVehicleDetails
@@ -118,7 +118,7 @@ const Details = () => {
             ))
           )
         }
-      </ScrollView>
+      </ScrollView> */}
     </View>
   )
 }
