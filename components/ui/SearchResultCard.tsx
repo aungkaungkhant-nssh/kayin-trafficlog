@@ -96,7 +96,7 @@ const SearchResultCard = ({
                             router.push({
                                 pathname: '/(stacks)/details',
                                 params: {
-                                    offenderVehicleId: item.offender_vehicle_id,
+                                    result: JSON.stringify(item),
                                     formData: JSON.stringify(formData)
                                 }
                             })
