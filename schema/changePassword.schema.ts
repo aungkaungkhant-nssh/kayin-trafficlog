@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const changePasswordSchema = z
     .object({
+        userName: z.string().nonempty({ message: "အသုံးပြုသူအမည် လိုအပ်သည်။" }),
         oldPassword: z.string().nonempty({ message: "စကားဝှက်ဟောင်းလိုအပ်သည်" }),
         newPassword: z
             .string()

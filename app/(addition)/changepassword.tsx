@@ -20,21 +20,32 @@ const ChangePassword = () => {
         control,
         handleSubmit,
         setError,
+        setValue,
         formState: { errors, isSubmitting },
+        reset
     } = useForm<ChangePasswordSchemaType>({
         resolver: zodResolver(changePasswordSchema),
         mode: "onChange",
         defaultValues: {
+            userName: "",
             oldPassword: "",
             newPassword: "",
             confirmNewPassword: "",
         },
     });
 
+    React.useEffect(() => {
+        if (officer?.user_name) {
+            setValue("userName", officer.user_name);
+        }
+    }, [officer, setValue]);
+
+
     const onSubmit = async (data: ChangePasswordSchemaType) => {
         if (!officer) return;
 
         const res = await changePassword({
+            userName: data.userName,
             oldPassword: data.oldPassword,
             newPassword: data.newPassword,
             officerId: officer.id,
@@ -53,24 +64,78 @@ const ChangePassword = () => {
     return (
         <View style={{ flex: 1 }}>
             <Header
-                title='စကားဝှက် ပြောင်းခြင်း'
+                title='ပရိုဖိုင်ပြောင်းခြင်း'
             />
             <AlertModal
                 visible={isSuccess}
                 onCancel={() => {
+                    reset(
+                        {
+                            oldPassword: '',
+                            newPassword: '',
+                            confirmNewPassword: '',
+                        }
+                    )
                     setIsSuccess(false)
                 }}
                 onConfirm={() => {
+                    reset(
+                        {
+                            oldPassword: '',
+                            newPassword: '',
+                            confirmNewPassword: '',
+                        }
+                    )
                     router.push("/(tabs)");
                     setIsSuccess(false)
                 }}
                 message="စကားဝှက်ပြောင်းခြင်း‌ အောင်မြင်ပါသည်။"
                 confirmText='မူလစာမျက်နှာ'
-                cancelText='ပယ်ဖျတ်မည်'
+                cancelText='ပိတ်မည်။'
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
             />
             <View style={{ padding: 20 }}>
-                <View style={{ marginBottom: 10 }}>
+                {/* Username Change Section */}
+                <View style={{
+                    backgroundColor: '#f0f8ff',
+                    borderRadius: 8,
+                    padding: 15,
+                    marginBottom: 30,
+                    borderWidth: 1,
+                    borderColor: '#a0c4ff'
+                }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 10, color: '#1e40af' }}>
+                        အသုံးပြုသူအမည် ပြောင်းမည်
+                    </Text>
+                    <Controller
+                        control={control}
+                        name="userName"
+                        render={({ field: { onChange, value } }) => (
+                            <AppTextInput
+                                label="အသုံးပြုသူအမည်"
+                                value={value}
+                                onChangeText={onChange}
+                                multiline={true}
+                            />
+                        )}
+                    />
+                    {errors.userName && (
+                        <Text style={{ color: 'red', marginTop: 5 }}>{errors.userName.message}</Text>
+                    )}
+                </View>
+
+                {/* Password Change Section */}
+                <View style={{
+                    backgroundColor: '#fff0f0',
+                    borderRadius: 8,
+                    padding: 15,
+                    borderWidth: 1,
+                    borderColor: '#ff7f7f'
+                }}>
+                    <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 15, color: '#b91c1c' }}>
+                        စကားဝှက်ပြောင်းမည်
+                    </Text>
+
                     <Controller
                         control={control}
                         name="oldPassword"
@@ -84,12 +149,9 @@ const ChangePassword = () => {
                         )}
                     />
                     {errors.oldPassword && (
-                        <Text style={{ color: "red" }}>{errors.oldPassword.message}</Text>
+                        <Text style={{ color: 'red', marginTop: 5 }}>{errors.oldPassword.message}</Text>
                     )}
-                </View>
 
-                {/* New Password */}
-                <View style={{ marginBottom: 10 }}>
                     <Controller
                         control={control}
                         name="newPassword"
@@ -99,16 +161,14 @@ const ChangePassword = () => {
                                 value={value}
                                 onChangeText={onChange}
                                 multiline={true}
+                                style={{ marginTop: 10 }}
                             />
                         )}
                     />
                     {errors.newPassword && (
-                        <Text style={{ color: "red" }}>{errors.newPassword.message}</Text>
+                        <Text style={{ color: 'red', marginTop: 5 }}>{errors.newPassword.message}</Text>
                     )}
-                </View>
 
-                {/* Confirm New Password */}
-                <View style={{ marginBottom: 10 }}>
                     <Controller
                         control={control}
                         name="confirmNewPassword"
@@ -118,22 +178,24 @@ const ChangePassword = () => {
                                 value={value}
                                 onChangeText={onChange}
                                 multiline={true}
+                                style={{ marginTop: 10 }}
                             />
                         )}
                     />
                     {errors.confirmNewPassword && (
-                        <Text style={{ color: "red" }}>{errors.confirmNewPassword.message}</Text>
+                        <Text style={{ color: 'red', marginTop: 5 }}>{errors.confirmNewPassword.message}</Text>
                     )}
-                </View>
 
-                <View >
-                    <AppButton
-                        label='အတည်ပြုမည်။'
-                        onPress={handleSubmit(onSubmit)}
-                        loading={isSubmitting}
-                    />
+                    <View style={{ marginTop: 20 }}>
+                        <AppButton
+                            label="အတည်ပြုမည်။"
+                            onPress={handleSubmit(onSubmit)}
+                            loading={isSubmitting}
+                        />
+                    </View>
                 </View>
             </View>
+
 
         </View>
     )

@@ -48,7 +48,7 @@ const Login = () => {
         };
 
         const res = await loginOfficer(trimmedData);
-
+        console.log(res)
         if (!res.success) {
             setError("root", {
                 type: "manual",
@@ -60,7 +60,7 @@ const Login = () => {
         router.replace("/(tabs)");
     };
 
-
+    console.log(errors)
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -112,7 +112,11 @@ const Login = () => {
                         ယာဉ်စည်းကမ်း ထိန်းသိမ်းရေး ပြစ်မှုမှတ်တမ်း (ကရင်ပြည်နယ်)
                     </Text>
 
-
+                    {errors.root && (
+                        <Text style={{ ...globalStyles.errorText, marginVertical: 10 }}>
+                            {errors.root.message}
+                        </Text>
+                    )}
 
                     {/* Name input */}
                     <View style={globalStyles.inputWrapper}>

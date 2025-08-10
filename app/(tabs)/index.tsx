@@ -66,7 +66,7 @@ export default function HomeScreen() {
             source={require('../../assets/images/changepassword.png')}
             style={styles.image}
           />
-          <Text style={styles.buttonText}>password ပြောင်းခြင်း</Text>
+          <Text style={styles.buttonText}>ပရိုဖိုင်ပြောင်းခြင်း</Text>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setLogoutVisible(true)} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
