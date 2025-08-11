@@ -59,7 +59,7 @@ const Login = () => {
         router.replace("/(tabs)");
     };
 
-    console.log(errors)
+
     return (
         <KeyboardAvoidingView
             behavior={Platform.OS === "ios" ? "padding" : "height"}

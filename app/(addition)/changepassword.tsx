@@ -8,12 +8,14 @@ import { changePasswordSchema, ChangePasswordSchemaType } from '@/schema/changeP
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import React from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
 
 const ChangePassword = () => {
-    const { officer, loading } = useSession();
+    const { officer, loading, setOfficer } = useSession();
+
     const router = useRouter();
     const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
     const {
@@ -51,7 +53,18 @@ const ChangePassword = () => {
             officerId: officer.id,
         });
 
-        if (res === true) {
+        if (res.success === true) {
+            const updatedOfficer = {
+                ...officer,
+                user_name: data.userName || officer.user_name,
+            };
+
+            await SecureStore.setItemAsync(
+                'officerSession',
+                JSON.stringify(updatedOfficer)
+            );
+
+            setOfficer(updatedOfficer); // update context state
             setIsSuccess(true);
         } else {
             // If old password is incorrect, show error under the input field
@@ -69,27 +82,15 @@ const ChangePassword = () => {
             <AlertModal
                 visible={isSuccess}
                 onCancel={() => {
-                    reset(
-                        {
-                            oldPassword: '',
-                            newPassword: '',
-                            confirmNewPassword: '',
-                        }
-                    )
+
                     setIsSuccess(false)
                 }}
                 onConfirm={() => {
-                    reset(
-                        {
-                            oldPassword: '',
-                            newPassword: '',
-                            confirmNewPassword: '',
-                        }
-                    )
+
                     router.push("/(tabs)");
                     setIsSuccess(false)
                 }}
-                message="စကားဝှက်ပြောင်းခြင်း‌ အောင်မြင်ပါသည်။"
+                message="ပရိုဖိုင်ပြောင်းခြင်း အောင်မြင်ပါသည်။"
                 confirmText='မူလစာမျက်နှာ'
                 cancelText='ပိတ်မည်။'
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
@@ -186,13 +187,15 @@ const ChangePassword = () => {
                         <Text style={{ color: 'red', marginTop: 5 }}>{errors.confirmNewPassword.message}</Text>
                     )}
 
-                    <View style={{ marginTop: 20 }}>
-                        <AppButton
-                            label="အတည်ပြုမည်။"
-                            onPress={handleSubmit(onSubmit)}
-                            loading={isSubmitting}
-                        />
-                    </View>
+
+                </View>
+
+                <View style={{ marginTop: 20 }}>
+                    <AppButton
+                        label="အတည်ပြုမည်။"
+                        onPress={handleSubmit(onSubmit)}
+                        loading={isSubmitting}
+                    />
                 </View>
             </View>
 

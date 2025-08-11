@@ -103,26 +103,48 @@ export async function changePassword({ oldPassword, newPassword, userName, offic
     try {
         const db = await getDatabase();
 
-        const existingOfficer = await db.getFirstAsync<{ password: string }>(
-            `SELECT password FROM officers WHERE id = ?`,
-            [officerId]
-        );
+        // Check if we need to verify old password
+        if (oldPassword && newPassword) {
+            const existingOfficer = await db.getFirstAsync<{ password: string }>(
+                `SELECT password FROM officers WHERE id = ?`,
+                [officerId]
+            );
 
-        if (!existingOfficer || existingOfficer.password !== oldPassword) {
-            return { success: false, error: "စကားဝှက်ဟောင်းမှားနေသည်" };
+            if (!existingOfficer) {
+                return { success: false, error: "Officer not found" };
+            }
+
+            if (existingOfficer.password !== oldPassword) {
+                return { success: false, error: "စကားဝှက်ဟောင်းမှားနေသည်" };
+            }
         }
 
-        // 2. Update password
-        await db.runAsync(
-            `
-            UPDATE officers
-            SET password = ?, user_name =?, updated_at = datetime('now')
-            WHERE id = ?
-            `,
-            [newPassword, userName, officerId]
-        );
+        // Build dynamic update fields
+        const updateFields: string[] = [];
+        const params: any[] = [];
 
-        return true;
+        if (newPassword) {
+            updateFields.push("password = ?");
+            params.push(newPassword);
+        }
+
+        if (userName) {
+            updateFields.push("user_name = ?");
+            params.push(userName);
+        }
+
+        updateFields.push("updated_at = datetime('now')");
+
+        // Run update if there’s something to change
+        if (updateFields.length > 1) {
+            params.push(officerId);
+            await db.runAsync(
+                `UPDATE officers SET ${updateFields.join(", ")} WHERE id = ?`,
+                params
+            );
+        }
+
+        return { success: true };
     } catch (err: any) {
         console.log(err);
         return { success: false, error: err.message };

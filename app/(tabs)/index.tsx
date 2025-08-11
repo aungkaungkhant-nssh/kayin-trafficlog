@@ -3,21 +3,20 @@ import { logoutOfficer } from '@/database/officer/auth';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { BackHandler, Image, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
 
 export default function HomeScreen() {
-  const theme = useTheme();
+
   const router = useRouter();
   const [logoutVisible, setLogoutVisible] = useState(false);
 
   const handleLogout = async (exit = false) => {
     setLogoutVisible(false);
     const res = await logoutOfficer();
+    console.log(res)
     if (res.success) {
       if (exit) {
         if (Platform.OS === 'android') {
           BackHandler.exitApp();
-
         }
       }
       router.replace("/(auth)");
