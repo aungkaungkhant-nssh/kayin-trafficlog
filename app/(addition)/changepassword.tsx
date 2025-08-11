@@ -29,6 +29,7 @@ const ChangePassword = () => {
         resolver: zodResolver(changePasswordSchema),
         mode: "onChange",
         defaultValues: {
+            name: "",
             userName: "",
             oldPassword: "",
             newPassword: "",
@@ -37,8 +38,9 @@ const ChangePassword = () => {
     });
 
     React.useEffect(() => {
-        if (officer?.user_name) {
+        if (officer?.user_name && officer?.name) {
             setValue("userName", officer.user_name);
+            setValue("name", officer.name);
         }
     }, [officer, setValue]);
 
@@ -47,6 +49,7 @@ const ChangePassword = () => {
         if (!officer) return;
 
         const res = await changePassword({
+            name: data.name,
             userName: data.userName,
             oldPassword: data.oldPassword,
             newPassword: data.newPassword,
@@ -57,6 +60,7 @@ const ChangePassword = () => {
             const updatedOfficer = {
                 ...officer,
                 user_name: data.userName || officer.user_name,
+                name: data.name || officer.name,
             };
 
             await SecureStore.setItemAsync(
@@ -100,29 +104,53 @@ const ChangePassword = () => {
                 <View style={{
                     backgroundColor: '#f0f8ff',
                     borderRadius: 8,
-                    padding: 15,
+                    padding: 12,
                     marginBottom: 30,
                     borderWidth: 1,
                     borderColor: '#a0c4ff'
                 }}>
-                    <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 10, color: '#1e40af' }}>
-                        အသုံးပြုသူအမည် ပြောင်းမည်
-                    </Text>
-                    <Controller
-                        control={control}
-                        name="userName"
-                        render={({ field: { onChange, value } }) => (
-                            <AppTextInput
-                                label="အသုံးပြုသူအမည်"
-                                value={value}
-                                onChangeText={onChange}
-                                multiline={true}
+                    <View>
+                        <Text style={{ fontSize: 15, fontWeight: '700', marginBottom: 10, color: '#1e40af' }}>
+                            အမည် (သို့မဟုတ်) အသုံးပြုသူအမည် ပြောင်းမည်
+                        </Text>
+                        <View
+                            style={{ gap: 10 }}
+                        >
+                            <Controller
+                                control={control}
+                                name="name"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppTextInput
+                                        label="အမည်"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        multiline={true}
+                                    />
+                                )}
                             />
-                        )}
-                    />
-                    {errors.userName && (
-                        <Text style={{ color: 'red', marginTop: 5 }}>{errors.userName.message}</Text>
-                    )}
+                            {errors.userName && (
+                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.userName.message}</Text>
+                            )}
+
+                            <Controller
+                                control={control}
+                                name="userName"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppTextInput
+                                        label="အသုံးပြုသူအမည်"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        multiline={true}
+                                    />
+                                )}
+                            />
+                            {errors.userName && (
+                                <Text style={{ color: 'red', marginTop: 5 }}>{errors.userName.message}</Text>
+                            )}
+                        </View>
+
+                    </View>
+
                 </View>
 
                 {/* Password Change Section */}
@@ -133,7 +161,7 @@ const ChangePassword = () => {
                     borderWidth: 1,
                     borderColor: '#ff7f7f'
                 }}>
-                    <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 15, color: '#b91c1c' }}>
+                    <Text style={{ fontSize: 15, fontWeight: '700', marginBottom: 15, color: '#b91c1c' }}>
                         စကားဝှက်ပြောင်းမည်
                     </Text>
 

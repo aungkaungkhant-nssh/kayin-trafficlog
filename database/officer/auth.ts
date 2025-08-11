@@ -99,7 +99,7 @@ export async function loginOfficer({ user_name, password }: { user_name: string,
     }
 }
 
-export async function changePassword({ oldPassword, newPassword, userName, officerId }: { oldPassword: string, newPassword: string, officerId: number, userName: string }) {
+export async function changePassword({ oldPassword, newPassword, userName, officerId, name }: { oldPassword: string, newPassword: string, officerId: number, userName: string, name: string }) {
     try {
         const db = await getDatabase();
 
@@ -131,6 +131,11 @@ export async function changePassword({ oldPassword, newPassword, userName, offic
         if (userName) {
             updateFields.push("user_name = ?");
             params.push(userName);
+        }
+
+        if (userName) {
+            updateFields.push("name = ?");
+            params.push(name);
         }
 
         updateFields.push("updated_at = datetime('now')");
