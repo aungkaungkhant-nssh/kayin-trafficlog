@@ -48,7 +48,6 @@ const Login = () => {
         };
 
         const res = await loginOfficer(trimmedData);
-        console.log(res)
         if (!res.success) {
             setError("root", {
                 type: "manual",

@@ -61,6 +61,15 @@ export default function HomeScreen() {
           <Text style={styles.buttonText}>ထည့်သွင်းခြင်း</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity onPress={() => router.push("/(addition)/trashrecord")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
+          <Image
+            source={require('../../assets/images/trash-bin.png')}
+            style={styles.image}
+          />
+          <Text style={styles.buttonText}>ဖျတ်ခြင်း</Text>
+        </TouchableOpacity>
+
+
         <TouchableOpacity onPress={() => router.push("/(addition)/changepassword")} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
           <Image
             source={require('../../assets/images/changepassword.png')}
@@ -68,6 +77,7 @@ export default function HomeScreen() {
           />
           <Text style={styles.buttonText}>ပရိုဖိုင်ပြောင်းခြင်း</Text>
         </TouchableOpacity>
+
 
         <TouchableOpacity onPress={() => setLogoutVisible(true)} style={[styles.button, { backgroundColor: '#cce0ff' }]}>
           <Image

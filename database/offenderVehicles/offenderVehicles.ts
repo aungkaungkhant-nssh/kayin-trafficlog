@@ -299,6 +299,7 @@ export async function getDetailOffender(
 
 
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
+    console.log("ok")
     const db = await getDatabase();
     try {
 
@@ -1086,6 +1087,109 @@ export async function caseFilterWithDateData2(
         return results;
     } catch (error: any) {
         console.error('Error fetching case records:', error);
+        return { success: false, message: error.message };
+    }
+}
+
+export async function deleteFullCaseDataByDateRangeSmart(
+    startDate: string,
+    endDate: string,
+    exportType: ExportTypeEnum
+) {
+    const db = await getDatabase();
+    const params: any[] = [];
+    let dateFilter = '';
+
+    switch (exportType) {
+        case ExportTypeEnum.Filed:
+            dateFilter = `
+                vsr.action_date IS NOT NULL AND vsr.action_date <> '' 
+                AND vsr.case_number IS NOT NULL 
+                AND vsr.action_date BETWEEN ? AND ?
+            `;
+            params.push(startDate, endDate);
+            break;
+
+        case ExportTypeEnum.UnFiled:
+            dateFilter = `
+                (vsr.action_date IS NULL OR vsr.action_date = '') 
+                AND vsr.case_number IS NULL 
+                AND vsr.seized_date BETWEEN ? AND ?
+            `;
+            params.push(startDate, endDate);
+            break;
+
+        case ExportTypeEnum.All:
+        default:
+            dateFilter = `
+                (
+                    (vsr.action_date IS NOT NULL AND vsr.action_date <> '' AND vsr.action_date BETWEEN ? AND ?)
+                    OR
+                    ((vsr.action_date IS NULL OR vsr.action_date = '') AND vsr.seized_date BETWEEN ? AND ?)
+                )
+            `;
+            params.push(startDate, endDate, startDate, endDate);
+            break;
+    }
+
+    try {
+        // 1. Get vehicle_seizure_records for the target date range
+        const seizureRecords = await db.getAllAsync(
+            `SELECT vsr.id, vsr.offender_vehicles
+             FROM vehicle_seizure_records vsr
+             WHERE ${dateFilter}`,
+            params
+        ) as any;
+
+        if (seizureRecords.length === 0) {
+            return { success: true, message: 'No records to delete' };
+        }
+
+        // 2. Delete the vehicle_seizure_records in date range
+        const seizureRecordIds = seizureRecords.map((r: any) => r.id);
+        await db.runAsync(
+            `DELETE FROM vehicle_seizure_records 
+             WHERE id IN (${seizureRecordIds.map(() => '?').join(',')})`,
+            seizureRecordIds
+        );
+
+        // 3. Check and delete offender_vehicles that exist only in this date range
+        for (const record of seizureRecords) {
+            const offenderVehicleId = record.offender_vehicles;
+
+            // Check if this offender_vehicle exists outside the date range
+            const existsOutsideRange = await db.getFirstAsync(
+                `SELECT 1
+                 FROM vehicle_seizure_records vsr
+                 WHERE vsr.offender_vehicles = ?
+                 AND NOT (${dateFilter})
+                 LIMIT 1`,
+                [offenderVehicleId, ...params]
+            );
+
+            if (!existsOutsideRange) {
+                await db.runAsync(
+                    `DELETE FROM offender_vehicles WHERE id = ?`,
+                    [offenderVehicleId]
+                );
+            }
+        }
+
+        // 4. Delete orphan offenders (no offender_vehicle)
+        await db.runAsync(`
+            DELETE FROM offenders
+            WHERE id NOT IN (SELECT offender_id FROM offender_vehicles)
+        `);
+
+        // 5. Delete orphan vehicles (no offender_vehicle)
+        await db.runAsync(`
+            DELETE FROM vehicles
+            WHERE id NOT IN (SELECT vehicle_id FROM offender_vehicles)
+        `);
+
+        return { success: true };
+    } catch (error: any) {
+        console.error('Error deleting smart full case data:', error);
         return { success: false, message: error.message };
     }
 }
