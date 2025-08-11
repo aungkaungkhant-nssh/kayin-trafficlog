@@ -272,7 +272,6 @@ export async function getDetailOffender(
     ]) as any;
 
     const totalCount = countResult?.count || 0;
-    console.log("akk", totalCount)
 
     // Map data if needed
     const mappedData = data.map((record: any) => ({
@@ -299,7 +298,6 @@ export async function getDetailOffender(
 
 
 export async function storePunishment(data: AddPunishmentInfoSchemaType, officerId: number) {
-    console.log("ok")
     const db = await getDatabase();
     try {
 
@@ -631,6 +629,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
 
 export async function addPunishment(data: AddPunishmentSchemaType, item: any, officerId: number) {
+    console.log("work")
     const db = await getDatabase();
     let offenderVehicleId = item.offender_vehicle_id;
 

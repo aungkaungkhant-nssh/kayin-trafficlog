@@ -31,7 +31,7 @@ const AddPunishment = () => {
         setValue,
         trigger,
         getValues,
-        formState: { errors, isSubmitting },
+        formState: { errors },
     } = useForm<AddPunishmentInfoSchemaType>({
         resolver: zodResolver(addPunishmentInfoSchema),
         mode: "onChange",

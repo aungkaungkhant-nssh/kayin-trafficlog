@@ -12,7 +12,7 @@ export default function HomeScreen() {
   const handleLogout = async (exit = false) => {
     setLogoutVisible(false);
     const res = await logoutOfficer();
-    console.log(res)
+
     if (res.success) {
       if (exit) {
         if (Platform.OS === 'android') {

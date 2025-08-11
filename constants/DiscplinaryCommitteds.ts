@@ -4,11 +4,11 @@ const DisciplinaryCommitted = [
         committed: [
             {
                 title: "ခါးပတ်မပါ",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             },
             {
                 title: "မောင်းမပါ",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             }
         ]
     },
@@ -18,23 +18,23 @@ const DisciplinaryCommitted = [
         committed: [
             {
                 title: "ယာဉ်ကြောပိတ်ဆို့",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             },
             {
                 title: "ဖြူ/နီ ကြားရပ်",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             },
             {
                 title: "ဝှီးတက်မပါ",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             },
             {
                 title: "စပါယ်ယာမပါ",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             },
             {
                 title: "ကပ်စင်တင်",
-                fineAmount: "၃၀၀၀၀",
+                fineAmount: "30000",
             }
         ]
     },
@@ -44,11 +44,11 @@ const DisciplinaryCommitted = [
         committed: [
             {
                 title: "သတ်မှတ်မမောင်း",
-                fineAmount: "၁၀၀၀၀၀",
+                fineAmount: "100000",
             },
             {
                 title: "မောင်းမရှိ",
-                fineAmount: "၁၀၀၀၀၀",
+                fineAmount: "100000",
             },
         ]
     }

@@ -108,6 +108,7 @@ const DisciplinaryInput = ({ control, watch, setValue, errors, getValues }: Cont
                                 label="ဒဏ်ငွေ"
                                 value={value}
                                 onChangeText={onChange}
+                                keyboardType='numeric'
                             />
                         )}
                     />

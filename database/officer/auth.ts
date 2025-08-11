@@ -90,8 +90,6 @@ export async function loginOfficer({ user_name, password }: { user_name: string,
 
         if (!result) return { success: false, error: "အမည် သို့မဟုတ် စကားဝှက်မှားနေသည်" };
         delete result.password;
-        await SecureStore.setItemAsync('officerSession', JSON.stringify(result));
-
         return { success: true, user: result };
     } catch (err: any) {
         console.log(err);
