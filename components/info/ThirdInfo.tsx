@@ -111,6 +111,7 @@ const ThirdInfo = ({ control, setCurrentInfo, setValue, watch, errors, setIsConf
                         }
                     }}
                     loading={false}
+                    mode={"outlined"}
                 />
             </View>
 

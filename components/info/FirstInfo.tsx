@@ -109,6 +109,7 @@ const FirstInfo = ({ control, watch, trigger, setCurrentInfo, errors, setValue }
                             setCurrentInfo(2);
                         }
                     }}
+                    mode='outlined'
                     loading={false}
                 />
             </View>

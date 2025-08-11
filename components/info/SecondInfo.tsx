@@ -125,6 +125,7 @@ const SecondInfo = ({ control, watch, setCurrentInfo, trigger, errors }: InfoPro
                             setCurrentInfo(3);
                         }
                     }}
+                    mode={"outlined"}
                     loading={false}
                 />
             </View>

@@ -1,12 +1,12 @@
 import { Entypo } from '@expo/vector-icons';
 import React from 'react';
-import { ActivityIndicator, GestureResponderEvent, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, GestureResponderEvent, Pressable, StyleSheet, Text, View } from 'react-native';
 import { IconProps } from 'react-native-paper/lib/typescript/components/MaterialCommunityIcon';
 
 interface AppButtonProps {
   onPress: (event: GestureResponderEvent) => void;
   label: string;
-  icon?: string | ((props: IconProps) => React.ReactNode); // Supports string name or custom component
+  icon?: string | ((props: IconProps) => React.ReactNode);
   disabled?: boolean;
   loading?: boolean;
   mode?: "contained" | "outlined";
@@ -14,6 +14,7 @@ interface AppButtonProps {
 }
 
 const PRIMARY_COLOR = '#000080';
+const PRESSED_COLOR = '#0000cc';
 
 const AppButton: React.FC<AppButtonProps> = ({
   onPress,
@@ -26,40 +27,46 @@ const AppButton: React.FC<AppButtonProps> = ({
 }) => {
   const isOutlined = mode === "outlined";
 
-  const backgroundColor = isOutlined ? 'transparent' : PRIMARY_COLOR;
-  const borderColor = isOutlined ? 'gray' : PRIMARY_COLOR;
-  const textColor = isOutlined ? 'gray' : '#fff';
+  const borderColor = PRIMARY_COLOR;
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       disabled={disabled || loading}
-      style={[
+      style={({ pressed }) => [
         styles.button,
-        { backgroundColor, borderColor },
+        {
+          backgroundColor: isOutlined
+            ? (pressed ? PRIMARY_COLOR : 'transparent')
+            : (pressed ? PRESSED_COLOR : PRIMARY_COLOR),
+          borderColor,
+          opacity: disabled ? 0.5 : 1,
+        },
         fullWidth && { width: '100%' },
-        disabled && { opacity: 0.5 },
       ]}
-      activeOpacity={0.8}
     >
-      {loading ? (
-        <ActivityIndicator color={textColor} />
-      ) : (
-        <View style={styles.content}>
-          {icon && typeof icon === 'string' && (
-            <Entypo name={icon as any} size={18} color={textColor} style={{ marginRight: 8 }} />
-          )}
-          {icon && typeof icon === 'function' && icon({
-            size: 18, color: textColor,
-            name: undefined,
-            direction: 'ltr',
-          })}
-          <Text style={[styles.label, { color: textColor }]}>
-            {label}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
+      {({ pressed }) => {
+        const textColor = pressed ? '#fff' : (isOutlined ? PRIMARY_COLOR : '#fff');
+
+        return loading ? (
+          <ActivityIndicator color={textColor} />
+        ) : (
+          <View style={styles.content}>
+            {icon && typeof icon === 'string' && (
+              <Entypo name={icon as any} size={18} color={textColor} style={{ marginRight: 8 }} />
+            )}
+            {icon && typeof icon === 'function' && icon({
+              size: 18, color: textColor,
+              name: undefined,
+              direction: 'ltr',
+            })}
+            <Text style={[styles.label, { color: textColor }]}>
+              {label}
+            </Text>
+          </View>
+        );
+      }}
+    </Pressable>
   )
 }
 
@@ -81,6 +88,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 6
   },
-})
+});
 
 export default AppButton;
