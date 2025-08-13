@@ -65,7 +65,7 @@ export default function HomeScreen() {
             source={require('../../assets/images/trash-bin.png')}
             style={styles.image}
           />
-          <Text style={styles.buttonText}>ဖျတ်ခြင်း</Text>
+          <Text style={styles.buttonText}>မှတ်တမ်းဟောင်းများ ဖယ်ထုတ်ခြင်း</Text>
         </TouchableOpacity>
 
 

@@ -629,7 +629,6 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
 
 export async function addPunishment(data: AddPunishmentSchemaType, item: any, officerId: number) {
-    console.log("work")
     const db = await getDatabase();
     let offenderVehicleId = item.offender_vehicle_id;
 
@@ -1524,6 +1523,23 @@ export async function importJsonData(data: any[]) {
     } catch (err) {
         return { success: false, error: err instanceof Error ? err.message : err };
     }
+}
+
+
+export async function getSeizureYearsBeforeTargetYear(targetYear: number) {
+    const database = await getDatabase();
+
+    const rows = await database.getAllAsync<{ year: number }>(
+        `
+      SELECT DISTINCT CAST(strftime('%Y', seized_date) AS INTEGER) AS year
+      FROM vehicle_seizure_records
+      WHERE CAST(strftime('%Y', seized_date) AS INTEGER) <= ?
+      ORDER BY year DESC
+      `,
+        [targetYear]
+    );
+
+    return rows.map(r => r.year);
 }
 
 

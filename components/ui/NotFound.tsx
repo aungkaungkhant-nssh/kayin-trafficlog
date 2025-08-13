@@ -1,19 +1,27 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-const NotFound = () => {
+type NotFoundProps = {
+    emoji?: string;
+    title?: string;
+    subtitle?: string;
+};
+
+export default function NotFound({
+    emoji = '🔍',
+    title = 'မှတ်တမ်းများ မတွေ့ရှိပါ',
+    subtitle = 'စစ်ထုတ်မှုများကို ပြင်ဆင်ကြည့်ပါ၊ သို့မဟုတ် နောက်မှ ထပ်စစ်ကြည့်ပါ။',
+}: NotFoundProps) {
     return (
         <View style={styles.notFoundContainer}>
-            <Text style={styles.notFoundEmoji}>🔍</Text>
-            <Text style={styles.notFoundTitle}>မှတ်တမ်းများ မတွေ့ရှိပါ</Text>
-            <Text style={styles.notFoundSubtitle}>
-                စစ်ထုတ်မှုများကို ပြင်ဆင်ကြည့်ပါ၊ သို့မဟုတ် နောက်မှ ထပ်စစ်ကြည့်ပါ။
-            </Text>
+            <Text style={styles.notFoundEmoji}>{emoji}</Text>
+            <Text style={styles.notFoundTitle}>{title}</Text>
+            <Text style={styles.notFoundSubtitle}>{subtitle}</Text>
         </View>
-    )
+    );
 }
 
-export default NotFound;
+
 
 const styles = StyleSheet.create({
     notFoundContainer: {

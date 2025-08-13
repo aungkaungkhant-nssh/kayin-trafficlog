@@ -14,7 +14,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Text, View } from 'react-native';
 
 const ChangePassword = () => {
-    const { officer, loading, setOfficer } = useSession();
+    const { officer, setOfficer } = useSession();
 
     const router = useRouter();
     const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
@@ -218,11 +218,23 @@ const ChangePassword = () => {
 
                 </View>
 
-                <View style={{ marginTop: 20 }}>
+                <View style={{
+                    marginTop: 20,
+                    flexDirection: "row",
+                    justifyContent: "space-between"
+                }}>
+                    <AppButton
+                        label='နောက်သို့'
+                        onPress={() => router.push("/(tabs)")}
+                        loading={false}
+                        mode={"outlined"}
+
+                    />
                     <AppButton
                         label="အတည်ပြုမည်။"
                         onPress={handleSubmit(onSubmit)}
                         loading={isSubmitting}
+                        mode={"outlined"}
                     />
                 </View>
             </View>

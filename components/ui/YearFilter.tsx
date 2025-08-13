@@ -3,7 +3,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type YearFilterProps = {
     years: number[];
-    selectedYear: number;
+    selectedYear?: number | null;
     onSelectYear: (year: number) => void;
 };
 
@@ -21,7 +21,7 @@ const YearFilter: React.FC<YearFilterProps> = ({
                         styles.button,
                         selectedYear === year && styles.selectedButton,
                     ]}
-                    onPress={() => onSelectYear(year)}
+                    onPress={() => year && onSelectYear(year)}
                 >
                     <Text
                         style={[
@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         justifyContent: "space-around",
-        marginVertical: 16,
+
     },
     button: {
         borderWidth: 1,
