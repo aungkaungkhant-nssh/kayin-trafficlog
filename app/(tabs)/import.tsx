@@ -16,6 +16,8 @@ import {
 } from 'react-native';
 
 const Import = () => {
+    const year = new Date().getFullYear() - 4;
+    const [isExpire, setIsExpire] = useState(false)
     const [state, setState] = useState({
         isLoading: false,
         isSuccess: false,
@@ -29,14 +31,29 @@ const Import = () => {
             type: 'application/json',
             copyToCacheDirectory: true,
             multiple: false,
-        });
+        }) as any;
+        const jsonData = await getJsonData([result.assets[0]]);
+        if (jsonData?.length) {
+            const hasExpireYear = jsonData.some(item => {
+                if (!item.seized_date) return false;
+                const itemYear = new Date(item.seized_date).getFullYear();
+                return itemYear <= year;
+            });
+            if (hasExpireYear) {
+                setIsExpire(true)
+                return;
+            }
 
-        if (!result.canceled && result.assets?.length) {
-            setState(prev => ({
-                ...prev,
-                selectedFiles: [...prev.selectedFiles, result.assets[0]],
-            }));
+
+            if (!result.canceled && result.assets?.length) {
+                setState(prev => ({
+                    ...prev,
+                    selectedFiles: [...prev.selectedFiles, result.assets[0]],
+                }));
+            }
         }
+
+
     };
 
     const handleRemoveFile = (uri: string) => {
@@ -82,6 +99,19 @@ const Import = () => {
                     setState(prev => ({ ...prev, isSuccess: false }));
                 }}
                 message="ဒေတာဖိုင်ထည့်ခြင်း အောင်မြင်ပါသည်။"
+                confirmText="မူလ စာမျက်နှာ"
+                cancelText="ပိတ်မည်"
+                icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}
+            />
+
+            <AlertModal
+                visible={isExpire}
+                onCancel={() => setIsExpire(false)}
+                onConfirm={() => {
+                    router.push("/(tabs)");
+                    setIsExpire(false);
+                }}
+                message="(၄)နှစ်အတွင်း ‌မှတ်တမ်းများသာ ထည့်သွင်းခွင့်ရှိပါမည်။"
                 confirmText="မူလ စာမျက်နှာ"
                 cancelText="ပိတ်မည်"
                 icon={<MaterialIcons name="check-circle" size={70} color="#4CAF50" />}

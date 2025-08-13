@@ -27,7 +27,7 @@ const TrashRecord = () => {
     const handleRemove = async () => {
         if (selectedYear) {
             setLoading(true)
-            const startDate = format(new Date(selectedYear, 0, 1), 'yyyy-MM-dd');  // Jan 1
+            const startDate = format(new Date(selectedYear, 0, 1), 'yyyy-MM-dd');
             const endDate = format(new Date(selectedYear, 11, 31), 'yyyy-MM-dd');
             const updatedTrashYear = trashYears.filter((year) => year !== selectedYear);
             const data = await caseFilterWithDateData2(startDate, endDate, '', ExportTypeEnum.All) as any;
@@ -58,7 +58,7 @@ const TrashRecord = () => {
                     setModalVisible(false);
                     handleRemove()
                 }}
-                message="မှတ်တမ်းများ  ဖယ်ထုတ်ရန် သေချာပါသလား။?"
+                message={`(${selectedYear})မှတ်တမ်းများ ဖယ်ထုတ်ရန် သေချာပါသလား။`}
                 confirmText='သေချာပါသည်။'
                 cancelText='မလုပ်တော့ပါ။'
                 icon={<Ionicons name="shield-checkmark" size={70} color="#4CAF50" />}
@@ -94,16 +94,12 @@ const TrashRecord = () => {
                             <Divider />
                             <View style={styles.instructionWrap}>
                                 <Text style={styles.instructionText}>
-                                    ရွေးချယ်ထားသောနှစ်မှ ဖယ်ထုတ်မည့် မှတ်တမ်းဟောင်းများကို
+                                    မှတ်တမ်းဟောင်းများအား
                                     <Text style={styles.highlight}> Excel ဖိုင် </Text>
                                     ဖြင့် သိမ်းဆည်းပေးပါမည်။
                                 </Text>
                                 <Text style={styles.instructionText}>
-                                    မှတ်တမ်းဟောင်းများဖယ်ထုတ်ခြင်းလုပ်ငန်း
-                                    ဆောင်ရွက်ပြီးလျှင် အဆိုပါမှတ်တမ်းများ
-                                    <Text style={styles.warningHighlight}>
-                                        ပြန်လည်ရယူခြင်းအား ဆောင်ရွက်နိုင်မည် မဟုတ်ပါ။
-                                    </Text>
+                                    ဖယ်ထုတ်ပြီးသော မှတ်တမ်းဟောင်းများကို ဆော့ဖ်ဝဲ အတွင်းသို ပြန်လည်သွင်း၍ ရမည် မဟုတ်ပါ။
                                 </Text>
                             </View>
                             <Divider />
@@ -126,9 +122,6 @@ const TrashRecord = () => {
                                     mode={"outlined"}
 
                                 />
-                                {/* <TouchableOpacity style={styles.removeButton} onPress={ }>
-                                    <Text style={styles.removeButtonText}>ဖယ်ထုတ်မည်။</Text>
-                                </TouchableOpacity> */}
                             </View>
 
                         </View>
