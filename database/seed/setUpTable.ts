@@ -22,42 +22,42 @@ export async function setUpTable() {
         `);
 
 
-    // 1. disciplinary_articles
-    await database.execAsync(`
-          PRAGMA journal_mode = WAL;
-          CREATE TABLE IF NOT EXISTS disciplinary_articles (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            number TEXT UNIQUE NOT NULL,
-            created_at TEXT DEFAULT (datetime('now')),
-            updated_at TEXT DEFAULT (datetime('now'))
-          );
-        `);
+    // // 1. disciplinary_articles
+    // await database.execAsync(`
+    //       PRAGMA journal_mode = WAL;
+    //       CREATE TABLE IF NOT EXISTS disciplinary_articles (
+    //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         number TEXT UNIQUE NOT NULL,
+    //         created_at TEXT DEFAULT (datetime('now')),
+    //         updated_at TEXT DEFAULT (datetime('now'))
+    //       );
+    //     `);
 
-    // // 2. committed_offenses
-    await database.execAsync(`
-          PRAGMA journal_mode = WAL;
-          CREATE TABLE IF NOT EXISTS committed_offenses (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            created_at TEXT DEFAULT (datetime('now')),
-            updated_at TEXT DEFAULT (datetime('now'))
-          );
-        `);
+    // // // 2. committed_offenses
+    // await database.execAsync(`
+    //       PRAGMA journal_mode = WAL;
+    //       CREATE TABLE IF NOT EXISTS committed_offenses (
+    //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         name TEXT NOT NULL,
+    //         created_at TEXT DEFAULT (datetime('now')),
+    //         updated_at TEXT DEFAULT (datetime('now'))
+    //       );
+    //     `);
 
-    // // 3. disciplinary_committed
-    await database.execAsync(`
-          PRAGMA journal_mode = WAL;
-          CREATE TABLE IF NOT EXISTS disciplinary_committed (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            disciplinary_articles_id INTEGER NOT NULL,
-            committed_offenses_id INTEGER NOT NULL,
-            fine_amount REAL NOT NULL,
-            created_at TEXT DEFAULT (datetime('now')),
-            updated_at TEXT DEFAULT (datetime('now')),
-            FOREIGN KEY (disciplinary_articles_id) REFERENCES disciplinary_articles(id),
-            FOREIGN KEY (committed_offenses_id) REFERENCES committed_offenses(id)
-          );
-        `);
+    // // // 3. disciplinary_committed
+    // await database.execAsync(`
+    //       PRAGMA journal_mode = WAL;
+    //       CREATE TABLE IF NOT EXISTS disciplinary_committed (
+    //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         disciplinary_articles_id INTEGER NOT NULL,
+    //         committed_offenses_id INTEGER NOT NULL,
+    //         fine_amount REAL NOT NULL,
+    //         created_at TEXT DEFAULT (datetime('now')),
+    //         updated_at TEXT DEFAULT (datetime('now')),
+    //         FOREIGN KEY (disciplinary_articles_id) REFERENCES disciplinary_articles(id),
+    //         FOREIGN KEY (committed_offenses_id) REFERENCES committed_offenses(id)
+    //       );
+    //     `);
 
     // 4. offenders
     await database.execAsync(`
@@ -116,15 +116,15 @@ export async function setUpTable() {
         `);
 
     // // 8. seizedItems
-    await database.execAsync(`
-          PRAGMA journal_mode = WAL;
-          CREATE TABLE IF NOT EXISTS seized_items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            created_at TEXT DEFAULT (datetime('now')),
-            updated_at TEXT DEFAULT (datetime('now'))
-          );
-        `);
+    // await database.execAsync(`
+    //       PRAGMA journal_mode = WAL;
+    //       CREATE TABLE IF NOT EXISTS seized_items (
+    //         id INTEGER PRIMARY KEY AUTOINCREMENT,
+    //         name TEXT NOT NULL,
+    //         created_at TEXT DEFAULT (datetime('now')),
+    //         updated_at TEXT DEFAULT (datetime('now'))
+    //       );
+    //     `);
 
 
     // // 10. vehicleSeizureRecords
@@ -133,20 +133,19 @@ export async function setUpTable() {
           CREATE TABLE IF NOT EXISTS vehicle_seizure_records (
             id INTEGER PRIMARY KEY,
             offender_vehicles INTEGER NOT NULL,
-            disciplinary_committed_id INTEGER NOT NULL,
+            disciplinary_articles TEXT NOT NULL,
+            committed_offenses TEXT NOT NULL,
             officer_id INTEGER NOT NULL,
             seized_date TEXT NOT NULL,
             seizure_location TEXT NOT NULL,
             fine_amount REAL NOT NULL,
             action_date TEXT,
             case_number INTEGER,
-            seized_item INTEGER NOT NULL,
+            seized_item TEXT NOT NULL,
             created_at TEXT DEFAULT (datetime('now')),
             updated_at TEXT DEFAULT (datetime('now')),
             FOREIGN KEY (offender_vehicles) REFERENCES offender_vehicles(id),
-            FOREIGN KEY (disciplinary_committed_id) REFERENCES disciplinary_committed(id),
-            FOREIGN KEY (officer_id) REFERENCES officers(id),
-            FOREIGN KEY (seized_item) REFERENCES seized_items(id)
+            FOREIGN KEY (officer_id) REFERENCES officers(id)
           );
         `);
 

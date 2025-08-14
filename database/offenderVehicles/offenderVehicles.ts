@@ -224,25 +224,13 @@ export async function getDetailOffender(
         vehicle_seizure_records.seized_date,
         vehicle_seizure_records.seizure_location,
         vehicle_seizure_records.fine_amount,
-        vehicle_seizure_records.case_number,
+        vehicle_seizure_records.disciplinary_articles,
+        vehicle_seizure_records.committed_offenses,
+        vehicle_seizure_records.seized_item,
         vehicle_seizure_records.action_date,
-        seized_items.name AS seized_item_name,
-        disciplinary_committed.id AS disciplinary_committed_id,
-        disciplinary_articles.id AS article_id,
-        disciplinary_articles.number AS article_number,
-        committed_offenses.id AS offense_id,
-        committed_offenses.name AS offense_name,
         officers.id AS officer_id,
         officers.name AS officer_name
       FROM vehicle_seizure_records
-      LEFT JOIN seized_items 
-        ON vehicle_seizure_records.seized_item = seized_items.id
-      LEFT JOIN disciplinary_committed 
-        ON vehicle_seizure_records.disciplinary_committed_id = disciplinary_committed.id
-      LEFT JOIN disciplinary_articles 
-        ON disciplinary_committed.disciplinary_articles_id = disciplinary_articles.id
-      LEFT JOIN committed_offenses 
-        ON disciplinary_committed.committed_offenses_id = committed_offenses.id
       LEFT JOIN officers 
         ON vehicle_seizure_records.officer_id = officers.id
       WHERE vehicle_seizure_records.offender_vehicles = ?
@@ -273,6 +261,8 @@ export async function getDetailOffender(
 
     const totalCount = countResult?.count || 0;
 
+    const c = await db.getAllAsync("select * from vehicle_seizure_records;")
+
     // Map data if needed
     const mappedData = data.map((record: any) => ({
         seizure_id: record.seizure_id,
@@ -280,13 +270,12 @@ export async function getDetailOffender(
         action_date: record.action_date,
         seizure_location: record.seizure_location,
         case_number: record.case_number,
-        seizedItem_label: record.seized_item_name,
-        disciplinary_committed_id: record.disciplinary_committed_id,
+        seizedItem_label: record.seized_item,
+        // disciplinary_committed_id: record.disciplinary_committed_id,
         fine_amount: record.fine_amount,
-        article_id: record.article_id,
-        article_number: record.article_number,
+        article_number: record.disciplinary_articles,
         offense_id: record.offense_id,
-        offense_name: record.offense_name,
+        offense_name: record.committed_offenses,
         officer_id: record.officer_id,
         officer_name: record.officer_name,
     }));
@@ -315,14 +304,13 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
             vehicle_types,
             wheel_tax,
             vehicle_license_number,
-            committed_id,
+            article_label,
+            committed_label,
             seized_date,
             seizure_location,
             fine_amount,
-            seizedItem_id,
+            seizedItem_label,
         } = data;
-        const committedIdInt = parseInt(committed_id, 10);
-        const seizedItemIdInt = parseInt(seizedItem_id, 10);
         const vehicleCategoriesInt = parseInt(vehicle_categories_id, 10);
 
         const baseId = Date.now() + Math.floor(Math.random() * 1000);
@@ -332,8 +320,6 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         const newSeizureRecordId = baseId + 3;
 
         if (
-            isNaN(committedIdInt) ||
-            isNaN(seizedItemIdInt) ||
             isNaN(vehicleCategoriesInt)
         ) {
             throw new Error(
@@ -341,28 +327,28 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
             );
         }
 
-        const committedRow = await db.getFirstAsync(
-            `SELECT id FROM disciplinary_committed WHERE id = ?`,
-            [committedIdInt]
-        ) as any;
-        if (!committedRow)
-            throw new Error(`committed_id ${committedIdInt} does not exist.`);
+        // const committedRow = await db.getFirstAsync(
+        //     `SELECT id FROM disciplinary_committed WHERE id = ?`,
+        //     [committedIdInt]
+        // ) as any;
+        // if (!committedRow)
+        //     throw new Error(`committed_id ${committedIdInt} does not exist.`);
 
-        if (committedRow?.fine_amount !== fine_amount) {
-            await db.runAsync(
-                `UPDATE disciplinary_committed 
-                 SET fine_amount = ? 
-                 WHERE id = ?`,
-                [fine_amount, committedIdInt]
-            );
-        }
+        // if (committedRow?.fine_amount !== fine_amount) {
+        //     await db.runAsync(
+        //         `UPDATE disciplinary_committed 
+        //          SET fine_amount = ? 
+        //          WHERE id = ?`,
+        //         [fine_amount, committedIdInt]
+        //     );
+        // }
 
-        const seizedItemRow = await db.getFirstAsync(
-            `SELECT id FROM seized_items WHERE id = ?`,
-            [seizedItemIdInt]
-        );
-        if (!seizedItemRow)
-            throw new Error(`seizedItem_id ${seizedItemIdInt} does not exist.`);
+        // const seizedItemRow = await db.getFirstAsync(
+        //     `SELECT id FROM seized_items WHERE id = ?`,
+        //     [seizedItemIdInt]
+        // );
+        // if (!seizedItemRow)
+        //     throw new Error(`seizedItem_id ${seizedItemIdInt} does not exist.`);
 
         const vehicleCategoryRow = await db.getFirstAsync(
             `SELECT id FROM vehicle_categories WHERE id = ?`,
@@ -421,20 +407,21 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
         await db.runAsync(
             `INSERT INTO vehicle_seizure_records (
             id,
-            offender_vehicles, disciplinary_committed_id, officer_id, seized_date,
+            offender_vehicles, disciplinary_articles, committed_offenses, officer_id, seized_date,
             seizure_location, fine_amount, action_date, case_number, seized_item
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)`,
             [
                 newSeizureRecordId,
                 offenderVehicleId,
-                committedIdInt,
+                article_label,
+                committed_label,
                 officerId,
                 seized_date,
                 sanitize(seizure_location),
                 fine_amount,
                 null,
                 null,
-                seizedItemIdInt,
+                seizedItem_label,
             ]
         );
         return { success: true };
@@ -629,19 +616,19 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
 
 export async function addPunishment(data: AddPunishmentSchemaType, item: any, officerId: number) {
+    console.log("work")
     const db = await getDatabase();
     let offenderVehicleId = item.offender_vehicle_id;
-
     const {
         seized_date,
         seizure_location,
-        committed_id,
+        article_label,
+        committed_label,
         fine_amount,
-        seizedItem_id,
+        seizedItem_label,
     } = data;
 
-    const committedIdInt = parseInt(committed_id, 10);
-    const seizedItemIdInt = parseInt(seizedItem_id, 10);
+
 
     //id generate
     const baseId = Date.now();
@@ -710,43 +697,45 @@ export async function addPunishment(data: AddPunishmentSchemaType, item: any, of
             }
 
 
-            const committedRow = await db.getFirstAsync(
-                `SELECT id FROM disciplinary_committed WHERE id = ?`,
-                [committedIdInt]
-            ) as any;
-            if (!committedRow)
-                throw new Error(`committed_id ${committedIdInt} does not exist.`);
+            // const committedRow = await db.getFirstAsync(
+            //     `SELECT id FROM disciplinary_committed WHERE id = ?`,
+            //     [committedIdInt]
+            // ) as any;
+            // if (!committedRow)
+            //     throw new Error(`committed_id ${committedIdInt} does not exist.`);
 
-            if (committedRow?.fine_amount !== fine_amount) {
-                await db.runAsync(
-                    `UPDATE disciplinary_committed 
-                     SET fine_amount = ? 
-                     WHERE id = ?`,
-                    [fine_amount, committedIdInt]
-                );
-            }
+            // if (committedRow?.fine_amount !== fine_amount) {
+            //     await db.runAsync(
+            //         `UPDATE disciplinary_committed 
+            //          SET fine_amount = ? 
+            //          WHERE id = ?`,
+            //         [fine_amount, committedIdInt]
+            //     );
+            // }
 
             // 2. Insert into vehicle_seizure_records
             await db.runAsync(
                 `INSERT INTO vehicle_seizure_records (
                     id,
                     offender_vehicles,
-                    disciplinary_committed_id,
+                    disciplinary_articles,
+                    committed_offenses,
                     officer_id,
                     seized_date,
                     seizure_location,
                     fine_amount,
                     seized_item
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
                     newSeizureRecordId,
                     offenderVehicleId,
-                    committedIdInt,
+                    article_label,
+                    committed_label,
                     officerId,
                     seized_date,
                     seizure_location,
                     fine_amount || 0,
-                    seizedItemIdInt
+                    seizedItem_label
                 ]
             );
 
@@ -823,20 +812,12 @@ export async function caseFilterWithDatePaginateData(
           v.vehicle_number,
           v.vehicle_license_number,
           v.vehicle_types,
-          da.number AS article_number,
-          dc.fine_amount AS fine_amount,
-          co.name AS offense_name,
-          of.name AS officer_name,
-          si.name AS seized_item_name
+          of.name AS officer_name
         FROM vehicle_seizure_records vsr
         LEFT JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
         LEFT JOIN offenders o ON ov.offender_id = o.id
         LEFT JOIN vehicles v ON ov.vehicle_id = v.id
-        LEFT JOIN disciplinary_committed dc ON vsr.disciplinary_committed_id = dc.id
-        LEFT JOIN disciplinary_articles da ON dc.disciplinary_articles_id = da.id
-        LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
         LEFT JOIN officers of ON vsr.officer_id = of.id
-        LEFT JOIN seized_items si ON vsr.seized_item = si.id
        WHERE (
             (vsr.action_date IS NOT NULL AND vsr.action_date <> '' AND vsr.action_date BETWEEN ? AND ?)
             OR
@@ -857,6 +838,7 @@ export async function caseFilterWithDatePaginateData(
                 offset,
             ]
         );
+        console.log(results)
         return results;
     } catch (error: any) {
         console.error('Error fetching case records:', error);
@@ -1044,37 +1026,26 @@ export async function caseFilterWithDateData2(
           v.created_at AS vehicle_created_at,
           v.updated_at AS vehicle_updated_at,
   
-          -- disciplinary_committed
-          dc.id AS disciplinary_committed_id,
-          dc.fine_amount,
-          dc.created_at AS dc_created_at,
-          dc.updated_at AS dc_updated_at,
+ 
   
           -- disciplinary_articles
-          da.id AS article_id,
-          da.number AS article_number,
+          vsr.disciplinary_articles AS article_number,
   
           -- committed_offenses
-          co.id AS offense_id,
-          co.name AS offense_name,
+          vsr.committed_offenses AS offense_name,
   
           -- officers
           of.id AS officer_id,
           of.name AS officer_name,
   
           -- seized_items
-          si.id AS seized_item_id,
-          si.name AS seized_item_name
+          vsr.seized_item AS seized_item_name
   
         FROM vehicle_seizure_records vsr
         LEFT JOIN offender_vehicles ov ON vsr.offender_vehicles = ov.id
         LEFT JOIN offenders o ON ov.offender_id = o.id
         LEFT JOIN vehicles v ON ov.vehicle_id = v.id
-        LEFT JOIN disciplinary_committed dc ON vsr.disciplinary_committed_id = dc.id
-        LEFT JOIN disciplinary_articles da ON dc.disciplinary_articles_id = da.id
-        LEFT JOIN committed_offenses co ON dc.committed_offenses_id = co.id
         LEFT JOIN officers of ON vsr.officer_id = of.id
-        LEFT JOIN seized_items si ON vsr.seized_item = si.id
   
         WHERE ${dateFilter}
         ORDER BY COALESCE(vsr.action_date, vsr.seized_date) DESC
@@ -1404,31 +1375,32 @@ export async function importJsonData(data: any[]) {
                         driver_license_number,
                         offender_address,
                         seizure_id,
-                        disciplinary_committed_id,
+                        offense_name,
+                        article_number,
                         officer_id,
                         seized_date,
                         seizure_location,
                         action_date,
                         case_number,
-                        seized_item_id,
+                        seized_item_name,
                         fine_amount
                     } = data;
 
-                    const committedRow = await db.getFirstAsync(
-                        `SELECT id FROM disciplinary_committed WHERE id = ?`,
-                        [disciplinary_committed_id]
-                    ) as any;
-                    if (!committedRow)
-                        throw new Error(`committed_id ${disciplinary_committed_id} does not exist.`);
+                    // const committedRow = await db.getFirstAsync(
+                    //     `SELECT id FROM disciplinary_committed WHERE id = ?`,
+                    //     [disciplinary_committed_id]
+                    // ) as any;
+                    // if (!committedRow)
+                    //     throw new Error(`committed_id ${disciplinary_committed_id} does not exist.`);
 
-                    if (committedRow?.fine_amount !== fine_amount) {
-                        await db.runAsync(
-                            `UPDATE disciplinary_committed 
-                             SET fine_amount = ? 
-                             WHERE id = ?`,
-                            [fine_amount, disciplinary_committed_id]
-                        );
-                    }
+                    // if (committedRow?.fine_amount !== fine_amount) {
+                    //     await db.runAsync(
+                    //         `UPDATE disciplinary_committed 
+                    //          SET fine_amount = ? 
+                    //          WHERE id = ?`,
+                    //         [fine_amount, disciplinary_committed_id]
+                    //     );
+                    // }
 
                     const offenderVehicle = await db.getFirstAsync(
                         `SELECT * FROM offender_vehicles WHERE id = ?`,
@@ -1497,19 +1469,21 @@ export async function importJsonData(data: any[]) {
 
                         await db.runAsync(
                             `INSERT INTO vehicle_seizure_records (
-                                id, offender_vehicles, disciplinary_committed_id,
+                                id, offender_vehicles, disciplinary_articles,
+                                committed_offenses,
                                 officer_id, seized_date, seizure_location,
                                 fine_amount, seized_item, case_number, action_date
-                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                             [
                                 seizure_id,
                                 offenderVehicleId,
-                                disciplinary_committed_id,
+                                article_number,
+                                offense_name,
                                 officer_id,
                                 seized_date,
                                 seizure_location,
                                 fine_amount,
-                                seized_item_id,
+                                seized_item_name,
                                 case_number,
                                 action_date
                             ]

@@ -8,8 +8,6 @@ import React, { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Modal, Portal, useTheme } from 'react-native-paper';
-import DisciplinaryInput from '../DisciplinaryInput';
-import SeizedInput from '../SeizedInput';
 import VehicleCategoriesInput from '../VehicleCategoriesInput';
 import AppButton from './AppButton';
 import AppTextInput from './AppTextInput';
@@ -44,12 +42,9 @@ const PunishmentFormModal = ({
         defaultValues: {
             seized_date: "",
             seizure_location: "",
-            article_id: "",
             article_label: "",
-            committed_id: "",
             committed_label: "",
             fine_amount: "",
-            seizedItem_id: "",
             seizedItem_label: "",
             vehicle_categories_id: "",
             vehicle_categories_label: "",
@@ -70,7 +65,9 @@ const PunishmentFormModal = ({
     }, [visible, item, setValue]);
 
     const onSubmit = async (data: AddPunishmentSchemaType) => {
+        console.log(data)
         try {
+
             const res = await addPunishment(data, item, officer.id);
             if (res.success) {
                 onConfirm();
@@ -142,7 +139,7 @@ const PunishmentFormModal = ({
                         )}
                     </View>
 
-                    <DisciplinaryInput
+                    {/* <DisciplinaryInput
                         control={control}
                         watch={watch}
                         setValue={setValue}
@@ -154,7 +151,81 @@ const PunishmentFormModal = ({
                         watch={watch}
                         errors={errors}
                         setValue={setValue}
-                    />
+                    /> */}
+
+                    <View style={[styles.disciplinaryContainer, globalStyles.inputWrapper]}>
+                        <View style={{ flex: 3, marginRight: 5 }}>
+                            <Controller
+                                control={control}
+                                name="article_label"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppTextInput
+                                        label="ပုဒ်မ"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        multiline
+                                    />
+                                )}
+                            />
+                            {errors.article_label && (
+                                <Text style={globalStyles.errorText}>{errors.article_label.message}</Text>
+                            )}
+                        </View>
+
+                        <View style={{ flex: 6, marginHorizontal: 5 }}>
+                            <Controller
+                                control={control}
+                                name="committed_label"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppTextInput
+                                        label="ကျူးလွန်ပြစ်မှု"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        multiline
+                                    />
+                                )}
+                            />
+                            {errors.committed_label && (
+                                <Text style={globalStyles.errorText}>{errors.committed_label.message}</Text>
+                            )}
+                        </View>
+
+                        <View style={{ flex: 3, marginLeft: 5 }}>
+                            <Controller
+                                control={control}
+                                name="fine_amount"
+                                render={({ field: { onChange, value } }) => (
+                                    <AppTextInput
+                                        label="ဒဏ်ငွေ"
+                                        value={value}
+                                        onChangeText={onChange}
+                                        keyboardType="numeric"
+                                    />
+                                )}
+                            />
+                            {errors.fine_amount && (
+                                <Text style={globalStyles.errorText}>{errors.fine_amount.message}</Text>
+                            )}
+                        </View>
+                    </View>
+
+                    <View style={globalStyles.inputWrapper}>
+                        <Controller
+                            control={control}
+                            name="seizedItem_label"
+                            render={({ field: { onChange, value } }) => (
+                                <AppTextInput
+                                    label="သိမ်းဆည်းပစ္စည်း"
+                                    value={value}
+                                    onChangeText={onChange}
+                                    multiline
+                                />
+                            )}
+                        />
+                        {errors.seizedItem_label && (
+                            <Text style={globalStyles.errorText}>{errors.seizedItem_label.message}</Text>
+                        )}
+                    </View>
 
                     <View style={globalStyles.inputWrapper}>
                         <Controller
@@ -218,6 +289,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginBottom: 16,
         justifyContent: "space-between"
+    },
+    disciplinaryContainer: {
+        flexDirection: "row",
+        gap: 6
     }
 })
 

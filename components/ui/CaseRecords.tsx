@@ -56,7 +56,7 @@ const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
                         <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
                         <Text style={styles.label}>အရေးယူပုဒ်မ</Text>
                     </View>
-                    <Badge style={styles.disciplineBadge}>{`${item.article_number}/${item.offense_name}`}</Badge>
+                    <Badge style={styles.disciplineBadge}>{`${item.disciplinary_articles}/${item.committed_offenses}`}</Badge>
                 </View>
                 <View style={styles.row}>
                     <View style={styles.labelRow}>
@@ -89,7 +89,7 @@ const CaseRecords = ({ data, onEndReached, loading, hasMore }: PropsType) => {
                         <MaterialIcons name="info-outline" size={16} color="#555" style={styles.icon} />
                         <Text style={styles.label}>သိမ်းဆည်းပစ္စည်း</Text>
                     </View>
-                    <Text style={styles.value}>{item.seized_item_name}</Text>
+                    <Text style={styles.value}>{item.seized_item}</Text>
                 </View>
 
                 {

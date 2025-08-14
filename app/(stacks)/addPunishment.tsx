@@ -50,14 +50,11 @@ const AddPunishment = () => {
             vehicle_license_number: "",
             seized_date: "",
             seizure_location: "",
-            article_id: "",
             article_label: "",
-            committed_id: "",
             committed_label: "",
             fine_amount: "",
             address: "",
             driver_license_number: "",
-            seizedItem_id: "",
             seizedItem_label: ""
 
         }
