@@ -30,7 +30,7 @@ const Contact = () => {
                         </View>
                         <View style={styles.textContainer}>
                             <Text style={styles.label}>အီးမေးလ်ပို့ရန်</Text>
-                            <Text style={styles.phoneNumber}>ucsh@gmailcom</Text>
+                            <Text style={styles.phoneNumber}>ucshpaanstudentaffair@gmail.com</Text>
                         </View>
                     </View>
                 </View>

@@ -4,6 +4,7 @@ import { useSession } from "@/context/SessionContext";
 import { loginOfficer } from "@/database/officer/auth";
 import { loginSchema, LoginSchemaType } from "@/schema/login.schema";
 import globalStyles from "@/styles/globalStyles";
+import { Ionicons } from '@expo/vector-icons';
 import Entypo from "@expo/vector-icons/Entypo";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image } from "expo-image";
@@ -94,6 +95,14 @@ const Login = () => {
                             >
                                 <Entypo name="phone" size={20} color="#000080" />
                                 <Text style={styles.drawerLabel}>ဆက်သွယ်ရန်</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => router.push("/(addition)/usermanual")}
+                                style={styles.drawerItem}
+                                activeOpacity={0.7}
+                            >
+                                <Ionicons name="book-outline" size={32} color="#000080" />
+                                <Text style={styles.drawerLabel}>အသုံးပြုပုံ</Text>
                             </TouchableOpacity>
                         </View>
                     </Drawer.Section>
