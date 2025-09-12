@@ -25,6 +25,7 @@ const SearchResultCard = ({
     setSelectedData,
     router,
 }: Props) => {
+    console.log(item)
     return (
         <View style={styles.itemContainer}>
             <AlertModal
@@ -68,7 +69,7 @@ const SearchResultCard = ({
 
                 <View style={styles.infoRow}>
                     <Text style={styles.label}>ယာဉ်အမျိုးအစား -</Text>
-                    <Text style={styles.value}>{item.vehicle_types}</Text>
+                    <Text style={styles.value}>{item.vehicle_categories}</Text>
                 </View>
 
                 <View style={styles.infoRow}>

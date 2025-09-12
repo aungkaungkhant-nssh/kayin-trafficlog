@@ -4,12 +4,12 @@ const confirmLabels = [
     {
         id: 1,
         name: "seized_date",
-        label: "ဖမ်းဆည်းသည့်နေ့",
+        label: "ဖမ်းဆီးသည့်နေ့",
     },
     {
         id: 2,
         name: "seizure_location",
-        label: "ဖမ်းဆည်းသည့်နေရာ",
+        label: "ဖမ်းဆီးသည့်နေရာ",
         type: LabelTypeEnum.Record
     },
     {
@@ -50,7 +50,7 @@ const confirmLabels = [
     },
     {
         id: 9,
-        name: "vehicle_categories",
+        name: "vehicle_categories_label",
         label: "ယာဉ်အမျိုးအစား",
         type: LabelTypeEnum.Vehicle
     },

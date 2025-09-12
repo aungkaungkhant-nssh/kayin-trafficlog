@@ -12,7 +12,7 @@ interface CalendarInputProps {
 export default function CalendarInput({ 
     value, 
     onChange,
-    label = "ဖမ်းဆည်းသည့်နေ့",
+    label = "ဖမ်းဆီးသည့်နေ့",
 }: CalendarInputProps) {
     const [show, setShow] = useState(false);
 

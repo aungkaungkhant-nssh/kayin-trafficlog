@@ -127,7 +127,7 @@ const PunishmentFormModal = ({
                             name="seizure_location"
                             render={({ field: { onChange, value } }) => (
                                 <AppTextInput
-                                    label="ဖမ်းဆည်းသည့်နေရာ"
+                                    label="ဖမ်းဆီးသည့်နေရာ"
                                     value={value}
                                     onChangeText={onChange}
                                     multiline
