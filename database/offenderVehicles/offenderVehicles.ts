@@ -228,6 +228,7 @@ export async function getDetailOffender(
         vehicle_seizure_records.committed_offenses,
         vehicle_seizure_records.seized_item,
         vehicle_seizure_records.action_date,
+        vehicle_seizure_records.case_number,
         officers.id AS officer_id,
         officers.name AS officer_name
       FROM vehicle_seizure_records
@@ -265,6 +266,7 @@ export async function getDetailOffender(
 
     // Map data if needed
     const mappedData = data.map((record: any) => ({
+        offender_vehicle_id: record.offender_vehicle_id,
         seizure_id: record.seizure_id,
         seized_date: record.seized_date,
         action_date: record.action_date,
@@ -616,7 +618,7 @@ export async function storePunishment(data: AddPunishmentInfoSchemaType, officer
 
 
 export async function addPunishment(data: AddPunishmentSchemaType, item: any, officerId: number) {
-    console.log("work")
+
     const db = await getDatabase();
     let offenderVehicleId = item.offender_vehicle_id;
     const {
@@ -788,6 +790,111 @@ export async function addCase(data: AddCaseSchemaType, seizure_id: number) {
         return { success: false, message: error.message };
     }
 }
+
+export async function updateCollapseData(data: any, isChangeRecord: boolean = false) {
+    const db = await getDatabase();
+
+    const {
+        seizure_id,
+        offender_id,
+        vehicle_id,
+        name,
+        father_name,
+        address,
+        driver_license_number,
+        national_id_number,
+        vehicle_number,
+        vehicle_license_number,
+        vehicle_types,
+        vehicle_categories_id,
+        case_number,
+        action_date,
+        article_number,
+        offense_name,
+        officer_id,
+        seized_date,
+        seizure_location,
+        fine_amount,
+        seizedItem_label,
+    } = data;
+
+    try {
+        // 1️⃣ Update offender info
+        if (offender_id) {
+            await db.runAsync(
+                `
+          UPDATE offenders
+          SET 
+            name = COALESCE(?, name),
+            father_name = COALESCE(?, father_name),
+            address = COALESCE(?, address),
+            driver_license_number = COALESCE(?, driver_license_number),
+            national_id_number = COALESCE(?, national_id_number),
+            updated_at = datetime('now')
+          WHERE id = ?
+        `,
+                [name, father_name, address, driver_license_number, national_id_number, offender_id]
+            );
+        }
+
+        // 2️⃣ Update vehicle info
+        if (vehicle_id) {
+            await db.runAsync(
+                `
+          UPDATE vehicles
+          SET
+            vehicle_number = COALESCE(?, vehicle_number),
+            vehicle_license_number = COALESCE(?, vehicle_license_number),
+            vehicle_types = COALESCE(?, vehicle_types),
+            vehicle_categories_id = COALESCE(?, vehicle_categories_id),
+            updated_at = datetime('now')
+          WHERE id = ?
+        `,
+                [vehicle_number, vehicle_license_number, vehicle_types, vehicle_categories_id, vehicle_id]
+            );
+        }
+
+        // 3️⃣ Update vehicle_seizure_records if isChangeRecord is true
+        if (seizure_id && isChangeRecord) {
+            await db.runAsync(
+                `
+                UPDATE vehicle_seizure_records
+                SET 
+                  disciplinary_articles = COALESCE(?, disciplinary_articles),
+                  committed_offenses = COALESCE(?, committed_offenses),
+                  officer_id = COALESCE(?, officer_id),
+                  seized_date = COALESCE(?, seized_date),
+                  seizure_location = COALESCE(?, seizure_location),
+                  fine_amount = COALESCE(?, fine_amount),
+                  action_date = COALESCE(?, action_date),
+                  case_number = COALESCE(?, case_number),
+                  seized_item = COALESCE(?, seized_item),
+                  updated_at = datetime('now')
+                WHERE id = ?
+              `,
+                [
+                    article_number,
+                    offense_name,
+                    officer_id,
+                    seized_date,
+                    seizure_location,
+                    fine_amount,
+                    action_date,
+                    case_number ? parseInt(case_number as any) : null,
+                    seizedItem_label,
+                    seizure_id, // use seizure_id here instead of offender_vehicle_id
+                ]
+            );
+        }
+
+
+        return { success: true, message: 'Data updated successfully.' };
+    } catch (error: any) {
+        console.error('Error updating collapse data:', error);
+        return { success: false, message: error.message };
+    }
+}
+
 
 export async function caseFilterWithDatePaginateData(
     startDate: string,

@@ -50,6 +50,12 @@ const confirmLabels = [
     },
     {
         id: 9,
+        name: "vehicle_categories",
+        label: "ယာဉ်အမျိုးအစား",
+        type: LabelTypeEnum.Vehicle
+    },
+    {
+        id: 20,
         name: "vehicle_categories_label",
         label: "ယာဉ်အမျိုးအစား",
         type: LabelTypeEnum.Vehicle
@@ -88,6 +94,18 @@ const confirmLabels = [
         id: 15,
         name: "fine_amount",
         label: "ဒဏ်ငွေ",
+        type: LabelTypeEnum.Record
+    },
+    {
+        id: 16,
+        name: "case_number",
+        label: "တရားစွဲအမှတ်",
+        type: LabelTypeEnum.Record
+    },
+    {
+        id: 17,
+        name: "action_date",
+        label: "လုပ်ဆောင်သည့်ရက်စွဲ",
         type: LabelTypeEnum.Record
     }
 ]

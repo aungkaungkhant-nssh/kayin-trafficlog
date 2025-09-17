@@ -13,6 +13,7 @@ import * as SecureStore from 'expo-secure-store';
 import React, { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+    BackHandler,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -103,6 +104,15 @@ const Login = () => {
                             >
                                 <Ionicons name="book-outline" size={32} color="#000080" />
                                 <Text style={styles.drawerLabel}>အသုံးပြုပုံ</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => BackHandler.exitApp()}
+                                style={styles.drawerItem}
+                                activeOpacity={0.7}
+                            >
+                                {/* Changed icon to log-out */}
+                                <Ionicons name="log-out-outline" size={32} color="#000080" />
+                                <Text style={styles.drawerLabel}>ထွက်မည်။</Text>
                             </TouchableOpacity>
                         </View>
                     </Drawer.Section>

@@ -25,7 +25,6 @@ const SearchResultCard = ({
     setSelectedData,
     router,
 }: Props) => {
-    console.log(item)
     return (
         <View style={styles.itemContainer}>
             <AlertModal

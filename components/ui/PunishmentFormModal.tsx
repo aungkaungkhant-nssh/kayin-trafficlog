@@ -65,7 +65,6 @@ const PunishmentFormModal = ({
     }, [visible, item, setValue]);
 
     const onSubmit = async (data: AddPunishmentSchemaType) => {
-        console.log(data)
         try {
 
             const res = await addPunishment(data, item, officer.id);
