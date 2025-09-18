@@ -945,7 +945,6 @@ export async function caseFilterWithDatePaginateData(
                 offset,
             ]
         );
-        console.log(results)
         return results;
     } catch (error: any) {
         console.error('Error fetching case records:', error);

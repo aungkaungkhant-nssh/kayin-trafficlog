@@ -17,7 +17,6 @@ export const SessionProvider = ({ children }: { children: React.ReactNode }) => 
         (async () => {
             try {
                 const session = await SecureStore.getItemAsync('officerSession');
-                console.log("main session", session)
                 if (session) {
                     setOfficer(JSON.parse(session));
                 }

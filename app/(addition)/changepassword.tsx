@@ -15,7 +15,6 @@ import { Text, View } from 'react-native';
 
 const ChangePassword = () => {
     const { officer, setOfficer } = useSession();
-
     const router = useRouter();
     const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
     const {
